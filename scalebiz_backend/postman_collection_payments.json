@@ -1,0 +1,343 @@
+{
+    "info": {
+        "_postman_id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+        "name": "Payment APIs",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "_collection_link": "https://www.postman.com/collections/a1b2c3d4-e5f6-7890-1234-567890abcdef"
+    },
+    "item": [
+        {
+            "name": "bKash Payments",
+            "item": [
+                {
+                    "name": "Create bKash Payment",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Host",
+                                "value": "your-store-domain.com"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"amount\": 100,\n    \"orderId\": \"ORDER-{{$randomInt}}\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{SERVER_URL}}/api/payment/bkash/create-payment",
+                            "host": [
+                                "{{SERVER_URL}}"
+                            ],
+                            "path": [
+                                "api",
+                                "payment",
+                                "bkash",
+                                "create-payment"
+                            ]
+                        },
+                        "description": "Initiates a bKash payment. Returns a bKash URL to redirect the user to."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Execute bKash Payment",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Host",
+                                "value": "your-store-domain.com"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"paymentID\": \"{{paymentID_from_create_response}}\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{SERVER_URL}}/api/payment/bkash/execute-payment",
+                            "host": [
+                                "{{SERVER_URL}}"
+                            ],
+                            "path": [
+                                "api",
+                                "payment",
+                                "bkash",
+                                "execute-payment"
+                            ]
+                        },
+                        "description": "Executes a bKash payment after user authorization. Use the paymentID obtained from the create-payment response."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "bKash Callback (Dummy)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{SERVER_URL}}/api/payment/bkash/callback",
+                            "host": [
+                                "{{SERVER_URL}}"
+                            ],
+                            "path": [
+                                "api",
+                                "payment",
+                                "bkash",
+                                "callback"
+                            ]
+                        },
+                        "description": "Dummy callback URL for bKash. Not typically called directly by the client."
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Nagad Payments",
+            "item": [
+                {
+                    "name": "Create Nagad Payment",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Host",
+                                "value": "your-store-domain.com"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"amount\": 50,\n    \"orderId\": \"ORDER-{{$randomInt}}\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{SERVER_URL}}/api/payment/nagad/create-payment",
+                            "host": [
+                                "{{SERVER_URL}}"
+                            ],
+                            "path": [
+                                "api",
+                                "payment",
+                                "nagad",
+                                "create-payment"
+                            ]
+                        },
+                        "description": "Initiates a Nagad payment. Returns a Nagad URL to redirect the user to."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Verify Nagad Payment",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Host",
+                                "value": "your-store-domain.com"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"paymentRefId\": \"{{paymentRefId_from_nagad_callback}}\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{SERVER_URL}}/api/payment/nagad/verify-payment",
+                            "host": [
+                                "{{SERVER_URL}}"
+                            ],
+                            "path": [
+                                "api",
+                                "payment",
+                                "nagad",
+                                "verify-payment"
+                            ]
+                        },
+                        "description": "Verifies a Nagad payment using the paymentRefId obtained from the Nagad callback."
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "SSLCommerz Payments",
+            "item": [
+                {
+                    "name": "Initialize SSLCommerz Payment",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Host",
+                                "value": "your-store-domain.com"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"amount\": 200,\n    \"customerName\": \"John Doe\",\n    \"customerEmail\": \"john.doe@example.com\",\n    \"customerPhone\": \"01711111111\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{SERVER_URL}}/api/payment/init",
+                            "host": [
+                                "{{SERVER_URL}}"
+                            ],
+                            "path": [
+                                "api",
+                                "payment",
+                                "init"
+                            ]
+                        },
+                        "description": "Initializes an SSLCommerz payment session. Returns a gateway URL to redirect the user to."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "SSLCommerz Success Callback",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "{{SERVER_URL}}/api/payment/success?transactionId={{transactionId}}",
+                            "host": [
+                                "{{SERVER_URL}}"
+                            ],
+                            "path": [
+                                "api",
+                                "payment",
+                                "success"
+                            ],
+                            "query": [
+                                {
+                                    "key": "transactionId",
+                                    "value": "{{transactionId}}",
+                                    "description": "Transaction ID from the initial payment request"
+                                }
+                            ]
+                        },
+                        "description": "Callback URL for successful SSLCommerz payments. This is typically called by SSLCommerz after a successful transaction."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "SSLCommerz Fail Callback",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "{{SERVER_URL}}/api/payment/fail?transactionId={{transactionId}}",
+                            "host": [
+                                "{{SERVER_URL}}"
+                            ],
+                            "path": [
+                                "api",
+                                "payment",
+                                "fail"
+                            ],
+                            "query": [
+                                {
+                                    "key": "transactionId",
+                                    "value": "{{transactionId}}",
+                                    "description": "Transaction ID from the initial payment request"
+                                }
+                            ]
+                        },
+                        "description": "Callback URL for failed SSLCommerz payments."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "SSLCommerz Cancel Callback",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "{{SERVER_URL}}/api/payment/cancel",
+                            "host": [
+                                "{{SERVER_URL}}"
+                            ],
+                            "path": [
+                                "api",
+                                "payment",
+                                "cancel"
+                            ]
+                        },
+                        "description": "Callback URL for cancelled SSLCommerz payments."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "SSLCommerz IPN (Instant Payment Notification)",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "{{SERVER_URL}}/api/payment/ipn",
+                            "host": [
+                                "{{SERVER_URL}}"
+                            ],
+                            "path": [
+                                "api",
+                                "payment",
+                                "ipn"
+                            ]
+                        },
+                        "description": "IPN URL for SSLCommerz. This is a server-to-server notification for payment status updates."
+                    },
+                    "response": []
+                }
+            ]
+        }
+    ],
+    "event": [
+        {
+            "listen": "prerequest",
+            "script": {
+                "type": "text/javascript",
+                "exec": [
+                    ""
+                ]
+            }
+        },
+        {
+            "listen": "test",
+            "script": {
+                "type": "text/javascript",
+                "exec": [
+                    ""
+                ]
+            }
+        }
+    ],
+    "variable": [
+        {
+            "key": "SERVER_URL",
+            "value": "http://localhost:5000",
+            "type": "string",
+            "description": "The base URL of your backend server"
+        },
+        {
+            "key": "CLIENT_URL",
+            "value": "http://localhost:3000",
+            "type": "string",
+            "description": "The base URL of your frontend client"
+        }
+    ]
+}

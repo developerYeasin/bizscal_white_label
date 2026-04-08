@@ -1,0 +1,144 @@
+{
+    "info": {
+        "_postman_id": "YOUR_POSTMAN_COLLECTION_ID",
+        "name": "Courier Integration APIs",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Create Order",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"type\": \"steadfast\",\n    \"payload\": {\n        \"invoice\": \"12366\",\n        \"recipient_name\": \"John Smith\",\n        \"recipient_phone\": \"01234567890\",\n        \"recipient_address\": \"Fla# A1, House# 17/1, Road# 3/A, Dhanmondi, Dhaka-1209\",\n        \"cod_amount\": 1060,\n        \"note\": \"Deliver within 3 PM\",\n        \"item_description\": \"Books\",\n        \"total_lot\": 1,\n        \"delivery_type\": 0\n    }\n}"
+                },
+                "url": {
+                    "raw": "{{base_url}}/courier/orders",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "courier",
+                        "orders"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Bulk Order Create",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"type\": \"steadfast\",\n    \"payload\": [\n        {\n            \"invoice\": \"bulk-1\",\n            \"recipient_name\": \"Jane Doe\",\n            \"recipient_address\": \"House 1, Road 1, Gulshan, Dhaka\",\n            \"recipient_phone\": \"01700000001\",\n            \"cod_amount\": 500,\n            \"note\": \"Fragile\"\n        },\n        {\n            \"invoice\": \"bulk-2\",\n            \"recipient_name\": \"Peter Pan\",\n            \"recipient_address\": \"Flat B2, Street 5, Mirpur, Dhaka\",\n            \"recipient_phone\": \"01700000002\",\n            \"cod_amount\": 750,\n            \"note\": \"Call before delivery\"\n        }\n    ]\n}"
+                },
+                "url": {
+                    "raw": "{{base_url}}/courier/orders/bulk",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "courier",
+                        "orders",
+                        "bulk"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Check Customer Status by Number",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{base_url}}/courier/status/:customerNumber",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "courier",
+                        "status",
+                        ":customerNumber"
+                    ],
+                    "variable": [
+                        {
+                            "key": "customerNumber",
+                            "value": "01234567890"
+                        }
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Bulk Update Order Status",
+            "request": {
+                "method": "PUT",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"updates\": [\n        {\n            \"order_id\": 1,\n            \"status\": \"shipped\"\n        },\n        {\n            \"order_id\": 2,\n            \"status\": \"delivered\"\n        }\n    ]\n}"
+                },
+                "url": {
+                    "raw": "{{base_url}}/courier/orders/bulk-status",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "courier",
+                        "orders",
+                        "bulk-status"
+                    ]
+                }
+            },
+            "response": []
+        }
+    ],
+    "event": [
+        {
+            "listen": "prerequest",
+            "script": {
+                "type": "text/javascript",
+                "exec": [
+                    ""
+                ]
+            }
+        },
+        {
+            "listen": "test",
+            "script": {
+                "type": "text/javascript",
+                "exec": [
+                    ""
+                ]
+            }
+        }
+    ],
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://localhost:3000/api/v1",
+            "type": "string"
+        }
+    ]
+}

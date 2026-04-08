@@ -1,0 +1,114 @@
+/* Page Builder Styles */
+
+/* Dot grid background for canvas */
+.canvas-grid-bg {
+  background-color: #f8f9fa;
+  background-image: radial-gradient(circle, #cbd5e1 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Block hover and selection effects */
+.block-renderer {
+  transition: all 0.15s ease-in-out;
+}
+
+.block-renderer:hover {
+  border-color: hsl(var(--primary) / 0.5);
+}
+
+.block-renderer.selected {
+  border-color: hsl(var(--primary));
+  box-shadow: 0 0 0 3px hsl(var(--primary) / 0.1);
+}
+
+/* Drag overlay styling */
+.drag-overlay {
+  opacity: 0.9;
+  transform: rotate(3deg);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+}
+
+/* Smooth panel transitions */
+.panel-transition {
+  transition: width 0.3s ease, opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* Component palette card hover */
+.component-palette .card {
+  transition: all 0.15s ease;
+}
+
+.component-palette .card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Properties panel custom scrollbar */
+.properties-panel ::-webkit-scrollbar {
+  width: 6px;
+}
+
+.properties-panel ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.properties-panel ::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 3px;
+}
+
+.properties-panel ::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.5);
+}
+
+/* Toolbar button active states */
+.toolbar-button {
+  transition: all 0.15s ease;
+}
+
+/* Animation for new block appearance */
+@keyframes blockInsert {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.block-animate-in {
+  animation: blockInsert 0.2s ease-out;
+}
+
+/* Focus styles for accessibility */
+.block-renderer:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+}
+
+/* Container block dashed border when empty */
+.container-empty {
+  border: 2px dashed hsl(var(--muted-foreground) / 0.3);
+  border-radius: 0.5rem;
+}
+
+/* Depth indicator styling */
+.depth-indicator {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: hsl(var(--primary) / 0.6);
+}
+
+/* Badge for item count */
+.item-count-badge {
+  font-size: 0.625rem;
+  padding: 0 4px;
+  height: 16px;
+  line-height: 16px;
+  border-radius: 999px;
+}

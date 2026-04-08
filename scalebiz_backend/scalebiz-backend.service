@@ -1,0 +1,19 @@
+[Unit]
+Description=ScaleBiz Backend API
+After=network.target mysql.service
+Wants=mysql.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/bizscal_white_label/scalebiz_backend
+Environment=NODE_ENV=production
+EnvironmentFile=/root/bizscal_white_label/scalebiz_backend/.env
+ExecStart=/usr/bin/node server.js
+Restart=on-failure
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

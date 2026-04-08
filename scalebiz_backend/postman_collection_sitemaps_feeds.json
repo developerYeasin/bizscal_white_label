@@ -1,0 +1,90 @@
+{
+  "info": {
+    "_postman_id": "a_new_unique_id_for_sitemaps_feeds",
+    "name": "Sitemaps and Feeds API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_collection_id": "a_new_unique_id_for_sitemaps_feeds"
+  },
+  "item": [
+    {
+      "name": "Google Sitemap for Store",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3001/api/v1/stores/:storeId/sitemap.xml",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3001",
+          "path": [
+            "api",
+            "v1",
+            "stores",
+            ":storeId",
+            "sitemap.xml"
+          ],
+          "variable": [
+            {
+              "key": "storeId",
+              "value": "123640",
+              "description": "Replace with an actual store ID"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Facebook Product Feed for Store",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3001/api/v1/stores/:storeId/facebook-feed.xml",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3001",
+          "path": [
+            "api",
+            "v1",
+            "stores",
+            ":storeId",
+            "facebook-feed.xml"
+          ],
+          "variable": [
+            {
+              "key": "storeId",
+              "value": "123640",
+              "description": "Replace with an actual store ID"
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,653 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Removed @import "react-inner-image-zoom/dist/index.css"; from here */
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --textprimary: 210 40% 98%;
+    
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+
+    --radius: 0.5rem;
+
+    /* Swiper Overrides */
+    --swiper-navigation-color: #000000; /* Black arrows */
+    --swiper-pagination-color: #000000; /* Black active dot */
+    --swiper-navigation-size: 16px; /* Arrow size */
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Dynamic Theme Variables */
+    --dynamic-primary-color: 0 0% 0%; /* Default black */
+    --dynamic-secondary-color: 0 0% 100%; /* Default white */
+    --dynamic-accent-color: 0 0% 0%;
+    --dynamic-text-color: 0 0% 0%;
+    --dynamic-announcement-bg: 0 0% 0%;
+    --dynamic-announcement-text: 0 0% 100%;
+
+    /* New: Gradient for Marketing Banner */
+    --marketing-banner-gradient-start: #ff8c00; /* Orange */
+    --marketing-banner-gradient-end: #ff4500; /* Red-Orange */
+
+    /* Not Found Page Colors */
+    --not-found-background: #6a0dad; /* Vibrant purple */
+    --not-found-link: #00bfff; /* Bright blue */
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Dynamic Theme Variables for Dark Mode (adjust as needed) */
+    --dynamic-primary-color: 0 0% 100%; /* Default white */
+    --dynamic-secondary-color: 0 0% 0%; /* Default black */
+    --dynamic-accent-color: 0 0% 100%;
+    --dynamic-text-color: 0 0% 100%;
+    --dynamic-announcement-bg: 0 0% 100%;
+    --dynamic-announcement-text: 0 0% 0%;
+
+    /* Not Found Page Colors for Dark Mode */
+    --not-found-background: #4a007f; /* Darker purple for dark mode */
+    --not-found-link: #00ffff; /* Brighter blue for dark mode */
+  }
+}
+
+@layer base {
+  html {
+    overflow-y: auto; /* Explicitly enable vertical scrolling when content overflows */
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: "Inter", sans-serif; /* Use Inter font */
+    /* Removed overflow: hidden; */
+    background-color: #f9fafb; /* Specific background for 404 page */
+  }
+
+  /* Remove all scroll-locking overrides from globals.css */
+  /* body[data-scroll-locked],
+  body.with-scroll-bars-hidden,
+  body.right-scroll-bar-position,
+  body.width-before-scroll-bar {
+    overflow: hidden !important;
+    overscroll-behavior: unset !important;
+    position: static !important;
+    padding-left: 0 !important;
+    padding-top: 0 !important;
+    padding-right: 0 !important;
+    margin-left: 0 !important;
+    margin-top: 0 !important;
+    margin-right: 0 !important;
+    --removed-body-scroll-bar-size: 0px !important;
+  } */
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--dynamic-heading-font), sans-serif;
+  }
+
+  /* Custom Swiper Navigation Buttons */
+  .swiper-button-next,
+  .swiper-button-prev {
+    background-color: white !important; /* White background */
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 50%;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    color: black !important; /* Black arrows */
+  }
+
+  .swiper-button-next:hover,
+  .swiper-button-prev:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Custom Swiper Pagination Dots */
+  .swiper-pagination-bullet {
+    width: 9px !important;
+    height: 9px !important;
+    background-color: var(
+      --dynamic-primary-color
+    ) !important; /* Use dynamic primary color for dots */
+    opacity: 0.3;
+    transition: all 0.3s ease;
+  }
+
+  .swiper-pagination-bullet-active {
+    opacity: 1 !important;
+  }
+
+  /* Swiper pagination position for HeroSlider */
+  .swiper-pagination-horizontal.swiper-pagination-bullets {
+    left: 20px !important; /* Adjust as needed to match image */
+    right: auto !important;
+    width: auto !important;
+    bottom: 20px !important; /* Adjust as needed */
+  }
+
+  /* Custom Swiper Navigation Buttons for Product Image Slider Modal */
+  .swiper-button-prev-custom,
+  .swiper-button-next-custom {
+    background-color: transparent !important; /* Transparent background */
+    width: 48px !important; /* Larger buttons */
+    height: 48px !important;
+    border-radius: 50%;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    color: white !important; /* White arrows */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .swiper-button-prev-custom:hover,
+  .swiper-button-next-custom:hover {
+    background-color: rgba(
+      255,
+      255,
+      255,
+      0.2
+    ) !important; /* Subtle white background on hover */
+    color: white !important; /* Keep white on hover */
+  }
+
+  /* Swiper pagination for the modal */
+  .swiper-pagination-bullets.swiper-pagination-horizontal {
+    bottom: 20px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: auto !important;
+  }
+
+  .swiper-pagination-bullet {
+    background-color: white !important; /* White dots */
+    opacity: 0.5;
+  }
+
+  .swiper-pagination-bullet-active {
+    opacity: 1 !important;
+    background-color: white !important; /* White dot when active */
+  }
+
+  /* Swiper Zoom styles */
+  .swiper-zoom-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* New: Pulse Scale Animation */
+  @keyframes pulse-scale {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.02); /* Slightly less aggressive pulse */
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  .animate-pulse-scale {
+    animation: pulse-scale 2s infinite;
+  }
+
+  /* New: Floating animations for Nirvana Hero Section */
+  @keyframes float-one {
+    0% {
+      transform: translate(0, 0);
+    }
+    50% {
+      transform: translate(10px, -10px);
+    }
+    100% {
+      transform: translate(0, 0);
+    }
+  }
+
+  @keyframes float-two {
+    0% {
+      transform: translate(0, 0);
+    }
+    50% {
+      transform: translate(-10px, 10px);
+    }
+    100% {
+      transform: translate(0, 0);
+    }
+  }
+
+  .animate-float-one {
+    animation: float-one 4s ease-in-out infinite;
+  }
+
+  .animate-float-two {
+    animation: float-two 4s ease-in-out infinite 0.5s; /* Slightly delayed */
+  }
+
+  /* New: Slow pulse for background elements */
+  @keyframes pulse-slow {
+    0% {
+      transform: scale(1);
+      opacity: 0.5;
+    }
+    50% {
+      transform: scale(1.1);
+      opacity: 0.7;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 0.5;
+    }
+  }
+
+  .animate-pulse-slow {
+    animation: pulse-slow 6s ease-in-out infinite;
+  }
+
+  /* New: Morph animation for ProductHeroSectionOne background shape */
+  @keyframes morph {
+    0% {
+      border-radius: 45% 55% 70% 30% / 30% 30% 70% 70%;
+    }
+    50% {
+      border-radius: 30% 70% 30% 70% / 70% 45% 55% 30%;
+    }
+    100% {
+      border-radius: 45% 55% 70% 30% / 30% 30% 70% 70%;
+    }
+  }
+
+  .animate-morph {
+    animation: morph 8s ease-in-out infinite;
+  }
+
+  /* New: Generic float animation for NotFoundIllustration */
+  @keyframes float {
+    0% {
+      transform: translateY(0px);
+      opacity: 0.7;
+    }
+    50% {
+      transform: translateY(-20px);
+      opacity: 0.3;
+    }
+    100% {
+      transform: translateY(0px);
+      opacity: 0.7;
+    }
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  /* New 404 Page Specific Animations */
+  @keyframes shake {
+    0%,
+    100% {
+      transform: translate(0, 0) rotate(0);
+    }
+    10%,
+    30%,
+    50%,
+    70%,
+    90% {
+      transform: translate(-1px, 1px) rotate(-0.5deg);
+    }
+    20%,
+    40%,
+    60%,
+    80% {
+      transform: translate(1px, -1px) rotate(0.5deg);
+    }
+  }
+
+  @keyframes glitch {
+    2%,
+    64% {
+      transform: translate(2px, 0) skew(0deg);
+    }
+    4%,
+    60% {
+      transform: translate(-2px, 0) skew(0deg);
+    }
+    62% {
+      transform: translate(0, 0) skew(5deg);
+    }
+  }
+
+  @keyframes man-confused {
+    0%,
+    100% {
+      transform: translateY(0) rotate(0);
+    }
+    50% {
+      transform: translateY(-5px) rotate(3deg);
+    }
+  }
+
+  @keyframes woman-tilt {
+    0%,
+    100% {
+      transform: rotate(0);
+    }
+    50% {
+      transform: rotate(-8deg);
+    }
+  }
+
+  @keyframes robot-appear {
+    from {
+      transform: translateY(150px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes robot-shrug {
+    0%,
+    100% {
+      transform: rotate(0);
+    }
+    50% {
+      transform: rotate(15deg);
+    }
+  }
+
+  @keyframes robot-eye-scan {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    40% {
+      transform: translateX(3px);
+    }
+    80% {
+      transform: translateX(-3px);
+    }
+  }
+
+  @keyframes antenna-blink {
+    0%,
+    48%,
+    52%,
+    100% {
+      fill: #facc15;
+    }
+    50% {
+      fill: #f59e0b;
+    }
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes plant-droop {
+    0%,
+    100% {
+      transform: rotate(0);
+    }
+    50% {
+      transform: rotate(-10deg);
+    }
+  }
+
+  @keyframes show-error-icon {
+    0%,
+    40% {
+      opacity: 0;
+    }
+    50%,
+    100% {
+      opacity: 1;
+    }
+  }
+  @keyframes hide-loader-icon {
+    0%,
+    40% {
+      opacity: 1;
+    }
+    50%,
+    100% {
+      opacity: 0;
+    }
+  }
+
+  /* Applying Animations */
+  #browser-window {
+    animation: shake 0.8s cubic-bezier(0.36, 0.07, 0.19, 0.97) 0.5s both;
+  }
+
+  #text-404 {
+    animation: glitch 1s linear 1.2s infinite;
+  }
+
+  #man-head {
+    transform-origin: bottom center;
+    animation: man-confused 2s ease-in-out 1.5s infinite;
+  }
+
+  #woman-head {
+    transform-origin: bottom center;
+    animation: woman-tilt 2.5s ease-in-out 1.8s infinite;
+  }
+
+  #robot {
+    animation: robot-appear 1s ease-out 2.5s both;
+  }
+
+  #robot-arm-left,
+  #robot-arm-right {
+    transform-origin: top center;
+    animation: robot-shrug 1.5s ease-in-out 3.5s infinite;
+  }
+  #robot-arm-right {
+    animation-direction: reverse;
+  }
+
+  #robot-eye-left-pupil,
+  #robot-eye-right-pupil {
+    animation: robot-eye-scan 3s ease-in-out infinite;
+  }
+  #robot-eye-right-pupil {
+    animation-delay: 0.2s;
+  }
+
+  #antenna-light {
+    animation: antenna-blink 2s linear infinite;
+  }
+
+  #home-button {
+    animation: fadeIn 0.5s ease-out 4.5s both;
+  }
+
+  #plant {
+    transform-origin: bottom center;
+    animation: plant-droop 3s ease-in-out 2s infinite;
+  }
+
+  .question-mark {
+    font-size: 50px;
+    font-weight: bold;
+    fill: #d1d5db;
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .question-mark:nth-of-type(2) {
+    animation-delay: -2s;
+  }
+  .question-mark:nth-of-type(3) {
+    animation-delay: -4s;
+  }
+
+  .laptop-loader {
+    animation: hide-loader-icon 4s forwards;
+    animation-delay: 1s;
+  }
+  .laptop-error {
+    animation: show-error-icon 4s forwards;
+    animation-delay: 1s;
+  }
+
+  /* Custom Sidebar Animations */
+  @keyframes slide-in-from-right-full {
+    from {
+      transform: translateX(100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes slide-out-to-right-full {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(100%);
+    }
+  }
+
+  .animate-in.slide-in-from-right-full {
+    animation: slide-in-from-right-full 0.3s ease-out forwards;
+  }
+
+  .animate-out.slide-out-to-right-full {
+    animation: slide-out-to-right-full 0.3s ease-in forwards;
+  }
+}
+
+.marketing-banner-gradient {
+  background-image: linear-gradient(
+    to right,
+    var(--marketing-banner-gradient-start),
+    var(--marketing-banner-gradient-end)
+  );
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(
+      -50%
+    ); /* Scrolls half the content width to loop seamlessly */
+  }
+}
+
+.animate-marquee {
+  animation: marquee 12s linear infinite; /* Adjusted duration to 12s for slower speed */
+  width: max-content; /* Ensure it takes up the full width of its content for seamless loop */
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused; /* Pause on hover */
+}
+
+/* 
+=======================================
+announcement bar
+======================================
+*/
+/* Removed hardcoded styles for .announcement-bar */

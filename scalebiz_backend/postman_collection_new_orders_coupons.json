@@ -1,0 +1,482 @@
+{
+  "info": {
+    "_postman_id": "generated-id-for-new-collection",
+    "name": "Scalebiz Orders & Coupons API (New)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Customer Orders & Coupons",
+      "item": [
+        {
+          "name": "Create Order (Customer)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customer_jwt_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"customer_email\": \"customer@example.com\",\n    \"customer_phone\": \"+1234567890\",\n    \"shipping_address\": {\n        \"address\": \"123 Main St\",\n        \"city\": \"Anytown\",\n        \"state\": \"CA\",\n        \"zip\": \"90210\",\n        \"country\": \"USA\"\n    },\n    \"billing_address\": {\n        \"address\": \"123 Main St\",\n        \"city\": \"Anytown\",\n        \"state\": \"CA\",\n        \"zip\": \"90210\",\n        \"country\": \"USA\"\n    },\n    \"shipping_method\": \"Standard Shipping\",\n    \"payment_method\": \"Credit Card\",\n    \"customer_notes\": \"Please deliver after 5 PM.\",\n    \"shipping_cost\": 5.00,\n    \"tax_amount\": 2.50,\n    \"discount_amount\": 1.00,\n    \"order_items\": [\n        {\n            \"product_id\": 1,\n            \"variants\": null,\n            \"quantity\": 2\n        },\n        {\n            \"product_id\": 2,\n            \"variants\": 101,\n            \"quantity\": 1\n        }\n    ],\n    \"customer_ip_address\": \"192.168.1.1\",\n    \"user_agent\": \"PostmanRuntime/7.29.0\",\n    \"utm_source\": \"google\",\n    \"coupon_code\": \"SUMMER20\",\n    \"cancellation_reason\": null,\n    \"shipping_tracking_number\": null,\n    \"fulfilled_at\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3001/api/v1/store/orders",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3001",
+              "path": [
+                "api",
+                "v1",
+                "store",
+                "orders"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Validate Coupon for Product (Public)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"code\": \"SUMMER25\",\n    \"product_ids\": [3, 4],\n    \"category_ids\": [1, 2]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3001/api/v1/store/coupons/validate",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3001",
+              "path": [
+                "api",
+                "v1",
+                "store",
+                "coupons",
+                "validate"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Owner Orders CRUD",
+      "item": [
+        {
+          "name": "Get All Store Orders (Paginated)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3001/api/v1/store/owner/orders?page=1&limit=10",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3001",
+              "path": [
+                "api",
+                "v1",
+                "store",
+                "owner",
+                "orders"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Store Order by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3001/api/v1/store/owner/orders/:order_id",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3001",
+              "path": [
+                "api",
+                "v1",
+                "store",
+                "owner",
+                "orders",
+                ":order_id"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Order (Owner)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_jwt_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"status\": \"confirmed\",\n    \"shipping_tracking_number\": \"TRACK12345\",\n    \"fulfilled_at\": \"2025-09-28T10:00:00Z\",\n    \"order_items\": [\n        {\n            \"product_id\": 1,\n            \"product_name_at_purchase\": \"Product A\",\n            \"sku_at_purchase\": \"SKU001\",\n            \"variants\": null,\n            \"quantity\": 1,\n            \"price_at_purchase\": 10.00,\n            \"line_item_total\": 10.00\n        },\n        {\n            \"product_id\": 2,\n            \"product_name_at_purchase\": \"Product B\",\n            \"sku_at_purchase\": \"SKU002\",\n            \"variants\": 101,\n            \"quantity\": 3,\n            \"price_at_purchase\": 15.00,\n            \"line_item_total\": 45.00\n        }\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3001/api/v1/store/owner/orders/:order_id",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3001",
+              "path": [
+                "api",
+                "v1",
+                "store",
+                "owner",
+                "orders",
+                ":order_id"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Order (Owner)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3001/api/v1/store/owner/orders/:order_id",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3001",
+              "path": [
+                "api",
+                "v1",
+                "store",
+                "owner",
+                "orders",
+                ":order_id"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Order Report (Owner)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3001/api/v1/owner/orders/report",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3001",
+              "path": [
+                "api",
+                "v1",
+                "owner",
+                "orders",
+                "report"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Owner Coupons CRUD",
+      "item": [
+        {
+          "name": "Create Coupon (Owner)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_jwt_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"code\": \"SUMMER25\",\n    \"discount_type\": \"percentage\",\n    \"discount_value\": 25,\n    \"minimum_spend\": 100,\n    \"usage_limit_per_coupon\": 50,\n    \"usage_limit_per_customer\": 1,\n    \"valid_from\": \"2025-09-28T00:00:00Z\",\n    \"valid_until\": \"2025-10-28T23:59:59Z\",\n    \"applies_to_products\": [],\n    \"applies_to_categories\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3001/api/v1/store/owner/coupons",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3001",
+              "path": [
+                "api",
+                "v1",
+                "store",
+                "owner",
+                "coupons"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Owner Product & Category Duplication",
+      "item": [
+        {
+          "name": "Duplicate Product as Draft (Owner)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3001/api/v1/owner/products/:product_id/duplicate",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3001",
+              "path": [
+                "api",
+                "v1",
+                "owner",
+                "products",
+                ":product_id",
+                "duplicate"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Duplicate Category as Draft (Owner)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3001/api/v1/owner/categories/:category_id/duplicate",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3001",
+              "path": [
+                "api",
+                "v1",
+                "owner",
+                "categories",
+                ":category_id",
+                "duplicate"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Owner User Management",
+      "item": [
+        {
+          "name": "Get All Owners (Paginated)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3001/api/v1/owner/users?page=1&limit=10",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3001",
+              "path": [
+                "api",
+                "v1",
+                "owner",
+                "users"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Owner by ID",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_jwt_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Updated Owner Name\",\n    \"email\": \"updated_owner@example.com\",\n    \"phone_number\": \"+1987654321\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3001/api/v1/owner/users/:owner_id",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3001",
+              "path": [
+                "api",
+                "v1",
+                "owner",
+                "users",
+                ":owner_id"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Owner by ID",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3001/api/v1/owner/users/:owner_id",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3001",
+              "path": [
+                "api",
+                "v1",
+                "owner",
+                "users",
+                ":owner_id"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

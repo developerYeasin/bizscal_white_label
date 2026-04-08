@@ -1,0 +1,318 @@
+{
+  "info": {
+    "_postman_id": "{{$guid}}",
+    "name": "Contact Submissions APIs",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "API endpoints for managing contact form submissions."
+  },
+  "item": [
+    {
+      "name": "Public Contact Submission",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"store_id\": 1,\n    \"full_name\": \"John Doe\",\n    \"email\": \"john.doe@example.com\",\n    \"phone\": \"123-456-7890\",\n    \"subject\": \"Inquiry about product A\",\n    \"order_number\": \"ORDER-12345\",\n    \"message\": \"I would like to know more about product A.\"\n}"
+        },
+        "url": {
+          "raw": "{{BASE_URL}}/contact-submissions",
+          "host": [
+            "{{BASE_URL}}"
+          ],
+          "path": [
+            "contact-submissions"
+          ]
+        },
+        "description": "Submit a new contact form (public access)"
+      }
+    },
+    {
+      "name": "Owner Contact Submissions",
+      "item": [
+        {
+          "name": "Get All Contact Submissions (Owner)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{OWNER_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/owner/contact-submissions?store_id=1",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "owner",
+                "contact-submissions"
+              ],
+              "query": [
+                {
+                  "key": "store_id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Get all contact submissions for a specific store (owner access)"
+          }
+        },
+        {
+          "name": "Get Contact Submission by ID (Owner)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{OWNER_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/owner/contact-submissions/1?store_id=1",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "owner",
+                "contact-submissions",
+                "1"
+              ],
+              "query": [
+                {
+                  "key": "store_id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Get a specific contact submission by ID for a store (owner access)"
+          }
+        },
+        {
+          "name": "Update Contact Submission Status (Owner)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{OWNER_TOKEN}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"status\": \"in-progress\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/owner/contact-submissions/1/status?store_id=1",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "owner",
+                "contact-submissions",
+                "1",
+                "status"
+              ],
+              "query": [
+                {
+                  "key": "store_id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Update the status of a contact submission (owner access)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin Contact Submissions",
+      "item": [
+        {
+          "name": "Create Contact Submission (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ADMIN_TOKEN}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"store_id\": 1,\n    \"full_name\": \"Jane Doe\",\n    \"email\": \"jane.doe@example.com\",\n    \"phone\": \"098-765-4321\",\n    \"subject\": \"Complaint about service\",\n    \"order_number\": \"ORDER-67890\",\n    \"message\": \"I am unhappy with the recent service.\",\n    \"status\": \"unread\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/admin/contact-submissions",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "admin",
+                "contact-submissions"
+              ]
+            },
+            "description": "Create a new contact submission (admin access)"
+          }
+        },
+        {
+          "name": "Get All Contact Submissions (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ADMIN_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/admin/contact-submissions",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "admin",
+                "contact-submissions"
+              ]
+            },
+            "description": "Get all contact submissions (admin access)"
+          }
+        },
+        {
+          "name": "Get Contact Submission by ID (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ADMIN_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/admin/contact-submissions/1",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "admin",
+                "contact-submissions",
+                "1"
+              ]
+            },
+            "description": "Get a specific contact submission by ID (admin access)"
+          }
+        },
+        {
+          "name": "Update Contact Submission (Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ADMIN_TOKEN}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"store_id\": 1,\n    \"full_name\": \"Jane Doe Updated\",\n    \"email\": \"jane.doe.updated@example.com\",\n    \"phone\": \"098-765-4321\",\n    \"subject\": \"Complaint about service updated\",\n    \"order_number\": \"ORDER-67890-UPDATED\",\n    \"message\": \"I am unhappy with the recent service. Please resolve this quickly.\",\n    \"status\": \"resolved\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/admin/contact-submissions/1",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "admin",
+                "contact-submissions",
+                "1"
+              ]
+            },
+            "description": "Update a contact submission (admin access)"
+          }
+        },
+        {
+          "name": "Delete Contact Submission (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ADMIN_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/admin/contact-submissions/1",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "admin",
+                "contact-submissions",
+                "1"
+              ]
+            },
+            "description": "Delete a contact submission (admin access)"
+          }
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "BASE_URL",
+      "value": "http://localhost:3000/api/v1",
+      "type": "string",
+      "description": "Base URL for your API"
+    },
+    {
+      "key": "OWNER_TOKEN",
+      "value": "",
+      "type": "string",
+      "description": "JWT token for an authenticated owner"
+    },
+    {
+      "key": "ADMIN_TOKEN",
+      "value": "",
+      "type": "string",
+      "description": "JWT token for an authenticated admin"
+    }
+  ]
+}

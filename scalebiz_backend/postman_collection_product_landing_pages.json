@@ -1,0 +1,513 @@
+{
+  "info": {
+    "_postman_id": "YOUR_POSTMAN_COLLECTION_ID",
+    "name": "Product Landing Pages & Templates",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Product Landing Pages",
+      "item": [
+        {
+          "name": "Create Product Landing Page (Admin/Owner)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"store_id\": 1,\n    \"product_id\": 1,\n    \"template_id\": 1,\n    \"page_title\": \"My Awesome Product Page\",\n    \"page_description\": \"This is a description for my awesome product landing page.\",\n    \"slug\": \"my-awesome-product-page\",\n    \"settings_json\": { \"hero_text\": \"Welcome!\", \"button_color\": \"blue\" },\n    \"is_active\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/product-landing-pages",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "product-landing-pages"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Product Landing Pages (Admin/Owner/Customer)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/product-landing-pages",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "product-landing-pages"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Product Landing Page by ID (Admin/Owner/Customer)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/product-landing-pages/{{product_landing_page_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "product-landing-pages",
+                "{{product_landing_page_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Product Landing Page by ID (Admin/Owner)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"page_title\": \"Updated Product Page Title\",\n    \"is_active\": 0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/product-landing-pages/{{product_landing_page_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "product-landing-pages",
+                "{{product_landing_page_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Product Landing Page by ID (Admin/Owner)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/product-landing-pages/{{product_landing_page_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "product-landing-pages",
+                "{{product_landing_page_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Public Product Landing Page by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/product-landing-pages/public/{{product_landing_page_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "product-landing-pages",
+                "public",
+                "{{product_landing_page_id}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Owner Product Landing Pages",
+      "item": [
+        {
+          "name": "Create Owner Product Landing Page",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"store_id\": 1,\n    \"product_id\": 1,\n    \"template_id\": 1,\n    \"page_title\": \"Owner's Product Page\",\n    \"page_description\": \"This is an owner's product landing page.\",\n    \"slug\": \"owner-product-page\",\n    \"settings_json\": { \"header_color\": \"red\" },\n    \"is_active\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/owner/product-landing-pages",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "owner",
+                "product-landing-pages"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Owner Product Landing Pages",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/owner/product-landing-pages",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "owner",
+                "product-landing-pages"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Owner Product Landing Page by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/owner/product-landing-pages/{{owner_product_landing_page_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "owner",
+                "product-landing-pages",
+                "{{owner_product_landing_page_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Owner Product Landing Page by ID",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"page_title\": \"Updated Owner Product Page Title\",\n    \"is_active\": 0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/owner/product-landing-pages/{{owner_product_landing_page_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "owner",
+                "product-landing-pages",
+                "{{owner_product_landing_page_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Owner Product Landing Page by ID",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/owner/product-landing-pages/{{owner_product_landing_page_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "owner",
+                "product-landing-pages",
+                "{{owner_product_landing_page_id}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Landing Page Templates",
+      "item": [
+        {
+          "name": "Create Landing Page Template (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"New Template\",\n    \"description\": \"A brand new landing page template.\",\n    \"version\": \"1.0.0\",\n    \"status\": \"draft\",\n    \"access_level\": \"free\",\n    \"category\": \"e-commerce\",\n    \"features\": { \"responsive\": true, \"animations\": false },\n    \"preview_image_url\": \"https://example.com/preview.jpg\",\n    \"live_demo_url\": \"https://example.com/demo\",\n    \"template_config\": { \"header\": { \"color\": \"#ffffff\" } }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/admin/landing-page-templates",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "landing-page-templates"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Landing Page Templates (Admin/Owner/Customer)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/landing-page-templates",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "landing-page-templates"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Landing Page Template by ID (Admin/Owner/Customer)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/landing-page-templates/{{landing_page_template_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "landing-page-templates",
+                "{{landing_page_template_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Landing Page Template by ID (Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"status\": \"published\",\n    \"version\": \"1.0.1\",\n    \"template_config\": { \"header\": { \"color\": \"#000000\" } }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/admin/landing-page-templates/{{landing_page_template_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "landing-page-templates",
+                "{{landing_page_template_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Landing Page Template by ID (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/landing-page-templates/{{landing_page_template_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "landing-page-templates",
+                "{{landing_page_template_id}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "admin_token",
+      "value": "YOUR_ADMIN_TOKEN",
+      "type": "string"
+    },
+    {
+      "key": "owner_token",
+      "value": "YOUR_OWNER_TOKEN",
+      "type": "string"
+    },
+    {
+      "key": "product_landing_page_id",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "owner_product_landing_page_id",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "landing_page_template_id",
+      "value": "1",
+      "type": "string"
+    }
+  ]
+}

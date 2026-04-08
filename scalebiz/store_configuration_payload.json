@@ -1,0 +1,79 @@
+{
+  "store_id": "string",
+  "store_name": "string",
+  "logo_url": "string | null",
+  "hostname": "string | null",
+  "layout_settings": {
+    "footer": {
+      "storeInfo": {
+        "email": "string",
+        "phone": "string",
+        "address": "string"
+      },
+      "socialLinks": [
+        {
+          "platform": "string",
+          "url": "string"
+        }
+      ]
+    },
+    "announcementBar": {
+      "text": "string"
+    }
+  },
+  "localization_settings": {
+    "country": "string",
+    "default_language": "string"
+  },
+  "payment_settings": {
+    "vat_tax_percentage": "string",
+    "zatiq_enabled": "boolean",
+    "cod_enabled": "boolean",
+    "aamarpay_enabled": "boolean",
+    "bkash_enabled": "boolean",
+    "note": "string"
+  },
+  "integrations": {
+    "shop_rules": {
+      "maintain_stock": "boolean",
+      "show_sold_count": "boolean"
+    },
+    "seo": {
+      "gtm_id": "string",
+      "fb_pixel_id": "string",
+      "fb_pixel_token": "string"
+    }
+  },
+  "notification_settings": {
+    "sms": {
+      "api_key": "string",
+      "sender_id": "string"
+    },
+    "chat": {
+      "facebook_enabled": "boolean",
+      "whatsapp_enabled": "boolean",
+      "whatsapp_number": "string"
+    }
+  },
+  "delivery_settings": {
+    "default_charge": "string",
+    "charge_not_refundable": "boolean",
+    "zones": [
+      {
+        "id": "number",
+        "zone_name": "string",
+        "charge": "string"
+      }
+    ]
+  },
+  "page_settings": {
+    "policies": {
+      "about_us": "string",
+      "terms_conditions": "string",
+      "return_cancellation": "string"
+    }
+  },
+  "theme_settings": {
+    "primaryColor": "string"
+  }
+}

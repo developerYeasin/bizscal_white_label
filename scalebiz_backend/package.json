@@ -1,0 +1,38 @@
+{
+  "name": "whitelabel-backend",
+  "version": "1.0.0",
+  "description": "A robust, multi-tenant backend for a white-labeled React application.",
+  "main": "server.js",
+  "scripts": {
+    "start": "nodemon server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "axios": "^1.12.2",
+    "bcrypt": "^6.0.0",
+    "bcryptjs": "^2.4.3",
+    "bkash-payment-gateway": "^2.0.1",
+    "cloudinary": "^2.7.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "eta": "1.12.3",
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "express-validator": "^6.14.2",
+    "http-status": "^2.1.0",
+    "json2csv": "^6.0.0-alpha.2",
+    "jsonwebtoken": "^9.0.0",
+    "multer": "^2.0.2",
+    "mysql2": "^2.3.3",
+    "nagad-payment-gateway": "^2.0.2",
+    "nodemailer": "^7.0.9",
+    "nodemon": "^3.1.10",
+    "puppeteer": "^24.27.0",
+    "sequelize": "^6.37.7",
+    "sslcommerz-lts": "^1.2.0",
+    "uuid": "^13.0.0",
+    "xmlbuilder": "^15.1.1"
+  },
+  "author": "",
+  "license": "ISC"
+}

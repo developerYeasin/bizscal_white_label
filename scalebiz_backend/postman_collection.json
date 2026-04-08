@@ -1,0 +1,4039 @@
+
+{
+  "info": {
+    "_postman_id": "a8a0b3a0-7b1a-4b1e-9c1a-3a1b0e0d0c0b",
+    "name": "Whitelabel Backend API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Public APIs",
+      "item": [
+        {
+          "name": "Get All Themes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3001/api/v1/themes",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3001",
+              "path": [
+                "api",
+                "v1",
+                "themes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Landing Page Templates",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3001/api/v1/landing-page-templates",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3001",
+              "path": [
+                "api",
+                "v1",
+                "landing-page-templates"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Coupon by Code",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3001/api/v1/coupons/:code",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3001",
+              "path": [
+                "api",
+                "v1",
+                "coupons",
+                ":code"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Owner APIs",
+      "item": [
+        {
+          "name": "Owner Authentication",
+          "item": [
+            {
+              "name": "Owner Register",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"email\": \"owner@example.com\",\n    \"name\": \"Test Owner\",\n    \"password\": \"ownerpassword123\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/owner/auth/register",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "owner",
+                    "auth",
+                    "register"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Owner Login",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"email\": \"owner@example.com\",\n    \"password\": \"ownerpassword123\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/owner/auth/login",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "owner",
+                    "auth",
+                    "login"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Owner Get Me",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{owner_jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/owner/auth/me",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "owner",
+                    "auth",
+                    "me"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Owner Update Me",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{owner_jwt_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Updated Owner Name\",\n    \"email\": \"updated_owner@example.com\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/owner/auth/me",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "owner",
+                    "auth",
+                    "me"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Owner Update Password",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{owner_jwt_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"current_password\": \"ownerpassword123\",\n    \"new_password\": \"newownerpassword123\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/owner/auth/update-password",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "owner",
+                    "auth",
+                    "update-password"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Owner Logout",
+              "request": {
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Owner Theme Settings",
+          "item": [
+            {
+              "name": "Get Theme Settings (Owner)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{owner_jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/owner/theme-settings",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "owner",
+                    "theme-settings"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Theme Settings (Owner)",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{owner_jwt_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"theme_id\": 1,\n    \"primary_color\": \"#FF0000\",\n    \"secondary_color\": \"#00FF00\",\n    \"theme_mode\": \"Dark\",\n    \"buy_now_button_enabled\": true\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/owner/theme-settings",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "owner",
+                    "theme-settings"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Owner Landing Page Settings",
+          "item": [
+            {
+              "name": "Get Landing Page Settings (Owner)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{owner_jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/owner/landing-page-settings",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "owner",
+                    "landing-page-settings"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Landing Page Settings (Owner)",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{owner_jwt_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"landing_page_template_id\": 1,\n    \"general_primary_color\": \"#0000FF\",\n    \"general_secondary_color\": \"#FFFF00\",\n    \"show_product_details\": true,\n    \"seo_page_title\": \"My Awesome Landing Page\",\n    \"seo_page_description\": \"This is the description for my awesome landing page.\",\n    \"scrolling_banner_text\": \"Limited time offer! Shop now!\",\n    \"top_banner_image_url\": \"https://example.com/top_banner.jpg\",\n    \"featured_section_images\": [\"https://example.com/featured1.jpg\", \"https://example.com/featured2.jpg\"],\n    \"featured_video_title\": \"Product Showcase\",\n    \"featured_video_url\": \"https://www.youtube.com/watch?v=example\",\n    \"showcased_banner_images\": [\"https://example.com/showcased1.jpg\", \"https://example.com/showcased2.jpg\"],\n    \"static_banner_image_url\": \"https://example.com/static_banner.jpg\",\n    \"product_images_section_title\": \"Our Products\",\n    \"product_images_section_images\": [\"https://example.com/product1.jpg\", \"https://example.com/product2.jpg\"]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/owner/landing-page-settings",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "owner",
+                    "landing-page-settings"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Owner Base Data",
+          "item": [
+            {
+              "name": "Get All Themes (Owner)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{owner_jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/owner/themes",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "owner",
+                    "themes"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get All Landing Page Templates (Owner)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{owner_jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/owner/landing-page-templates",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "owner",
+                    "landing-page-templates"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Owner Product Management",
+          "item": [
+            {
+              "name": "Get All Owner Products",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{owner_jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/owner/products",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "owner",
+                    "products"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Create Owner Product",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{owner_jwt_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"New Product\",\n    \"description\": \"Description for new product\",\n    \"price\": 100,\n    \"category\": \"Electronics\",\n    \"stock\": 50\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/owner/products",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "owner",
+                    "products"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Owner Product By ID",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{owner_jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/owner/products/:product_id",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "owner",
+                    "products",
+                    ":product_id"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Owner Product",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{owner_jwt_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Updated Product Name\",\n    \"price\": 120\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/owner/products/:product_id",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "owner",
+                    "products",
+                    ":product_id"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Owner Product",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{owner_jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/owner/products/:product_id",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "owner",
+                    "products",
+                    ":product_id"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Owner Store Management",
+          "item": [
+            {
+              "name": "Get Store Configuration (Owner)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{owner_jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/owner/store-configuration",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "owner",
+                    "store-configuration"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Store Configuration (Owner)",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{owner_jwt_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"store_name\": \"My Awesome Store\",\n  \"logo_url\": \"https://example.com/logo.png\",\n  \"hostname\": \"myawesomestore.localhost\",\n  \"layout_settings\": {\n    \"footer\": {\n      \"storeInfo\": {\n        \"email\": \"info@myawesomestore.com\",\n        \"phone\": \"+1234567890\",\n        \"address\": \"123 Main St, City, Country\"\n      },\n      \"socialLinks\": [\n        {\n          \"platform\": \"facebook\",\n          \"url\": \"https://facebook.com/myawesomestore\"\n        }\n      ]\n    },\n    \"announcementBar\": {\n      \"text\": \"Welcome to our store!\"\n    }\n  },\n  \"localization_settings\": {\n    \"country\": \"USA\",\n    \"default_language\": \"en\"\n  },\n  \"payment_settings\": {\n    \"vat_tax_percentage\": \"15%\",\n    \"zatiq_enabled\": true,\n    \"cod_enabled\": true,\n    \"aamarpay_enabled\": false,\n    \"bkash_enabled\": false,\n    \"note\": \"Payment notes here\"\n  },\n  \"integrations\": {\n    \"shop_rules\": {\n      \"maintain_stock\": true,\n      \"show_sold_count\": true\n    },\n    \"seo\": {\n      \"gtm_id\": \"GTM-XXXXXX\",\n      \"fb_pixel_id\": \"FB-XXXXXX\",\n      \"fb_pixel_token\": \"FB-TOKEN-XXXXXX\"\n    }\n  },\n  \"notification_settings\": {\n    \"sms\": {\n      \"api_key\": \"SMS_API_KEY\",\n      \"sender_id\": \"SENDER_ID\"\n    },\n    \"chat\": {\n      \"facebook_enabled\": true,\n      \"whatsapp_enabled\": true,\n      \"whatsapp_number\": \"+1234567890\"\n    }\n  },\n  \"delivery_settings\": {\n    \"default_charge\": \"5.00\",\n    \"charge_not_refundable\": false,\n    \"zones\": [\n      {\n        \"id\": 1,\n        \"zone_name\": \"Zone A\",\n        \"charge\": \"2.00\"\n      }\n    ]\n  },\n  \"page_settings\": {\n    \"policies\": {\n      \"about_us\": \"About us content...\",\n      \"terms_conditions\": \"Terms and conditions content...\",\n      \"return_cancellation\": \"Return and cancellation policy content...\"\n    }\n  },\n  \"theme_settings\": {\n    \"primaryColor\": \"#FF5733\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/owner/store-configuration",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "owner",
+                    "store-configuration"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Create Store",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{owner_jwt_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"hostname\": \"newstore.localhost\",\n    \"store_name\": \"New Store\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/owner/stores",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "owner",
+                    "stores"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Store",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{owner_jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/owner/stores/:store_id",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "owner",
+                    "stores",
+                    ":store_id"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Owner Page Management",
+          "item": [
+            {
+              "name": "Get All Pages (Owner)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{owner_jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/owner/pages",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "owner",
+                    "pages"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Page By Slug (Owner)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{owner_jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/owner/pages/:page_slug",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "owner",
+                    "pages",
+                    ":page_slug"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Create Page (Owner)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{owner_jwt_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"title\": \"New Page Title\",\n    \"slug\": \"new-page-slug\",\n    \"content\": \"Content of the new page\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/owner/pages",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "owner",
+                    "pages"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Page (Owner)",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{owner_jwt_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"title\": \"Updated Page Title\",\n    \"content\": \"Updated content of the page\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/owner/pages/:page_slug",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "owner",
+                    "pages",
+                    ":page_slug"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Page (Owner)",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{owner_jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/owner/pages/:page_slug",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "owner",
+                    "pages",
+                    ":page_slug"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Owner Category Management",
+          "item": [
+            {
+              "name": "Get All Categories (Owner)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{owner_jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/owner/categories",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "owner",
+                    "categories"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Category By ID (Owner)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{owner_jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/owner/categories/:category_id",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "owner",
+                    "categories",
+                    ":category_id"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Create Category (Owner)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{owner_jwt_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"New Category\",\n    \"description\": \"Description for new category\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/owner/categories",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "owner",
+                    "categories"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Category (Owner)",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{owner_jwt_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Updated Category Name\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/owner/categories/:category_id",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "owner",
+                    "categories",
+                    ":category_id"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Category (Owner)",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{owner_jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/owner/categories/:category_id",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "owner",
+                    "categories",
+                    ":category_id"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+
+    },
+    {
+      "name": "Admin APIs",
+      "item": [
+        {
+          "name": "Admin User Management",
+          "item": [
+            {
+              "name": "Create Admin User",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"New Admin User\",\n    \"email\": \"newadmin@example.com\",\n    \"password\": \"adminpassword123\",\n    \"role\": \"admin\",\n    \"store_id\": null\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/users",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "users"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Admin Login",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"email\": \"admin@example.com\",\n    \"password\": \"adminpassword123\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/login",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "login"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get All Users (Admin)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/users?page=1&limit=10",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "users"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get User By ID (Admin)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/users/:id",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "users",
+                    ":id"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update User (Admin)",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Updated Admin User\",\n    \"email\": \"updated_admin@example.com\",\n    \"role\": \"admin\",\n    \"account_status\": \"active\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/users/:id",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "users",
+                    ":id"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete User (Admin)",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/users/:id",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "users",
+                    ":id"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Admin Category Management",
+          "item": [
+            {
+              "name": "Create Category (Admin)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"store_id\": 1,\n    \"name\": \"Admin Created Category\",\n    \"slug\": \"admin-created-category\",\n    \"description\": \"Description for admin created category\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/categories",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "categories"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get All Categories (Admin)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/categories?page=1&limit=10",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "categories"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Category By ID (Admin)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/categories/:id",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "categories",
+                    ":id"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Category (Admin)",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Updated Admin Category Name\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/categories/:id",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "categories",
+                    ":id"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Category (Admin)",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/categories/:id",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "categories",
+                    ":id"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Admin Customer Management",
+          "item": [
+            {
+              "name": "Create Customer (Admin)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"store_id\": 1,\n    \"name\": \"Admin Created Customer\",\n    \"email\": \"admin.customer@example.com\",\n    \"phone\": \"+1234567890\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/customers",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "customers"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get All Customers (Admin)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/customers?page=1&limit=10",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "customers"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Customer By ID (Admin)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/customers/:id",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "customers",
+                    ":id"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Customer (Admin)",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Updated Admin Customer Name\",\n    \"email\": \"updated.admin.customer@example.com\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/customers/:id",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "customers",
+                    ":id"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Customer (Admin)",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/customers/:id",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "customers",
+                    ":id"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Admin Landing Page Template Management",
+          "item": [
+            {
+              "name": "Create Landing Page Template (Admin)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Admin Landing Page Template\",\n    \"description\": \"Description for admin landing page template\",\n    \"version\": \"1.0.0\",\n    \"status\": \"published\",\n    \"access_level\": \"free\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/landing-page-templates",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "landing-page-templates"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get All Landing Page Templates (Admin)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/landing-page-templates?page=1&limit=10",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "landing-page-templates"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Landing Page Template By ID (Admin)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/landing-page-templates/:id",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "landing-page-templates",
+                    ":id"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Landing Page Template (Admin)",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Updated Admin Landing Page Template\",\n    \"status\": \"draft\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/landing-page-templates/:id",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "landing-page-templates",
+                    ":id"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Landing Page Template (Admin)",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/landing-page-templates/:id",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "landing-page-templates",
+                    ":id"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Admin Order Management",
+          "item": [
+            {
+              "name": "Create Order (Admin)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"store_id\": 1,\n    \"total_amount\": 100.00,\n    \"subtotal_amount\": 90.00,\n    \"shipping_address\": \"123 Admin St, Admin City, Admin Country\",\n    \"payment_method\": \"COD\",\n    \"status\": \"pending\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/orders",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "orders"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get All Orders (Admin)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/orders?page=1&limit=10",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "orders"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Order By ID (Admin)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/orders/:id",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "orders",
+                    ":id"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Order (Admin)",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"status\": \"shipped\",\n    \"shipping_tracking_number\": \"TRACK12345\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/orders/:id",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "orders",
+                    ":id"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Order (Admin)",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/orders/:id",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "orders",
+                    ":id"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Admin Page Management",
+          "item": [
+            {
+              "name": "Create Page (Admin)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"store_id\": 1,\n    \"title\": \"Admin Created Page\",\n    \"slug\": \"admin-created-page\",\n    \"content\": \"Content for admin created page\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/pages",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "pages"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get All Pages (Admin)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/pages?page=1&limit=10",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "pages"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Page By ID (Admin)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/pages/:id",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "pages",
+                    ":id"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Page (Admin)",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"title\": \"Updated Admin Page Title\",\n    \"content\": \"Updated content for admin page\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/pages/:id",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "pages",
+                    ":id"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Page (Admin)",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/pages/:id",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "pages",
+                    ":id"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Admin Product Management",
+          "item": [
+            {
+              "name": "Create Product (Admin)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"store_id\": 1,\n    \"name\": \"Admin Created Product\",\n    \"slug\": \"admin-created-product\",\n    \"price\": 150.00,\n    \"status\": \"published\",\n    \"product_type\": \"simple\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/products",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "products"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get All Products (Admin)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/products?page=1&limit=10",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "products"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Product By ID (Admin)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/products/:id",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "products",
+                    ":id"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Product (Admin)",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Updated Admin Product Name\",\n    \"price\": 110.00\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/products/:id",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "products",
+                    ":id"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Product (Admin)",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/products/:id",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "products",
+                    ":id"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Admin Store Configuration Management",
+          "item": [
+            {
+              "name": "Create Store Configuration (Admin)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"store_id\": 1,\n    \"theme_settings\": { \"primaryColor\": \"#FF0000\" },\n    \"layout_settings\": { \"header\": { \"logo\": \"logo.png\" }},\n    \"page_settings\": { \"home\": { \"title\": \"Admin Home\" }},\n    \"localization_settings\": { \"country\": \"USA\" },\n    \"payment_settings\": { \"cod_enabled\": true },\n    \"integrations\": { \"shop_rules\": { \"maintain_stock\": true }},\n    \"notification_settings\": { \"sms\": { \"api_key\": \"ABC\" }},\n    \"delivery_settings\": { \"default_charge\": \"5.00\" }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/store-configurations",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "store-configurations"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get All Store Configurations (Admin)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/store-configurations?page=1&limit=10",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "store-configurations"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Store Configuration By ID (Admin)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/store-configurations/:id",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "store-configurations",
+                    ":id"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Store Configuration (Admin)",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"theme_settings\": { \"primaryColor\": \"#0000FF\" }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/store-configurations/:id",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "store-configurations",
+                    ":id"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Store Configuration (Admin)",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/store-configurations/:id",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "store-configurations",
+                    ":id"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Admin Store Landing Page Settings Management",
+          "item": [
+            {
+              "name": "Create Store Landing Page Settings (Admin)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"store_id\": 1,\n    \"landing_page_template_id\": 1,\n    \"general_primary_color\": \"#FF0000\",\n    \"show_product_details\": true\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/store-landing-page-settings",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "store-landing-page-settings"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get All Store Landing Page Settings (Admin)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/store-landing-page-settings?page=1&limit=10",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "store-landing-page-settings"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Store Landing Page Settings By ID (Admin)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/store-landing-page-settings/:id",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "store-landing-page-settings",
+                    ":id"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Store Landing Page Settings (Admin)",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"general_primary_color\": \"#00FF00\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/store-landing-page-settings/:id",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "store-landing-page-settings",
+                    ":id"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Store Landing Page Settings (Admin)",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/store-landing-page-settings/:id",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "store-landing-page-settings",
+                    ":id"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Admin Store Theme Settings Management",
+          "item": [
+            {
+              "name": "Create Store Theme Settings (Admin)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"store_id\": 1,\n    \"theme_id\": 1,\n    \"primary_color\": \"#FF0000\",\n    \"secondary_color\": \"#00FF00\",\n    \"theme_mode\": \"Dark\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/store-theme-settings",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "store-theme-settings"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get All Store Theme Settings (Admin)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/store-theme-settings?page=1&limit=10",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "store-theme-settings"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Store Theme Settings By ID (Admin)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/store-theme-settings/:id",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "store-theme-settings",
+                    ":id"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Store Theme Settings (Admin)",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"primary_color\": \"#0000FF\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/store-theme-settings/:id",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "store-theme-settings",
+                    ":id"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Store Theme Settings (Admin)",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/store-theme-settings/:id",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "store-theme-settings",
+                    ":id"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Admin Store Management",
+          "item": [
+            {
+              "name": "Create Store (Admin)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"theme_id\": \"default\",\n    \"hostname\": \"adminstore.localhost\",\n    \"store_name\": \"Admin Store\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/stores",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "stores"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get All Stores (Admin)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/stores?page=1&limit=10",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "stores"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Store By ID (Admin)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/stores/:id",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "stores",
+                    ":id"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Store (Admin)",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"store_name\": \"Updated Admin Store Name\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/stores/:id",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "stores",
+                    ":id"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Store (Admin)",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/stores/:id",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "stores",
+                    ":id"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Admin Theme Management",
+          "item": [
+            {
+              "name": "Create Theme (Admin)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Admin Created Theme\",\n    \"description\": \"Description for admin created theme\",\n    \"version\": \"1.0.0\",\n    \"status\": \"published\",\n    \"access_level\": \"free\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/themes",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "themes"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get All Themes (Admin)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/themes?page=1&limit=10",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "themes"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Theme By ID (Admin)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/themes/:id",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "themes",
+                    ":id"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Theme (Admin)",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Updated Admin Theme Name\",\n    \"status\": \"draft\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/themes/:id",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "themes",
+                    ":id"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Theme (Admin)",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/admin/themes/:id",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "themes",
+                    ":id"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Store APIs",
+      "item": [
+        {
+          "name": "Store & Content",
+          "item": [
+            {
+              "name": "Get Store Configuration",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Host",
+                    "value": "localhost"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/store/store_configuration",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "store",
+                    "store_configuration"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Store Configuration",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{owner_jwt_token}}"
+                  },
+                  {
+                    "key": "Host",
+                    "value": "localhost"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"store_name\": \"My Awesome Store\",\n  \"logo_url\": \"https://example.com/logo.png\",\n  \"hostname\": \"myawesomestore.localhost\",\n  \"layout_settings\": {\n    \"footer\": {\n      \"storeInfo\": {\n        \"email\": \"info@myawesomestore.com\",\n        \"phone\": \"+1234567890\",\n        \"address\": \"123 Main St, City, Country\"\n      },\n      \"socialLinks\": [\n        {\n          \"platform\": \"facebook\",\n          \"url\": \"https://facebook.com/myawesomestore\"\n        }\n      ]\n    },\n    \"announcementBar\": {\n      \"text\": \"Welcome to our store!\"\n    }\n  },\n  \"localization_settings\": {\n    \"country\": \"USA\",\n    \"default_language\": \"en\"\n  },\n  \"payment_settings\": {\n    \"vat_tax_percentage\": \"15%\",\n    \"zatiq_enabled\": true,\n    \"cod_enabled\": true,\n    \"aamarpay_enabled\": false,\n    \"bkash_enabled\": false,\n    \"note\": \"Payment notes here\"\n  },\n  \"integrations\": {\n    \"shop_rules\": {\n      \"maintain_stock\": true,\n      \"show_sold_count\": true\n    },\n    \"seo\": {\n      \"gtm_id\": \"GTM-XXXXXX\",\n      \"fb_pixel_id\": \"FB-XXXXXX\",\n      \"fb_pixel_token\": \"FB-TOKEN-XXXXXX\"\n    }\n  },\n  \"notification_settings\": {\n    \"sms\": {\n      \"api_key\": \"SMS_API_KEY\",\n      \"sender_id\": \"SENDER_ID\"\n    },\n    \"chat\": {\n      \"facebook_enabled\": true,\n      \"whatsapp_enabled\": true,\n      \"whatsapp_number\": \"+1234567890\"\n    }\n  },\n  \"delivery_settings\": {\n    \"default_charge\": \"5.00\",\n    \"charge_not_refundable\": false,\n    \"zones\": [\n      {\n        \"id\": 1,\n        \"zone_name\": \"Zone A\",\n        \"charge\": \"2.00\"\n      }\n    ]\n  },\n  \"page_settings\": {\n    \"policies\": {\n      \"about_us\": \"About us content...\",\n      \"terms_conditions\": \"Terms and conditions content...\",\n      \"return_cancellation\": \"Return and cancellation policy content...\"\n    }\n  },\n  \"theme_settings\": {\n    \"primaryColor\": \"#FF5733\"\n  }\n  }",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/store/store_configuration/:store_id",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "store",
+                    "store_configuration",
+                    ":store_id"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Create Store",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{owner_jwt_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"hostname\": \"newstore.localhost\",\n    \"store_name\": \"New Store\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/store/stores",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "store",
+                    "stores"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Store",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{owner_jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/store/stores/:store_id",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "store",
+                    "stores",
+                    ":store_id"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Owner Page Management",
+          "item": [
+            {
+              "name": "Get All Pages (Store)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Host",
+                    "value": "localhost"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/store/pages",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "store",
+                    "pages"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Create Page (Store)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{user_jwt_token}}"
+                  },
+                  {
+                    "key": "Host",
+                    "value": "localhost"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"title\": \"New Store Page Title\",\n    \"slug\": \"new-store-page-slug\",\n    \"content\": \"Content of the new store page\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/store/pages",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "store",
+                    "pages"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Page By Slug (Store)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Host",
+                    "value": "localhost"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/store/pages/:page_slug",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "store",
+                    "pages",
+                    ":page_slug"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Page (Store)",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{user_jwt_token}}"
+                  },
+                  {
+                    "key": "Host",
+                    "value": "localhost"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"title\": \"Updated Store Page Title\",\n    \"content\": \"Updated content of the store page\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/pages/:page_slug",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "pages",
+                    ":page_slug"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Page (Store)",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{user_jwt_token}}"
+                  },
+                  {
+                    "key": "Host",
+                    "value": "localhost"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/store/pages/:page_slug",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "store",
+                    "pages",
+                    ":page_slug"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Store Product Management",
+          "item": [
+            {
+              "name": "Get All Products (Store)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Host",
+                    "value": "localhost"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/store/products",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "store",
+                    "products"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Product By Slug (Store)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Host",
+                    "value": "localhost"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/store/products/:product_slug",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "store",
+                    "products",
+                    ":product_slug"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Store Category Management",
+          "item": [
+            {
+              "name": "Get All Categories (Store)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Host",
+                    "value": "localhost"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/store/categories",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "store",
+                    "categories"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Category By Slug (Store)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Host",
+                    "value": "localhost"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/store/categories/:category_slug",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "store",
+                    "categories",
+                    ":category_slug"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Store Cart Management",
+          "item": [
+            {
+              "name": "Add Item to Cart",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{user_jwt_token}}"
+                  },
+                  {
+                    "key": "Host",
+                    "value": "localhost"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"product_id\": 1,\n    \"quantity\": 1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/store/cart/add",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "store",
+                    "cart",
+                    "add"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Cart Items",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{user_jwt_token}}"
+                  },
+                  {
+                    "key": "Host",
+                    "value": "localhost"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/store/cart",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "store",
+                    "cart"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Cart Item Quantity",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{user_jwt_token}}"
+                  },
+                  {
+                    "key": "Host",
+                    "value": "localhost"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"product_id\": 1,\n    \"quantity\": 2\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/store/cart/update",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "store",
+                    "cart",
+                    "update"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Remove Item from Cart",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{user_jwt_token}}"
+                  },
+                  {
+                    "key": "Host",
+                    "value": "localhost"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"product_id\": 1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/store/cart/remove",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "store",
+                    "cart",
+                    "remove"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Clear Cart",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{user_jwt_token}}"
+                  },
+                  {
+                    "key": "Host",
+                    "value": "localhost"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/store/cart/clear",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "store",
+                    "cart",
+                    "clear"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Store Order Management",
+          "item": [
+            {
+              "name": "Create Order",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{user_jwt_token}}"
+                  },
+                  {
+                    "key": "Host",
+                    "value": "localhost"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"shipping_address\": \"123 Store St, Store City, Store Country\",\n    \"payment_method\": \"COD\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/store/orders",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "store",
+                    "orders"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get All Orders (Store)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{user_jwt_token}}"
+                  },
+                  {
+                    "key": "Host",
+                    "value": "localhost"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/store/orders",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "store",
+                    "orders"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Order By ID (Store)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{user_jwt_token}}"
+                  },
+                  {
+                    "key": "Host",
+                    "value": "localhost"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/store/orders/:order_id",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "store",
+                    "orders",
+                    ":order_id"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Order Status (Store)",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{user_jwt_token}}"
+                  },
+                  {
+                    "key": "Host",
+                    "value": "localhost"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"status\": \"cancelled\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/store/orders/:order_id/status",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "store",
+                    "orders",
+                    ":order_id",
+                    "status"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Store User Authentication",
+          "item": [
+            {
+              "name": "User Register",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Host",
+                    "value": "localhost"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"email\": \"user@example.com\",\n    \"name\": \"Test User\",\n    \"password\": \"userpassword123\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/store/auth/register",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "store",
+                    "auth",
+                    "register"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "User Login",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Host",
+                    "value": "localhost"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"email\": \"user@example.com\",\n    \"password\": \"userpassword123\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/store/auth/login",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "store",
+                    "auth",
+                    "login"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "User Get Me",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{user_jwt_token}}"
+                  },
+                  {
+                    "key": "Host",
+                    "value": "localhost"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/auth/me",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "auth",
+                    "me"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "User Update Me",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{user_jwt_token}}"
+                  },
+                  {
+                    "key": "Host",
+                    "value": "localhost"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Updated User Name\",\n    \"email\": \"updated_user@example.com\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/store/auth/me",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "store",
+                    "auth",
+                    "me"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "User Update Password",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{user_jwt_token}}"
+                  },
+                  {
+                    "key": "Host",
+                    "value": "localhost"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"current_password\": \"userpassword123\",\n    \"new_password\": \"newuserpassword123\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/store/auth/update-password",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "store",
+                    "auth",
+                    "update-password"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "User Logout",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{user_jwt_token}}"
+                  },
+                  {
+                    "key": "Host",
+                    "value": "localhost"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3001/api/v1/store/auth/logout",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3001",
+                  "path": [
+                    "api",
+                    "v1",
+                    "store",
+                    "auth",
+                    "logout"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

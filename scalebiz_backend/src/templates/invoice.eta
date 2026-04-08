@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Invoice Template</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- QR Code Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+      /* Use Inter font */
+      body {
+        font-family: "Inter", sans-serif;
+        -webkit-print-color-adjust: exact;
+        color-adjust: exact;
+      }
+
+      /* Hide print button when printing */
+      @media print {
+        .no-print {
+          display: none !important;
+        }
+        body {
+          /* Ensure background colors print */
+          background-color: #ffffff;
+        }
+        .print-container {
+          box-shadow: none;
+          margin: 0;
+          max-width: 100%;
+          border: none;
+        }
+      }
+    </style>
+  </head>
+  <body class=" p-4">
+
+    <!-- Invoice Container -->
+    <div
+      class="print-container max-w-4xl mx-auto bg-white p-6 sm:p-10"
+    >
+  
+      <!-- Header Section -->
+      <header
+        class="flex flex-col sm:flex-row justify-between items-start pb-6 mb-8 border-b border-gray-200"
+      >
+        <!-- Logo -->
+        <div class="mb-6 sm:mb-0">
+          <img
+            src="<%= it.invoiceData.logo %>"
+            alt="Company Logo"
+            class="w-36"
+            onerror="this.onerror=null; this.src='<%= it.invoiceData.logo %>';"
+          />
+        </div>
+
+        <!-- Invoice Title and Details -->
+        <div class="text-left sm:text-right">
+          <h2 class="text-4xl font-bold uppercase text-gray-800 tracking-tight">
+            Invoice
+          </h2>
+          <div class="mt-4 text-gray-600 space-y-1">
+            <p class="flex sm:justify-end items-center">
+              <span class="font-semibold w-28 text-gray-500">Invoice #:</span>
+              <span class="font-medium text-gray-800"><%= it.invoiceData.invoiceNumber %></span>
+            </p>
+            <p class="flex sm:justify-end items-center">
+              <span class="font-semibold w-28 text-gray-500">Date:</span>
+              <span class="font-medium text-gray-800"><%= it.invoiceData.date %></span>
+            </p>
+          </div>
+        </div>
+      </header>
+
+      <!-- From/To Section -->
+      <section class="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-10">
+        <div>
+          <h3 class="text-sm font-semibold text-gray-500 uppercase mb-3">
+            From:
+          </h3>
+          <p class="text-lg font-bold text-gray-800"><%= it.invoiceData.ownerName %></p>
+          <p class="text-gray-600 text-sm"><%= it.invoiceData.ownerAddress %></p>
+          <p class="text-gray-600 text-sm"><%= it.invoiceData.ownerEmail %></p>
+        </div>
+        <div class="sm:text-right">
+          <h3 class="text-sm font-semibold text-gray-500 uppercase mb-3">
+            Bill To:
+          </h3>
+          <p class="text-lg font-bold text-gray-800"><%= it.invoiceData.customerName %></p>
+          <p class="text-gray-600 text-sm"><%= it.invoiceData.customerAddress %></p>
+          <p class="text-gray-600 text-sm"><%= it.invoiceData.customerEmail %></p>
+        </div>
+      </section>
+
+      <!-- Items Table -->
+      <section>
+        <div
+          class="flow-root border border-gray-200 rounded-lg overflow-hidden"
+        >
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-100">
+              <tr>
+                <th
+                  scope="col"
+                  class="px-4 sm:px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider"
+                >
+                  Item
+                </th>
+                <th
+                  scope="col"
+                  class="hidden sm:table-cell px-4 sm:px-6 py-4 text-right text-xs font-bold text-gray-600 uppercase tracking-wider"
+                >
+                  Qty
+                </th>
+                <th
+                  scope="col"
+                  class="hidden sm:table-cell px-4 sm:px-6 py-4 text-right text-xs font-bold text-gray-600 uppercase tracking-wider"
+                >
+                  Unit Price
+                </th>
+                <th
+                  scope="col"
+                  class="px-4 sm:px-6 py-4 text-right text-xs font-bold text-gray-600 uppercase tracking-wider"
+                >
+                  Total
+                </th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <% it.invoiceData.items.forEach(function(item){ %>
+              <tr>
+                <td class="px-4 sm:px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <img
+                      src="<%= item.image %>"
+                      alt="<%= item.name %>"
+                      class="w-10 h-10 object-cover rounded-md mr-3"
+                      onerror="this.onerror=null; this.src='https://placehold.co/40x40/e2e8f0/64748b?text=No+Image';"
+                    />
+                    <div>
+                      <div class="text-sm font-medium text-gray-900">
+                        <%= item.name %>
+                      </div>
+                      <div class="text-sm text-gray-500">
+                        ID: <%= item.id %>
+                      </div>
+                      <!-- Mobile-only details -->
+                      <div class="sm:hidden text-gray-600 text-xs mt-1">
+                        Qty: <%= item.quantity %> @ $<%= item.price.toFixed(2) %>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                <td
+                  class="hidden sm:table-cell px-4 sm:px-6 py-4 text-right text-sm text-gray-600"
+                >
+                  <%= item.quantity %>
+                </td>
+                <td
+                  class="hidden sm:table-cell px-4 sm:px-6 py-4 text-right text-sm text-gray-600"
+                >
+                  $<%= item.price.toFixed(2) %>
+                </td>
+                <td
+                  class="px-4 sm:px-6 py-4 text-right text-sm font-medium text-gray-800"
+                >
+                  $<%= (item.quantity * item.price).toFixed(2) %>
+                </td>
+              </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Totals Section -->
+      <section class="mt-8 ">
+        <div class="w-full grid grid-cols-1 sm:grid-cols-2 gap-8 mb-10">
+          <!-- QR Code -->
+          <div class="mt-6 sm:mt-0 sm:ml-6 flex-shrink-0">
+            <div
+              id="qrcode"
+              class="w-40 h-40 flex items-center justify-center border border-gray-200 p-2 rounded-lg"
+            ></div>
+          </div>
+          <div class="bg-gray-50 rounded-lg p-5 max-w-xl ">
+            <div class="space-y-3">
+              <div class="flex justify-between text-gray-600">
+                <span class="font-medium">Subtotal</span>
+                <span class="font-medium">$<%= it.invoiceData.items.reduce((acc, item) => acc + (item.quantity * item.price), 0).toFixed(2) %></span>
+              </div>
+              <div class="flex justify-between text-gray-600">
+                <span class="font-medium">Delivery Cost</span>
+                <span class="font-medium">$<%= it.invoiceData.delivery_cost.toFixed(2) %></span>
+              </div>
+              <div class="border-t border-gray-200 my-2"></div>
+              <div class="flex justify-between text-xl font-bold text-gray-900">
+                <span>Total</span>
+                <span class="text-indigo-600">$<%= it.invoiceData.totalAmount.toFixed(2) %></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer / Notes -->
+      <footer
+        class="mt-12 border-t border-gray-200 pt-6 flex flex-col sm:flex-row justify-between items-start"
+      >
+        <div>
+          <h4 class="text-lg font-semibold text-gray-800 mb-2">
+            Thank you for your business!
+          </h4>
+          <p class="text-sm text-gray-500 max-w-md">
+            Please make payment within 30 days. Payment can be made via bank
+            transfer to Account: 123456789, Sort Code: 00-00-00.
+          </p>
+        </div>
+      </footer>
+    </div>
+
+    <script>
+      // EJS will render 'it.qr_url' here, or an empty string if it's not defined
+      const qrUrl =
+        "<%= (typeof it !== 'undefined' && it.invoiceData && it.invoiceData.qr_url) ? it.invoiceData.qr_url : '' %>";
+      if (qrUrl && document.getElementById("qrcode")) {
+        new QRCode(document.getElementById("qrcode"), {
+          text: qrUrl,
+          width: 170,
+          height: 170,
+          colorDark: "#000000",
+          colorLight: "#ffffff",
+          correctLevel: QRCode.CorrectLevel.H,
+        });
+      }
+    </script>
+  </body>
+</html>

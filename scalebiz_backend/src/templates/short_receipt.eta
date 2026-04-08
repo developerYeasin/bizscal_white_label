@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Short Receipt</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- QR Code Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-print-color-adjust: exact;
+            color-adjust: exact;
+        }
+        @media print {
+            .no-print { display: none !important; }
+            body { background-color: #ffffff; }
+            .print-container { box-shadow: none; margin: 0; max-width: 100%; border: none; }
+        }
+    </style>
+</head>
+<body class="p-2">
+    <div class="print-container max-w-xs mx-auto bg-white p-4">
+        <header class="text-center pb-4 mb-4 border-b border-dashed border-gray-400">
+            <img src="<%= it.invoiceData.logo %>" alt="Company Logo" class="w-24 mx-auto mb-4" onerror="this.onerror=null; this.src='<%= it.invoiceData.logo %>';">
+        </header>
+        <section class="mb-4">
+            <div class="flex justify-between text-xs text-gray-600">
+                <p><strong>Inv #:</strong> <%= it.invoiceData.invoiceNumber %></p>
+                <p><%= it.invoiceData.date %></p>
+            </div>
+        </section>
+        <section>
+            <div class="flow-root">
+                <table class="min-w-full">
+                    <tbody class="bg-white">
+                        <% it.invoiceData.items.forEach(function(item){ %>
+                        <tr class="border-b border-dashed border-gray-300">
+                            <td class="py-1 whitespace-nowrap">
+                                <p class="text-xs font-medium text-gray-900"><%= item.name %></p>
+                                <p class="text-xs text-gray-500">Qty: <%= item.quantity %></p>
+                            </td>
+                            <td class="py-1 text-right text-xs font-medium text-gray-800">
+                                $<%= (item.quantity * item.price).toFixed(2) %>
+                            </td>
+                        </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        <section class="mt-4">
+            <div class="border-t border-dashed border-gray-300 my-2"></div>
+            <div class="flex justify-between text-sm font-bold text-gray-900">
+                <span>Total</span>
+                <span>$<%= it.invoiceData.totalAmount.toFixed(2) %></span>
+            </div>
+        </section>
+        <footer class="mt-6 text-center">
+            <div
+              id="qrcode"
+              class="w-20 h-20 flex items-center justify-center border border-gray-200 p-1 rounded-lg mx-auto mb-2"
+            ></div>
+            <p class="text-xs text-gray-500">Thank you!</p>
+        </footer>
+    </div>
+    <script>
+      const qrUrl =
+        "<%= (typeof it !== 'undefined' && it.invoiceData && it.invoiceData.qr_url) ? it.invoiceData.qr_url : '' %>";
+      if (qrUrl && document.getElementById("qrcode")) {
+        new QRCode(document.getElementById("qrcode"), {
+          text: qrUrl,
+          width: 80,
+          height: 80,
+          colorDark: "#000000",
+          colorLight: "#ffffff",
+          correctLevel: QRCode.CorrectLevel.H,
+        });
+      }
+    </script>
+</body>
+</html>

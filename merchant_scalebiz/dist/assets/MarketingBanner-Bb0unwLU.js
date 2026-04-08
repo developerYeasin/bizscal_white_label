@@ -1,0 +1,1 @@
+import{j as t,c as r}from"./index-BpnOs9ts.js";const i=({text:e,className:n})=>e?t.jsx("div",{className:r("py-2 text-center text-sm font-medium text-white marketing-banner-gradient",n),children:t.jsx("div",{className:"container mx-auto px-4",children:e})}):null;export{i as default};
