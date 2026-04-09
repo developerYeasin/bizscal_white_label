@@ -163,8 +163,9 @@ const PageBuilderV2 = () => {
   const [currentPage, setCurrentPage] = useState(null); // page being edited
   const [viewport, setViewport] = useState("desktop");
 
-  // Row selection state for page list
-  const [selectedRowIds, setSelectedRowIds] = useState(new Set());
+  // Single page selection state for page list
+  const [selectedPageId, setSelectedPageId] = useState(null);
+  const [selectedPageData, setSelectedPageData] = useState(null);
 
   // System blocks visibility (page-level settings)
   const [showHeader, setShowHeader] = useState(true);
@@ -284,22 +285,10 @@ const PageBuilderV2 = () => {
   }, [resetForm]);
 
   // Edit existing page
-  const handleEditPage = useCallback((page) => {
-    setCurrentPage(page);
-    setFormData({
-      title: page.title,
-      slug: page.slug,
-      meta_title: page.meta_title || "",
-      meta_description: page.meta_description || "",
-      status: page.status || "draft",
-    });
-    const pageBlocks = page.content?.blocks || [];
-    canvasState.reset(Array.isArray(pageBlocks) ? pageBlocks : []);
-    // Load page-level system block visibility
-    setShowHeader(page.content?.showHeader !== false);
-    setShowFooter(page.content?.showFooter !== false);
-    setMode("edit");
-  }, [canvasState]);
+  const handleEditPage = useCallback((pageId) => {
+    // Navigate to page builder with selected page
+    navigate(`/custom-pages-v2/${pageId}`);
+  }, [navigate]);
 
   // Save page
   const handleSave = useCallback(() => {
@@ -328,25 +317,59 @@ const PageBuilderV2 = () => {
     }
   }, [formData, canvasState.items, showHeader, showFooter, mode, currentPage, updateMutation, createMutation]);
 
-  // Delete page
-  const handleDeletePage = useCallback((pageId) => {
-    if (window.confirm("Delete this page? This action cannot be undone.")) {
-      deleteMutation.mutate(pageId);
+  // Load page data
+  const loadPageData = useCallback(async (pageId) => {
+    try {
+      const response = await api.get(`/pages/${pageId}`);
+      const page = response.data.data.page;
+
+      setSelectedPageId(page.id);
+      setSelectedPageData(page);
+
+      // Update page settings
+      setFormData({
+        title: page.title,
+        slug: page.slug,
+        meta_title: page.meta_title || "",
+        meta_description: page.meta_description || "",
+        status: page.status || "draft",
+      });
+
+      const pageBlocks = page.content?.blocks || [];
+      canvasState.reset(Array.isArray(pageBlocks) ? pageBlocks : []);
+
+      // Load page-level system block visibility
+      setShowHeader(page.content?.showHeader !== false);
+      setShowFooter(page.content?.showFooter !== false);
+
+      console.log('Page loaded successfully', page);
+    } catch (error) {
+      console.error('Failed to load page', error);
+      showError('Failed to load page data.');
     }
-  }, [deleteMutation]);
+  }, [canvasState]);
 
   // Toggle row selection
   const toggleRowSelection = useCallback((pageId) => {
-    setSelectedRowIds(prev => {
-      const next = new Set(prev);
-      if (next.has(pageId)) {
-        next.delete(pageId);
-      } else {
-        next.add(pageId);
-      }
-      return next;
-    });
-  }, []);
+    setSelectedPageId(pageId === selectedPageId ? null : pageId);
+    if (pageId === selectedPageId) {
+      // Deselect page
+      setSelectedPageData(null);
+      setFormData({
+        title: "",
+        slug: "",
+        meta_title: "",
+        meta_description: "",
+        status: "draft",
+      });
+      canvasState.reset([]);
+      setShowHeader(true);
+      setShowFooter(true);
+    } else {
+      // Load selected page data
+      loadPageData(pageId);
+    }
+  }, [loadPageData, canvasState]);
 
   // Go back to list
   const handleBack = useCallback(() => {
@@ -474,7 +497,7 @@ const PageBuilderV2 = () => {
                   {pagesData?.map((page) => (
                     <tr
                       key={page.id}
-                      className={`hover:bg-muted/50 cursor-pointer ${selectedRowIds.has(page.id) ? "bg-muted/70" : ""}`}
+                      className={`hover:bg-muted/50 cursor-pointer ${selectedPageId === page.id ? "bg-muted/70" : ""}`}
                       onClick={() => toggleRowSelection(page.id)}
                     >
                       <td className="px-4 py-3 text-sm font-medium">{page.title}</td>
@@ -501,7 +524,7 @@ const PageBuilderV2 = () => {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => handleEditPage(page)}>
+                            <DropdownMenuItem onClick={() => handleEditPage(page.id)}>
                               Edit
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
