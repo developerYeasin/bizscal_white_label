@@ -6,7 +6,7 @@ import { useThemeConfig } from '@/contexts/ThemeSettingsContext.jsx';
 
 // Storefront URL where preview should be displayed
 // In production, this would be your storefront domain
-const STOREFRONT_URL = process.env.VITE_STOREFRONT_URL || 'http://localhost:8080';
+const STOREFRONT_URL = import.meta.env.VITE_STOREFRONT_URL || 'http://localhost:8080';
 
 /**
  * Hook to manage live preview functionality

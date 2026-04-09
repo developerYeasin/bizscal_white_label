@@ -1,8 +1,11 @@
 import axios from "axios";
 
+const baseURL = "http://localhost:4000/api/v1/store";
+
 export const apiClient = axios.create({
   // Use relative URL to go through nginx proxy
-  baseURL: "/api/v1/store",
+  // baseURL: "/api/v1/store",
+  baseURL: baseURL,
   withCredentials: true,
 });
 
@@ -540,7 +543,10 @@ export const fetchProductLandingPageById = async (productLandingPageId) => {
       try {
         parsedSettings = JSON.parse(apiLandingPage.settings_json);
       } catch (e) {
-        console.error("Error parsing settings_json for product landing page:", e);
+        console.error(
+          "Error parsing settings_json for product landing page:",
+          e,
+        );
       }
     } else if (typeof apiLandingPage.settings_json === "object") {
       parsedSettings = apiLandingPage.settings_json;
@@ -600,9 +606,9 @@ export const submitContactForm = async (formData) => {
   try {
     // Assuming store_id is available globally or passed down. For now, hardcoding as 1 as per example.
     // In a real application, you might get this from context or a user session.
-    const payload = { ...formData, store_id: 1 }; 
+    const payload = { ...formData, store_id: 1 };
     const response = await apiClient.post("/contact-submissions", payload);
-    return response.data; 
+    return response.data;
   } catch (error) {
     console.error("Error submitting contact form:", error);
     throw error; // Re-throw to be handled by the calling component

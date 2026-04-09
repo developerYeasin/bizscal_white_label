@@ -1,7 +1,13 @@
 "use client";
 
-import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import React, {
+  useState,
+  useEffect,
+  useMemo,
+  useCallback,
+  useRef,
+} from "react";
+import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext.jsx";
 import { useThemeConfig } from "@/contexts/ThemeSettingsContext.jsx";
@@ -88,14 +94,43 @@ import { ScrollArea } from "@/components/ui/scroll-area.jsx";
 
 // Icons
 import {
-  Home, Eye, Monitor, Tablet, Smartphone, Plus,
-  FileText, Palette, Settings, ChevronDown, X,
-  PanelTop, PanelBottom, Globe, Search, CreditCard, Truck, Share2,
-  Layout, LayoutPanelTop, List, Table, Image, FileInput, Sliders, GripVertical, MoreHorizontal
+  Home,
+  Eye,
+  Monitor,
+  Tablet,
+  Smartphone,
+  Plus,
+  FileText,
+  Palette,
+  Settings,
+  ChevronDown,
+  X,
+  PanelTop,
+  PanelBottom,
+  Globe,
+  Search,
+  CreditCard,
+  Truck,
+  Share2,
+  Layout,
+  LayoutPanelTop,
+  List,
+  Table,
+  Image,
+  FileInput,
+  Sliders,
+  GripVertical,
+  MoreHorizontal,
 } from "lucide-react";
 
 // UI Components
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu.jsx";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu.jsx";
 
 // Viewport definitions
 const VIEWPORTS = {
@@ -107,12 +142,12 @@ const VIEWPORTS = {
 // Helper to update nested data object given a dot path
 const updateNestedData = (obj, path, value) => {
   if (!obj) obj = {};
-  const keys = path.split('.');
+  const keys = path.split(".");
   const result = { ...obj };
   let current = result;
   for (let i = 0; i < keys.length - 1; i++) {
     const key = keys[i];
-    if (!(key in current) || typeof current[key] !== 'object') {
+    if (!(key in current) || typeof current[key] !== "object") {
       current[key] = {};
     }
     current[key] = { ...current[key] };
@@ -123,22 +158,33 @@ const updateNestedData = (obj, path, value) => {
 };
 
 // Pages Panel with DnD reordering - separate component to comply with Rules of Hooks
-const SortablePageItem = ({ page, pageId, navigate, canvasState, setActiveLeftPanel, setLeftPanelOpen, selectedRowIds, toggleRowSelection, onDelete }) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    isDragging,
-  } = useSortable({ id: page.id });
+const SortablePageItem = ({
+  page,
+  selectedPageId,
+  setSelectedPageId,
+  setMode,
+  navigate,
+  canvasState,
+  setActiveLeftPanel,
+  setLeftPanelOpen,
+  selectedRowIds,
+  toggleRowSelection,
+  onDelete,
+}) => {
+  const { attributes, listeners, setNodeRef, isDragging } = useSortable({
+    id: page.id,
+  });
 
   const isSelected = selectedRowIds.has(page.id);
-  const isEditing = pageId === String(page.id);
+  const isEditing = selectedPageId === String(page.id);
 
-  const handleEdit = (e) => { e && e.stopPropagation();
+  const handleEdit = (e) => {
+    e && e.stopPropagation();
     e.stopPropagation();
-    navigate(`/custom-pages?pageId=${page.id}`);
+    setSelectedPageId(page.id);
+    setMode("page");
     canvasState.clearSelection();
-    setActiveLeftPanel('properties');
+    setActiveLeftPanel("properties");
     setLeftPanelOpen(true);
   };
 
@@ -164,26 +210,34 @@ const SortablePageItem = ({ page, pageId, navigate, canvasState, setActiveLeftPa
           const cp = resp.data.data;
           const rawBlocks = cp.content?.blocks;
           let blocks = Array.isArray(rawBlocks) ? [...rawBlocks] : [];
-          const hasHeader = blocks.some(b => b.type === 'systemHeader');
-          const hasFooter = blocks.some(b => b.type === 'systemFooter');
+          const hasHeader = blocks.some((b) => b.type === "systemHeader");
+          const hasFooter = blocks.some((b) => b.type === "systemFooter");
           const content = cp.content || {};
           if (!hasHeader && content.showHeader !== false) {
-            blocks.unshift({ id: 'systemHeader', type: 'systemHeader', data: {} });
+            blocks.unshift({
+              id: "systemHeader",
+              type: "systemHeader",
+              data: {},
+            });
           }
           if (!hasFooter && content.showFooter !== false) {
-            blocks.push({ id: 'systemFooter', type: 'systemFooter', data: {} });
+            blocks.push({ id: "systemFooter", type: "systemFooter", data: {} });
           }
           canvasState.reset(blocks);
         } catch (err) {
-          console.error('Failed to load preview page:', err);
+          console.error("Failed to load preview page:", err);
         }
         // Keep left panel on pages list
-        setActiveLeftPanel('pages');
+        setActiveLeftPanel("pages");
         setLeftPanelOpen(true);
-      } }
+      }}
     >
       {/* Drag handle */}
-      <span {...attributes} {...listeners} className="cursor-grab flex-shrink-0">
+      <span
+        {...attributes}
+        {...listeners}
+        className="cursor-grab flex-shrink-0"
+      >
         <GripVertical className="h-4 w-4 text-gray-400" />
       </span>
 
@@ -220,7 +274,9 @@ const SortablePageItem = ({ page, pageId, navigate, canvasState, setActiveLeftPa
 const PagesPanel = ({
   orderedPages,
   setOrderedPages,
-  pageId,
+  selectedPageId,
+  setSelectedPageId,
+  setMode,
   navigate,
   canvasState,
   setActiveLeftPanel,
@@ -229,62 +285,86 @@ const PagesPanel = ({
   showLoading,
   selectedRowIds,
   toggleRowSelection,
-  deleteMutation
+  deleteMutation,
 }) => {
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
   );
 
-  const handlePagesDragEnd = useCallback((event) => {
-    const { active, over } = event;
-    if (over && active.id !== over.id && orderedPages.length > 0) {
-      setOrderedPages((items) => {
-        const oldIndex = items.findIndex(p => p.id === active.id);
-        const newIndex = items.findIndex(p => p.id === over.id);
-        if (oldIndex === -1 || newIndex === -1) return items;
-        const newItems = arrayMove(items, oldIndex, newIndex);
+  const handlePagesDragEnd = useCallback(
+    (event) => {
+      const { active, over } = event;
+      if (over && active.id !== over.id && orderedPages.length > 0) {
+        setOrderedPages((items) => {
+          const oldIndex = items.findIndex((p) => p.id === active.id);
+          const newIndex = items.findIndex((p) => p.id === over.id);
+          if (oldIndex === -1 || newIndex === -1) return items;
+          const newItems = arrayMove(items, oldIndex, newIndex);
 
-        // Prepare orders for API
-        const orders = newItems.map((page, idx) => ({ id: page.id, sort_order: idx }));
+          // Prepare orders for API
+          const orders = newItems.map((page, idx) => ({
+            id: page.id,
+            sort_order: idx,
+          }));
 
-        // Send to server
-        api.put('/owner/custom-pages/reorder', { orders })
-          .then(() => {
-            showSuccess('Page order updated');
-            queryClient.invalidateQueries({ queryKey: ['customPages'] });
-          })
-          .catch(err => {
-            showError(err.response?.data?.message || 'Failed to update page order');
-            queryClient.invalidateQueries({ queryKey: ['customPages'] });
-          });
+          // Send to server
+          api
+            .put("/owner/custom-pages/reorder", { orders })
+            .then(() => {
+              showSuccess("Page order updated");
+              queryClient.invalidateQueries({ queryKey: ["customPages"] });
+            })
+            .catch((err) => {
+              showError(
+                err.response?.data?.message || "Failed to update page order",
+              );
+              queryClient.invalidateQueries({ queryKey: ["customPages"] });
+            });
 
-        return newItems;
-      });
-    }
-  }, [orderedPages, queryClient]);
+          return newItems;
+        });
+      }
+    },
+    [orderedPages, queryClient],
+  );
 
   if (showLoading) {
     return (
       <div className="space-y-2">
-        {[1, 2, 3, 4, 5].map(i => <Skeleton key={i} className="h-8 w-full" />)}
+        {[1, 2, 3, 4, 5].map((i) => (
+          <Skeleton key={i} className="h-8 w-full" />
+        ))}
       </div>
     );
   }
 
   if (!orderedPages || orderedPages.length === 0) {
-    return <p className="text-sm text-gray-500 text-center py-4">No pages yet</p>;
+    return (
+      <p className="text-sm text-gray-500 text-center py-4">No pages yet</p>
+    );
   }
 
   return (
-    <DndContext sensors={sensors} onDragEnd={handlePagesDragEnd} collisionDetection={closestCenter}>
-      <SortableContext items={orderedPages.map(p => p.id)} strategy={verticalListSortingStrategy}>
+    <DndContext
+      sensors={sensors}
+      onDragEnd={handlePagesDragEnd}
+      collisionDetection={closestCenter}
+    >
+      <SortableContext
+        items={orderedPages.map((p) => p.id)}
+        strategy={verticalListSortingStrategy}
+      >
         <div className="space-y-1">
           {orderedPages.map((page) => (
             <SortablePageItem
               key={page.id}
               page={page}
-              pageId={pageId}
+              selectedPageId={selectedPageId}
+              setSelectedPageId={setSelectedPageId}
+              setMode={setMode}
               navigate={navigate}
               canvasState={canvasState}
               setActiveLeftPanel={setActiveLeftPanel}
@@ -305,12 +385,9 @@ const Builder = () => {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [searchParams] = useSearchParams();
-
-  // Mode detection
-  const mode = searchParams.get("mode") || "page";
-  const productId = searchParams.get("productId");
-  const pageId = searchParams.get("pageId");
+  const [mode, setMode] = useState("page");
+  const [productId, setProductId] = useState(null);
+  const [selectedPageId, setSelectedPageId] = useState(null);
 
   // Active panel in left sidebar: 'blocks' | 'pages' | 'theme' | 'settings' | null
   const [activeLeftPanel, setActiveLeftPanel] = useState("blocks");
@@ -323,6 +400,7 @@ const Builder = () => {
   // Editor mode state
   const [creating, setCreating] = useState(false);
   const [editingPage, setEditingPage] = useState(null);
+  const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(false);
 
   // Pages list ordering state (local) - initialize with pagesData when available
   const [orderedPages, setOrderedPages] = useState([]);
@@ -347,7 +425,7 @@ const Builder = () => {
   // ESC key to exit builder or close panel
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.key === 'Escape') {
+      if (e.key === "Escape") {
         if (leftPanelOpen) {
           setLeftPanelOpen(false);
         } else {
@@ -355,8 +433,8 @@ const Builder = () => {
         }
       }
     };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, [navigate, leftPanelOpen]);
 
   // Fetch custom pages list
@@ -370,11 +448,16 @@ const Builder = () => {
   });
 
   // Fetch theme and store config
-  const { config: themeConfig, isLoading: themeLoading, error: themeError } = useThemeConfig();
+  const {
+    config: themeConfig,
+    isLoading: themeLoading,
+    error: themeError,
+  } = useThemeConfig();
   const { config: storeConfig, isLoading: storeLoading } = useStoreConfig();
 
   // Fetch available themes for palette
-  const { data: availableThemes, isLoading: themesLoading } = useAvailableThemes();
+  const { data: availableThemes, isLoading: themesLoading } =
+    useAvailableThemes();
 
   // Fetch all theme blocks
   const { data: themeBlocksData } = useQuery({
@@ -388,7 +471,7 @@ const Builder = () => {
   const themeBlocksMap = useMemo(() => {
     if (!themeBlocksData || themeBlocksData.length === 0) return {};
     const map = {};
-    themeBlocksData.forEach(block => {
+    themeBlocksData.forEach((block) => {
       if (!map[block.theme_id]) {
         map[block.theme_id] = [];
       }
@@ -400,7 +483,9 @@ const Builder = () => {
   // Determine current theme blocks
   const currentTheme = useMemo(() => {
     if (!storeConfig || !availableThemes) return null;
-    const theme = availableThemes.find(t => t.id === storeConfig.theme_id) || availableThemes[0];
+    const theme =
+      availableThemes.find((t) => t.id === storeConfig.theme_id) ||
+      availableThemes[0];
     if (!theme) return null;
     const blocks = themeBlocksMap[theme.id] || [];
     return {
@@ -411,52 +496,58 @@ const Builder = () => {
 
   const themeBlocks = useMemo(() => {
     if (!currentTheme?.theme_blocks) return [];
-    return [...currentTheme.theme_blocks].sort((a, b) => a.sort_order - b.sort_order);
+    return [...currentTheme.theme_blocks].sort(
+      (a, b) => a.sort_order - b.sort_order,
+    );
   }, [currentTheme]);
 
   // Filtered blocks based on search query
   const filteredThemeBlocks = useMemo(() => {
     if (!blockSearchQuery.trim()) return themeBlocks;
     const q = blockSearchQuery.toLowerCase();
-    return themeBlocks.filter(b =>
-      (b.name || b.block_type).toLowerCase().includes(q) ||
-      (b.description || '').toLowerCase().includes(q)
+    return themeBlocks.filter(
+      (b) =>
+        (b.name || b.block_type).toLowerCase().includes(q) ||
+        (b.description || "").toLowerCase().includes(q),
     );
   }, [themeBlocks, blockSearchQuery]);
 
   // Settings components map
-  const settingsComponentMap = useMemo(() => ({
-    heroBanner: HeroBannerSettings,
-    productCarousel: ProductCarouselSettings,
-    featuredCategories: FeaturedCategoriesSettings,
-    heroBannerSlider: HeroBannerSliderSection,
-    marketingBanner: MarketingBannerSettings,
-    featureBlocks: FeatureBlocksSettings,
-    productSection: ProductSectionSettings,
-    brandShowcase: BrandShowcaseSettings,
-    latestNews: LatestNewsSettings,
-    categorySidebar: CategorySidebarSettings,
-    promotionalBanners: PromotionalBannersSettings,
-    midPageCallToAction: MidPageCallToActionSettings,
-    newsletterSubscription: NewsletterSubscriptionSettings,
-    blogPostsSection: BlogPostsSectionSettings,
-    systemHeader: SystemHeaderSettings,
-    systemFooter: SystemFooterSettings,
-    // Layout blocks
-    section: SectionBlockSettings,
-    row: RowBlockSettings,
-    column: ColumnBlockSettings,
-    columns: ColumnBlockSettings, // Alias for compatibility
-    grid: GridBlockSettings,
-    container: SectionBlockSettings, // Fallback: use section settings
-  }), []);
+  const settingsComponentMap = useMemo(
+    () => ({
+      heroBanner: HeroBannerSettings,
+      productCarousel: ProductCarouselSettings,
+      featuredCategories: FeaturedCategoriesSettings,
+      heroBannerSlider: HeroBannerSliderSection,
+      marketingBanner: MarketingBannerSettings,
+      featureBlocks: FeatureBlocksSettings,
+      productSection: ProductSectionSettings,
+      brandShowcase: BrandShowcaseSettings,
+      latestNews: LatestNewsSettings,
+      categorySidebar: CategorySidebarSettings,
+      promotionalBanners: PromotionalBannersSettings,
+      midPageCallToAction: MidPageCallToActionSettings,
+      newsletterSubscription: NewsletterSubscriptionSettings,
+      blogPostsSection: BlogPostsSectionSettings,
+      systemHeader: SystemHeaderSettings,
+      systemFooter: SystemFooterSettings,
+      // Layout blocks
+      section: SectionBlockSettings,
+      row: RowBlockSettings,
+      column: ColumnBlockSettings,
+      columns: ColumnBlockSettings, // Alias for compatibility
+      grid: GridBlockSettings,
+      container: SectionBlockSettings, // Fallback: use section settings
+    }),
+    [],
+  );
 
   // Create page mutation
   const createPageMutation = useMutation({
     mutationFn: async (data) => {
       const response = await api.post("/owner/custom-pages", {
         ...data,
-        content: { blocks: data.blocks || [] }
+        content: data.content || { blocks: [] },
       });
       return response.data;
     },
@@ -464,7 +555,7 @@ const Builder = () => {
       showSuccess("Page created successfully!");
       queryClient.invalidateQueries({ queryKey: ["customPages"] });
       // Navigate to edit the new page
-      navigate(`/custom-pages?pageId=${data.data.page_id}`);
+      setSelectedPageId(data.data.page_id);
     },
     onError: (err) => {
       showError(err.response?.data?.message || "Failed to create page.");
@@ -498,15 +589,14 @@ const Builder = () => {
   // Local saving state for Save button
   const [isSaving, setIsSaving] = useState(false);
 
-
   // Custom page/product data
   const { data: customPage, isLoading: isLoadingCustomPage } = useQuery({
-    queryKey: ["customPage", pageId],
+    queryKey: ["customPage", selectedPageId],
     queryFn: async () => {
-      const response = await api.get(`/owner/custom-pages/${pageId}`);
+      const response = await api.get(`/owner/custom-pages/${selectedPageId}`);
       return response.data.data.page; // Extract the page object from the response
     },
-    enabled: mode === "page" && !!pageId,
+    enabled: mode === "page" && !!selectedPageId,
   });
 
   const productLandingPageQuery = useProductLandingPage(productId);
@@ -516,42 +606,62 @@ const Builder = () => {
 
   // Initialize canvas when page/product loads
   useEffect(() => {
-    if (mode === "page" && customPage) {
-      // Activate editor mode for this page
-      setEditingPage(customPage);
-      setCreating(false);
+    if (mode === "page") {
+      if (customPage) {
+        // Activate editor mode for this page
+        setEditingPage(customPage);
+        setCreating(false);
 
-      // Copy blocks to avoid mutating the query cached data
-      // Safely ensure it's an array
-      const rawBlocks = customPage.content?.blocks;
-      let blocks = Array.isArray(rawBlocks) ? [...rawBlocks] : [];
+        // Copy blocks to avoid mutating the query cached data
+        // Safely ensure it's an array
+        const rawBlocks = customPage.content?.blocks;
+        let blocks = Array.isArray(rawBlocks) ? [...rawBlocks] : [];
 
-      const hasHeader = blocks.some(b => b.type === 'systemHeader');
-      const hasFooter = blocks.some(b => b.type === 'systemFooter');
-      const content = customPage.content || {};
+        const hasHeader = blocks.some((b) => b.type === "systemHeader");
+        const hasFooter = blocks.some((b) => b.type === "systemFooter");
+        const content = customPage.content || {};
 
-      if (!hasHeader && content.showHeader !== false) {
-        blocks.unshift({ id: 'systemHeader', type: 'systemHeader', data: {} });
+        if (!hasHeader && content.showHeader !== false) {
+          blocks.unshift({
+            id: "systemHeader",
+            type: "systemHeader",
+            data: {},
+          });
+        }
+        if (!hasFooter && content.showFooter !== false) {
+          blocks.push({ id: "systemFooter", type: "systemFooter", data: {} });
+        }
+
+        canvasState.reset(blocks);
+        setFormData((prev) => ({
+          ...prev,
+          title: customPage.title || "",
+          slug: customPage.slug || "",
+          meta_title: customPage.meta_title || "",
+          meta_description: customPage.meta_description || "",
+          status: customPage.status || "draft",
+        }));
+        setIsSlugManuallyEdited(false); // Reset for existing page
+
+        // Ensure properties panel is open and active when editing a page
+        setLeftPanelOpen(true);
+        setActiveLeftPanel("properties");
+      } else if (!selectedPageId) {
+        // This is the case for a new page creation
+        setFormData({
+          title: "",
+          slug: "",
+          meta_title: "",
+          meta_description: "",
+          status: "draft",
+        });
+        canvasState.reset([]);
+        setIsSlugManuallyEdited(false); // Reset for new page
+        setLeftPanelOpen(true);
+        setActiveLeftPanel("properties");
       }
-      if (!hasFooter && content.showFooter !== false) {
-        blocks.push({ id: 'systemFooter', type: 'systemFooter', data: {} });
-      }
-
-      canvasState.reset(blocks);
-      setFormData(prev => ({
-        ...prev,
-        title: customPage.title || "",
-        slug: customPage.slug || "",
-        meta_title: customPage.meta_title || "",
-        meta_description: customPage.meta_description || "",
-        status: customPage.status || "draft",
-      }));
-
-      // Ensure properties panel is open and active when editing a page
-      setLeftPanelOpen(true);
-      setActiveLeftPanel("properties");
     }
-  }, [mode, customPage, resetCanvas]);
+  }, [mode, customPage, resetCanvas, selectedPageId]);
 
   useEffect(() => {
     if (mode === "product" && productLandingPage) {
@@ -559,23 +669,26 @@ const Builder = () => {
       const rawBlocks = productLandingPage.settings_json?.components;
       let blocks = Array.isArray(rawBlocks) ? [...rawBlocks] : [];
 
-      const hasHeader = blocks.some(b => b.type === 'systemHeader');
-      const hasFooter = blocks.some(b => b.type === 'systemFooter');
+      const hasHeader = blocks.some((b) => b.type === "systemHeader");
+      const hasFooter = blocks.some((b) => b.type === "systemFooter");
       const settingsJson = productLandingPage.settings_json || {};
 
       if (!hasHeader && settingsJson.showHeader !== false) {
-        blocks.unshift({ id: 'systemHeader', type: 'systemHeader', data: {} });
+        blocks.unshift({ id: "systemHeader", type: "systemHeader", data: {} });
       }
       if (!hasFooter && settingsJson.showFooter !== false) {
-        blocks.push({ id: 'systemFooter', type: 'systemFooter', data: {} });
+        blocks.push({ id: "systemFooter", type: "systemFooter", data: {} });
       }
 
       canvasState.reset(blocks);
 
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        page_title: productLandingPage.settings_json?.seo_settings?.page_title || "",
-        page_description: productLandingPage.settings_json?.seo_settings?.page_description || "",
+        page_title:
+          productLandingPage.settings_json?.seo_settings?.page_title || "",
+        page_description:
+          productLandingPage.settings_json?.seo_settings?.page_description ||
+          "",
         slug: productLandingPage.slug || "",
         status: productLandingPage.status || "draft",
       }));
@@ -587,32 +700,38 @@ const Builder = () => {
   }, [mode, productLandingPage]);
 
   // Handlers
-  const handleAddBlock = useCallback((blockType, arg2, arg3) => {
-    let defaultConfig = {};
-    let index = null;
+  const handleAddBlock = useCallback(
+    (blockType, arg2, arg3) => {
+      let defaultConfig = {};
+      let index = null;
 
-    // Handle both signatures:
-    // - (blockType, defaultConfig) from palette click
-    // - (blockType, index, defaultConfig) from drag-drop
-    if (typeof arg2 === 'number') {
-      index = arg2;
-      defaultConfig = arg3 || {};
-    } else if (typeof arg2 === 'object' && arg2 !== null) {
-      defaultConfig = arg2;
-    }
+      // Handle both signatures:
+      // - (blockType, defaultConfig) from palette click
+      // - (blockType, index, defaultConfig) from drag-drop
+      if (typeof arg2 === "number") {
+        index = arg2;
+        defaultConfig = arg3 || {};
+      } else if (typeof arg2 === "object" && arg2 !== null) {
+        defaultConfig = arg2;
+      }
 
-    const newBlock = {
-      id: Date.now() + Math.random(),
-      type: blockType,
-      data: defaultConfig,
-    };
-    canvasState.addItem(newBlock, null, index);
-    // Keep left panel open after adding block
-    setActiveLeftPanel("blocks");
-  }, [resetCanvas]);
+      const newBlock = {
+        id: Date.now() + Math.random(),
+        type: blockType,
+        data: defaultConfig,
+      };
+      canvasState.addItem(newBlock, null, index);
+      // Keep left panel open after adding block
+      setActiveLeftPanel("blocks");
+    },
+    [resetCanvas],
+  );
 
   const handleMetaChange = useCallback((field, value) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    if (field === "slug") {
+      setIsSlugManuallyEdited(true);
+    }
   }, []);
 
   const handleCreateNewPage = useCallback(() => {
@@ -627,7 +746,8 @@ const Builder = () => {
     canvasState.reset([]);
 
     // Navigate to custom-pages without pageId to enter create mode
-    navigate('/custom-pages', { replace: true });
+    setSelectedPageId(null);
+    setMode("page");
 
     // Open left panel and switch to properties to show page form
     setLeftPanelOpen(true);
@@ -665,7 +785,6 @@ const Builder = () => {
         }
         showSuccess(customPage ? "Page updated!" : "Page created!");
         queryClient.invalidateQueries({ queryKey: ["customPages"] });
-        navigate("/custom-pages");
       } else if (isProductMode) {
         if (!productId) {
           showError("Product ID missing.");
@@ -696,7 +815,10 @@ const Builder = () => {
         };
 
         if (productLandingPage) {
-          await productLandingPageQuery.updateProductLandingPage({ id: productLandingPage.id, ...payload });
+          await productLandingPageQuery.updateProductLandingPage({
+            id: productLandingPage.id,
+            ...payload,
+          });
         } else {
           await productLandingPageQuery.createProductLandingPage(payload);
         }
@@ -709,36 +831,52 @@ const Builder = () => {
       showError(err.response?.data?.message || "Failed to save.");
       setIsSaving(false);
     }
-  }, [mode, productId, customPage, productLandingPage, formData, canvasState.items, storeConfig, queryClient, navigate, productLandingPageQuery]);
+  }, [
+    mode,
+    productId,
+    customPage,
+    productLandingPage,
+    formData,
+    canvasState.items,
+    storeConfig,
+    queryClient,
+    navigate,
+    productLandingPageQuery,
+  ]);
 
   const handlePublish = useCallback(() => {
-    setFormData(prev => ({ ...prev, status: "published" }));
+    setFormData((prev) => ({ ...prev, status: "published" }));
     handleSave();
   }, [handleSave]);
 
   const handleBack = useCallback(() => {
-    navigate('/dashboard');
+    navigate("/dashboard");
   }, [navigate]);
 
   // Toggle row selection
   const toggleRowSelection = useCallback((pageId) => {
     // Single selection: replace any existing selection with the clicked page
+    console.log("toggleRowSelection", pageId);
+    setSelectedPageId(pageId);
     setSelectedRowIds(new Set([pageId]));
   }, []);
 
   // Handle panel switching - toggle behavior
-  const openPanel = useCallback((panelId) => {
-    if (activeLeftPanel === panelId && leftPanelOpen) {
-      // If clicking the same open panel, close it (manual close)
-      setLeftPanelOpen(false);
-      manualCloseRef.current = true;
-    } else {
-      // Open new panel (manual open)
-      setActiveLeftPanel(panelId);
-      setLeftPanelOpen(true);
-      manualCloseRef.current = false; // User manually opened, allow auto-reopen if needed
-    }
-  }, [activeLeftPanel, leftPanelOpen]);
+  const openPanel = useCallback(
+    (panelId) => {
+      if (activeLeftPanel === panelId && leftPanelOpen) {
+        // If clicking the same open panel, close it (manual close)
+        setLeftPanelOpen(false);
+        manualCloseRef.current = true;
+      } else {
+        // Open new panel (manual open)
+        setActiveLeftPanel(panelId);
+        setLeftPanelOpen(true);
+        manualCloseRef.current = false; // User manually opened, allow auto-reopen if needed
+      }
+    },
+    [activeLeftPanel, leftPanelOpen],
+  );
 
   const closePanel = useCallback(() => {
     manualCloseRef.current = true;
@@ -748,7 +886,7 @@ const Builder = () => {
   // Sync orderedPages with pagesData when it changes
   useEffect(() => {
     if (pagesData) {
-      setOrderedPages(prev => {
+      setOrderedPages((prev) => {
         // If lengths differ, definitely different
         if (prev.length !== pagesData.length) return pagesData;
         // Check if any ID differs
@@ -760,7 +898,7 @@ const Builder = () => {
 
   // Auto-open properties panel when a block is selected (unless user manually closed)
   useEffect(() => {
-    if (canvasState.selectedId && (mode === "page" || mode === "product")) {
+    if (canvasState.selectedItem && (mode === "page" || mode === "product")) {
       if (!leftPanelOpen && manualCloseRef.current) {
         // User manually closed, don't auto-reopen
         return;
@@ -784,7 +922,11 @@ const Builder = () => {
   }
 
   if (themeError) {
-    return <div className="p-6 text-destructive">Error loading theme: {themeError.message}</div>;
+    return (
+      <div className="p-6 text-destructive">
+        Error loading theme: {themeError.message}
+      </div>
+    );
   }
 
   // Panel titles and content
@@ -793,7 +935,9 @@ const Builder = () => {
       case "blocks":
         return (
           <>
-            <h2 className="font-semibold text-sm text-gray-800 mb-4">Add New Block</h2>
+            <h2 className="font-semibold text-sm text-gray-800 mb-4">
+              Add New Block
+            </h2>
             <div className="relative mb-4">
               <input
                 type="text"
@@ -809,33 +953,43 @@ const Builder = () => {
                 <div
                   key={block.id}
                   className="border border-gray-200 bg-white hover:border-blue-500 hover:shadow-sm transition-all p-3 rounded-md cursor-pointer flex flex-col items-center gap-2 text-center"
-                  onClick={() => handleAddBlock(block.block_type, block.default_config || {})}
+                  onClick={() =>
+                    handleAddBlock(block.block_type, block.default_config || {})
+                  }
                   draggable
                   onDragStart={(e) => {
-                    e.dataTransfer.setData('application/json', JSON.stringify({
-                      type: 'new-block',
-                      blockType: block.block_type,
-                      defaultConfig: block.default_config || {}
-                    }));
-                    e.dataTransfer.effectAllowed = 'copy';
+                    e.dataTransfer.setData(
+                      "application/json",
+                      JSON.stringify({
+                        type: "new-block",
+                        blockType: block.block_type,
+                        defaultConfig: block.default_config || {},
+                      }),
+                    );
+                    e.dataTransfer.effectAllowed = "copy";
                   }}
                 >
                   <Layout className="w-6 h-6 text-gray-400" />
-                  <span className="text-xs font-medium">{block.name || block.block_type}</span>
+                  <span className="text-xs font-medium">
+                    {block.name || block.block_type}
+                  </span>
                 </div>
               ))}
               {/* System blocks */}
               <div
                 className="border border-gray-200 bg-white hover:border-blue-500 hover:shadow-sm transition-all p-3 rounded-md cursor-pointer flex flex-col items-center gap-2 text-center"
-                onClick={() => handleAddBlock('systemHeader', {})}
+                onClick={() => handleAddBlock("systemHeader", {})}
                 draggable
                 onDragStart={(e) => {
-                  e.dataTransfer.setData('application/json', JSON.stringify({
-                    type: 'new-block',
-                    blockType: 'systemHeader',
-                    defaultConfig: {}
-                  }));
-                  e.dataTransfer.effectAllowed = 'copy';
+                  e.dataTransfer.setData(
+                    "application/json",
+                    JSON.stringify({
+                      type: "new-block",
+                      blockType: "systemHeader",
+                      defaultConfig: {},
+                    }),
+                  );
+                  e.dataTransfer.effectAllowed = "copy";
                 }}
               >
                 <PanelTop className="w-6 h-6 text-gray-400" />
@@ -843,15 +997,18 @@ const Builder = () => {
               </div>
               <div
                 className="border border-gray-200 bg-white hover:border-blue-500 hover:shadow-sm transition-all p-3 rounded-md cursor-pointer flex flex-col items-center gap-2 text-center"
-                onClick={() => handleAddBlock('systemFooter', {})}
+                onClick={() => handleAddBlock("systemFooter", {})}
                 draggable
                 onDragStart={(e) => {
-                  e.dataTransfer.setData('application/json', JSON.stringify({
-                    type: 'new-block',
-                    blockType: 'systemFooter',
-                    defaultConfig: {}
-                  }));
-                  e.dataTransfer.effectAllowed = 'copy';
+                  e.dataTransfer.setData(
+                    "application/json",
+                    JSON.stringify({
+                      type: "new-block",
+                      blockType: "systemFooter",
+                      defaultConfig: {},
+                    }),
+                  );
+                  e.dataTransfer.effectAllowed = "copy";
                 }}
               >
                 <PanelBottom className="w-6 h-6 text-gray-400" />
@@ -867,13 +1024,15 @@ const Builder = () => {
             <div className="flex items-center justify-between mb-4">
               <h2 className="font-semibold text-sm text-gray-800">Pages</h2>
               <Button size="sm" variant="outline" onClick={handleCreateNewPage}>
-                New
+                Add Page
               </Button>
             </div>
             <PagesPanel
               orderedPages={orderedPages}
               setOrderedPages={setOrderedPages}
-              pageId={pageId}
+              selectedPageId={selectedPageId}
+              setSelectedPageId={setSelectedPageId}
+              setMode={setMode}
               navigate={navigate}
               canvasState={canvasState}
               setActiveLeftPanel={setActiveLeftPanel}
@@ -890,7 +1049,9 @@ const Builder = () => {
       case "theme":
         return (
           <>
-            <h2 className="font-semibold text-sm text-gray-800 mb-4">Theme Settings</h2>
+            <h2 className="font-semibold text-sm text-gray-800 mb-4">
+              Theme Settings
+            </h2>
             <ScrollArea className="h-[calc(100vh-200px)]">
               <ThemeSelection />
             </ScrollArea>
@@ -900,33 +1061,89 @@ const Builder = () => {
       case "settings":
         return (
           <>
-            <h2 className="font-semibold text-sm text-gray-800 mb-4">Settings</h2>
+            <h2 className="font-semibold text-sm text-gray-800 mb-4">
+              Settings
+            </h2>
             <div className="space-y-1">
-              <Button variant="ghost" className="w-full justify-start h-8 px-2" onClick={() => { navigate('/manage-shop/shop-settings'); }}>
+              <Button
+                variant="ghost"
+                className="w-full justify-start h-8 px-2"
+                onClick={() => {
+                  navigate("/manage-shop/shop-settings");
+                }}
+              >
                 <Settings className="w-4 h-4 mr-2" /> Shop Settings
               </Button>
-              <Button variant="ghost" className="w-full justify-start h-8 px-2" onClick={() => { navigate('/manage-shop/header-settings'); }}>
+              <Button
+                variant="ghost"
+                className="w-full justify-start h-8 px-2"
+                onClick={() => {
+                  navigate("/manage-shop/header-settings");
+                }}
+              >
                 <PanelTop className="w-4 h-4 mr-2" /> Header
               </Button>
-              <Button variant="ghost" className="w-full justify-start h-8 px-2" onClick={() => { navigate('/manage-shop/footer-settings'); }}>
+              <Button
+                variant="ghost"
+                className="w-full justify-start h-8 px-2"
+                onClick={() => {
+                  navigate("/manage-shop/footer-settings");
+                }}
+              >
                 <PanelBottom className="w-4 h-4 mr-2" /> Footer
               </Button>
-              <Button variant="ghost" className="w-full justify-start h-8 px-2" onClick={() => { navigate('/manage-shop/seo-marketing'); }}>
+              <Button
+                variant="ghost"
+                className="w-full justify-start h-8 px-2"
+                onClick={() => {
+                  navigate("/manage-shop/seo-marketing");
+                }}
+              >
                 <Search className="w-4 h-4 mr-2" /> SEO & Marketing
               </Button>
-              <Button variant="ghost" className="w-full justify-start h-8 px-2" onClick={() => { navigate('/manage-shop/shop-domain'); }}>
+              <Button
+                variant="ghost"
+                className="w-full justify-start h-8 px-2"
+                onClick={() => {
+                  navigate("/manage-shop/shop-domain");
+                }}
+              >
                 <Globe className="w-4 h-4 mr-2" /> Domain
               </Button>
-              <Button variant="ghost" className="w-full justify-start h-8 px-2" onClick={() => { navigate('/manage-shop/shop-policy'); }}>
+              <Button
+                variant="ghost"
+                className="w-full justify-start h-8 px-2"
+                onClick={() => {
+                  navigate("/manage-shop/shop-policy");
+                }}
+              >
                 <FileText className="w-4 h-4 mr-2" /> Shop Policy
               </Button>
-              <Button variant="ghost" className="w-full justify-start h-8 px-2" onClick={() => { navigate('/manage-shop/payment-gateway'); }}>
+              <Button
+                variant="ghost"
+                className="w-full justify-start h-8 px-2"
+                onClick={() => {
+                  navigate("/manage-shop/payment-gateway");
+                }}
+              >
                 <CreditCard className="w-4 h-4 mr-2" /> Payment Gateway
               </Button>
-              <Button variant="ghost" className="w-full justify-start h-8 px-2" onClick={() => { navigate('/manage-shop/delivery-support'); }}>
+              <Button
+                variant="ghost"
+                className="w-full justify-start h-8 px-2"
+                onClick={() => {
+                  navigate("/manage-shop/delivery-support");
+                }}
+              >
                 <Truck className="w-4 h-4 mr-2" /> Delivery & Support
               </Button>
-              <Button variant="ghost" className="w-full justify-start h-8 px-2" onClick={() => { navigate('/manage-shop/social-links'); }}>
+              <Button
+                variant="ghost"
+                className="w-full justify-start h-8 px-2"
+                onClick={() => {
+                  navigate("/manage-shop/social-links");
+                }}
+              >
                 <Share2 className="w-4 h-4 mr-2" /> Social Links
               </Button>
             </div>
@@ -937,7 +1154,9 @@ const Builder = () => {
         return (
           <>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-semibold text-sm text-gray-800">Properties</h2>
+              <h2 className="font-semibold text-sm text-gray-800">
+                Properties
+              </h2>
               <Button
                 variant="ghost"
                 size="icon"
@@ -947,10 +1166,13 @@ const Builder = () => {
                   canvasState.selectItem(null);
                   // If we were viewing Page Settings (no block selected), go to Pages list
                   // Otherwise if we were viewing block properties, go to Blocks list
-                  if (!hadSelection && (mode === "page" || mode === "product")) {
-                    setActiveLeftPanel('pages');
+                  if (
+                    !hadSelection &&
+                    (mode === "page" || mode === "product")
+                  ) {
+                    setActiveLeftPanel("pages");
                   } else {
-                    setActiveLeftPanel('blocks');
+                    setActiveLeftPanel("blocks");
                   }
                 }}
               >
@@ -960,120 +1182,203 @@ const Builder = () => {
             <div className="overflow-y-auto">
               <div className="space-y-4">
                 {/* Page-level settings (shown when no block is selected in page/product mode) */}
-                {(mode === "page" || mode === "product") && !canvasState.selectedId && (
-                  <div className="border-b pb-4">
-                    <h3 className="text-xs font-semibold text-gray-500 uppercase mb-2">Page Settings</h3>
-                    <div className="space-y-3">
-                      <div>
-                        <label className="text-xs font-medium text-gray-600">Title</label>
-                        <Input
-                          value={formData.title || formData.page_title || ''}
-                          onChange={(e) => handleMetaChange('title', e.target.value)}
-                          className="h-8 text-sm mt-1"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-xs font-medium text-gray-600">URL Slug</label>
-                        <Input
-                          value={formData.slug}
-                          onChange={(e) => handleMetaChange('slug', e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-'))}
-                          className="h-8 text-sm mt-1"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-xs font-medium text-gray-600">Status</label>
-                        <Select value={formData.status} onValueChange={(value) => handleMetaChange('status', value)}>
-                          <SelectTrigger className="h-8 text-sm mt-1">
-                            <SelectValue placeholder="Status" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="draft">Draft</SelectItem>
-                            <SelectItem value="published">Published</SelectItem>
-                          </SelectContent>
-                        </Select>
+                {(mode === "page" || mode === "product") &&
+                  !canvasState.selectedId && (
+                    <div className="border-b pb-4">
+                      <h3 className="text-xs font-semibold text-gray-500 uppercase mb-2">
+                        {mode === "page" && !selectedPageId
+                          ? "Create New Page"
+                          : "Page Settings"}
+                      </h3>
+                      <div className="space-y-3">
+                        <div>
+                          <label className="text-xs font-medium text-gray-600">
+                            Title
+                          </label>
+                          <Input
+                            value={formData.title || formData.page_title || ""}
+                            onChange={(e) => {
+                              const newTitle = e.target.value;
+                              handleMetaChange("title", newTitle);
+                              if (!selectedPageId && !isSlugManuallyEdited) {
+                                const newSlug = newTitle
+                                  .toLowerCase()
+                                  .replace(/[^a-z0-9-]/g, "-")
+                                  .replace(/-+/g, "-");
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  slug: newSlug,
+                                }));
+                              }
+                            }}
+                            className="h-8 text-sm mt-1"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-gray-600">
+                            URL Slug
+                          </label>
+                          <Input
+                            value={formData.slug}
+                            onChange={(e) => {
+                              const newSlugValue = e.target.value
+                                .toLowerCase()
+                                .replace(/[^a-z0-9-]/g, "-")
+                                .replace(/-+/g, "-");
+                              handleMetaChange("slug", newSlugValue);
+                            }}
+                            className="h-8 text-sm mt-1"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-gray-600">
+                            Status
+                          </label>
+                          <Select
+                            value={formData.status}
+                            onValueChange={(value) =>
+                              handleMetaChange("status", value)
+                            }
+                          >
+                            <SelectTrigger className="h-8 text-sm mt-1">
+                              <SelectValue placeholder="Status" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="draft">Draft</SelectItem>
+                              <SelectItem value="published">
+                                Published
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="pt-4 space-y-2">
+                          <Button
+                            className="w-full"
+                            onClick={handleSave}
+                            disabled={isSaving}
+                          >
+                            {isSaving
+                              ? "Saving..."
+                              : selectedPageId
+                                ? "Update Page Settings"
+                                : "Create Page"}
+                          </Button>
+                          {!selectedPageId && (
+                            <p className="text-[10px] text-center text-gray-400">
+                              Configure your page title and slug, then click
+                              Create Page to start building.
+                            </p>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
                 {/* Block-specific settings or empty state */}
-                {!canvasState.selectedId || (canvasState.selectedId !== 'systemHeader' && canvasState.selectedId !== 'systemFooter' && !canvasState.selectedItem) ? (
+                {!canvasState.selectedId ||
+                (canvasState.selectedId !== "systemHeader" &&
+                  canvasState.selectedId !== "systemFooter" &&
+                  !canvasState.selectedItem) ? (
                   !(mode === "page" || mode === "product") ? (
-                    <p className="text-sm text-gray-500 text-center py-8">Select a block to edit its properties.</p>
+                    <p className="text-sm text-gray-500 text-center py-8">
+                      Select a block to edit its properties.
+                    </p>
                   ) : null
                 ) : (
                   <div className="space-y-4 pt-4">
                     {/* Header/Footer settings */}
-                    {canvasState.selectedId === 'systemHeader' && (
+                    {canvasState.selectedId === "systemHeader" && (
                       <SystemHeaderSettings
-                        component={{ id: 'systemHeader', type: 'systemHeader', data: {} }}
+                        component={{
+                          id: "systemHeader",
+                          type: "systemHeader",
+                          data: {},
+                        }}
                         index={0}
                         updateNested={(path, value) => {
-                          console.log('Header setting:', path, value);
+                          console.log("Header setting:", path, value);
                         }}
                         isUpdating={false}
                       />
                     )}
 
-                    {canvasState.selectedId === 'systemFooter' && (
+                    {canvasState.selectedId === "systemFooter" && (
                       <SystemFooterSettings
-                        component={{ id: 'systemFooter', type: 'systemFooter', data: {} }}
+                        component={{
+                          id: "systemFooter",
+                          type: "systemFooter",
+                          data: {},
+                        }}
                         index={0}
                         updateNested={(path, value) => {
-                          console.log('Footer setting:', path, value);
+                          console.log("Footer setting:", path, value);
                         }}
                         isUpdating={false}
                       />
                     )}
 
                     {/* Regular block settings */}
-                    {canvasState.selectedItem && (
+                    {canvasState.selectedItem &&
                       (() => {
-                        const SettingsComp = settingsComponentMap[canvasState.selectedItem.type];
+                        const SettingsComp =
+                          settingsComponentMap[canvasState.selectedItem.type];
                         if (!SettingsComp) {
-                          return <p className="text-sm text-gray-500">No settings available for this block type.</p>;
+                          return (
+                            <p className="text-sm text-gray-500">
+                              No settings available for this block type.
+                            </p>
+                          );
                         }
                         return (
                           <SettingsComp
                             component={canvasState.selectedItem}
                             index={0}
                             updateNested={(path, value) => {
-                              if (path.startsWith('data.')) {
+                              if (path.startsWith("data.")) {
                                 const dataPath = path.substring(5);
-                                const currentData = canvasState.selectedItem?.data || {};
-                                const newData = updateNestedData(currentData, dataPath, value);
-                                canvasState.updateItem(canvasState.selectedId, { data: newData });
+                                const currentData =
+                                  canvasState.selectedItem?.data || {};
+                                const newData = updateNestedData(
+                                  currentData,
+                                  dataPath,
+                                  value,
+                                );
+                                canvasState.updateItem(canvasState.selectedId, {
+                                  data: newData,
+                                });
                               } else {
-                                canvasState.updateItem(canvasState.selectedId, { [path]: value });
+                                canvasState.updateItem(canvasState.selectedId, {
+                                  [path]: value,
+                                });
                               }
                             }}
                             isUpdating={false}
                           />
                         );
-                      })()
-                    )}
+                      })()}
 
                     {/* Delete button for non-system blocks */}
-                    {canvasState.selectedId && canvasState.selectedId !== 'systemHeader' && canvasState.selectedId !== 'systemFooter' && (
-                      <div className="pt-4 border-t">
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          className="w-full"
-                          onClick={() => {
-                            if (window.confirm("Remove this block?")) {
-                              canvasState.deleteItem(canvasState.selectedId);
-                              // Switch to blocks panel to show component palette
-                              setActiveLeftPanel('blocks');
-                              setLeftPanelOpen(true);
-                            }
-                          }}
-                        >
-                          Delete Block
-                        </Button>
-                      </div>
-                    )}
-
+                    {canvasState.selectedId &&
+                      canvasState.selectedId !== "systemHeader" &&
+                      canvasState.selectedId !== "systemFooter" && (
+                        <div className="pt-4 border-t">
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            className="w-full"
+                            onClick={() => {
+                              if (window.confirm("Remove this block?")) {
+                                canvasState.deleteItem(canvasState.selectedId);
+                                // Switch to blocks panel to show component palette
+                                setActiveLeftPanel("blocks");
+                                setLeftPanelOpen(true);
+                              }
+                            }}
+                          >
+                            Delete Block
+                          </Button>
+                        </div>
+                      )}
                   </div>
                 )}
               </div>
@@ -1088,7 +1393,6 @@ const Builder = () => {
 
   return (
     <div className="h-screen w-screen overflow-hidden flex bg-[#F5F6F8]">
-
       {/* 1. LEFT TOOL RAIL (68px) */}
       <aside className="w-[68px] bg-white border-r border-gray-200 flex flex-col items-center py-4 shrink-0 z-30">
         {/* Logo */}
@@ -1104,8 +1408,8 @@ const Builder = () => {
         <nav className="flex flex-col gap-4 w-full items-center flex-1">
           {/* Add Block Button (highlighted) */}
           <button
-            className={`flex items-center justify-center w-10 h-10 rounded-lg transition-colors shadow-sm ${activeLeftPanel === 'blocks' ? 'bg-[#1C2434] text-white' : 'bg-white text-gray-400 hover:text-gray-900 border border-gray-200'}`}
-            onClick={() => openPanel('blocks')}
+            className={`flex items-center justify-center w-10 h-10 rounded-lg transition-colors shadow-sm ${activeLeftPanel === "blocks" ? "bg-[#1C2434] text-white" : "bg-white text-gray-400 hover:text-gray-900 border border-gray-200"}`}
+            onClick={() => openPanel("blocks")}
             title="Add Block"
           >
             <Plus className="w-5 h-5" />
@@ -1115,8 +1419,8 @@ const Builder = () => {
 
           {/* Pages Button */}
           <button
-            className={`flex flex-col items-center justify-center w-12 h-12 rounded-lg transition-colors ${activeLeftPanel === 'pages' ? 'bg-gray-100 text-gray-900' : 'text-gray-400 hover:text-gray-900 hover:bg-gray-50'}`}
-            onClick={() => openPanel('pages')}
+            className={`flex flex-col items-center justify-center w-12 h-12 rounded-lg transition-colors ${activeLeftPanel === "pages" ? "bg-gray-100 text-gray-900" : "text-gray-400 hover:text-gray-900 hover:bg-gray-50"}`}
+            onClick={() => openPanel("pages")}
             title="Pages"
           >
             <FileText className="w-5 h-5 mb-1" />
@@ -1125,18 +1429,18 @@ const Builder = () => {
 
           {/* Properties Button */}
           <button
-            className={`flex flex-col items-center justify-center w-12 h-12 rounded-lg transition-colors ${activeLeftPanel === 'properties' ? 'bg-gray-100 text-gray-900' : 'text-gray-400 hover:text-gray-900 hover:bg-gray-50'}`}
-            onClick={() => openPanel('properties')}
+            className={`flex flex-col items-center justify-center w-12 h-12 rounded-lg transition-colors ${activeLeftPanel === "properties" ? "bg-gray-100 text-gray-900" : "text-gray-400 hover:text-gray-900 hover:bg-gray-50"}`}
+            onClick={() => openPanel("properties")}
             title="Properties"
           >
             <Sliders className="w-5 h-5 mb-1" />
-            <span className="text-[9px] font-medium">Props</span>
+            <span className="text-[9px] font-medium">Edit</span>
           </button>
 
           {/* Theme Button */}
           <button
-            className={`flex flex-col items-center justify-center w-12 h-12 rounded-lg transition-colors ${activeLeftPanel === 'theme' ? 'bg-gray-100 text-gray-900' : 'text-gray-400 hover:text-gray-900 hover:bg-gray-50'}`}
-            onClick={() => openPanel('theme')}
+            className={`flex flex-col items-center justify-center w-12 h-12 rounded-lg transition-colors ${activeLeftPanel === "theme" ? "bg-gray-100 text-gray-900" : "text-gray-400 hover:text-gray-900 hover:bg-gray-50"}`}
+            onClick={() => openPanel("theme")}
             title="Theme"
           >
             <Palette className="w-5 h-5 mb-1" />
@@ -1145,8 +1449,8 @@ const Builder = () => {
 
           {/* Settings Button */}
           <button
-            className={`flex flex-col items-center justify-center w-12 h-12 rounded-lg transition-colors ${activeLeftPanel === 'settings' ? 'bg-gray-100 text-gray-900' : 'text-gray-400 hover:text-gray-900 hover:bg-gray-50'}`}
-            onClick={() => openPanel('settings')}
+            className={`flex flex-col items-center justify-center w-12 h-12 rounded-lg transition-colors ${activeLeftPanel === "settings" ? "bg-gray-100 text-gray-900" : "text-gray-400 hover:text-gray-900 hover:bg-gray-50"}`}
+            onClick={() => openPanel("settings")}
             title="Settings"
           >
             <Settings className="w-5 h-5 mb-1" />
@@ -1157,7 +1461,7 @@ const Builder = () => {
         {/* Store info at bottom */}
         <div className="border-t w-full py-3 px-2 text-center mt-auto">
           <p className="text-[10px] text-gray-400 truncate w-full">
-            {storeConfig?.store_name || 'Store'}
+            {storeConfig?.store_name || "Store"}
           </p>
         </div>
       </aside>
@@ -1168,11 +1472,11 @@ const Builder = () => {
           {/* Panel Header */}
           <div className="h-14 border-b border-gray-100 flex items-center justify-between px-4 shrink-0">
             <h2 className="font-semibold text-sm text-gray-800">
-              {activeLeftPanel === 'blocks' && 'Add New Block'}
-              {activeLeftPanel === 'pages' && 'Pages'}
-              {activeLeftPanel === 'theme' && 'Theme Settings'}
-              {activeLeftPanel === 'settings' && 'App Settings'}
-              {activeLeftPanel === 'properties' && 'Properties'}
+              {activeLeftPanel === "blocks" && "Add New Block"}
+              {activeLeftPanel === "pages" && "Pages"}
+              {activeLeftPanel === "theme" && "Theme Settings"}
+              {activeLeftPanel === "settings" && "App Settings"}
+              {activeLeftPanel === "properties" && "Properties"}
             </h2>
             <button
               className="text-gray-400 hover:text-gray-600 p-1 rounded hover:bg-gray-50"
@@ -1184,26 +1488,27 @@ const Builder = () => {
           </div>
 
           {/* Panel Content */}
-          <div className="flex-1 overflow-y-auto p-4">
-            {getPanelContent()}
-          </div>
+          <div className="flex-1 overflow-y-auto p-4">{getPanelContent()}</div>
         </aside>
       )}
 
       {/* 3. MAIN COLUMN */}
       <div className="flex-1 flex flex-col min-w-0 h-full">
-
         {/* Header */}
         <header className="h-14 bg-white border-b border-gray-200 flex items-center justify-between px-4 shrink-0 z-10">
           {/* Left: Home + App name */}
           <div className="flex items-center gap-3 w-1/3">
-            <button className="p-1.5 text-gray-500 hover:bg-gray-100 rounded" onClick={handleBack} title="Back">
+            <button
+              className="p-1.5 text-gray-500 hover:bg-gray-100 rounded"
+              onClick={handleBack}
+              title="Back"
+            >
               <Home className="w-4 h-4" />
             </button>
             <div className="flex flex-col leading-tight">
               <div className="flex items-center gap-1">
                 <span className="text-sm font-semibold text-gray-800">
-                  {storeConfig?.store_name || 'ScaleBiz'}
+                  {storeConfig?.store_name || "ScaleBiz"}
                 </span>
               </div>
             </div>
@@ -1215,7 +1520,7 @@ const Builder = () => {
               <div className="relative">
                 <button
                   className="flex items-center gap-2 text-sm text-gray-500 font-medium bg-gray-100 px-3 py-1 rounded-md border border-gray-200 hover:bg-gray-50"
-                  onClick={() => openPanel('pages')}
+                  onClick={() => openPanel("pages")}
                 >
                   <FileText className="w-4 h-4" />
                   <span>{customPage?.title || "New Page"}</span>
@@ -1225,7 +1530,11 @@ const Builder = () => {
             ) : (
               <span className="text-sm text-gray-500 font-medium">
                 {(() => {
-                  if (mode === "product") return productLandingPage?.product?.name || "Product Landing Page";
+                  if (mode === "product")
+                    return (
+                      productLandingPage?.product?.name ||
+                      "Product Landing Page"
+                    );
                   return "Page Builder";
                 })()}
               </span>
@@ -1234,27 +1543,44 @@ const Builder = () => {
 
           {/* Right: Actions */}
           <div className="flex items-center justify-end gap-3 w-1/3">
-            <button className="p-1.5 text-gray-500 hover:bg-gray-100 rounded-full border border-gray-200" title="Preview">
+            <button
+              className="p-1.5 text-gray-500 hover:bg-gray-100 rounded-full border border-gray-200"
+              title="Preview"
+            >
               <Eye className="w-4 h-4" />
             </button>
             <Button
               variant="outline"
               size="sm"
               onClick={() => {
-                setFormData(prev => ({ ...prev, status: "draft" }));
+                setFormData((prev) => ({ ...prev, status: "draft" }));
                 handleSave();
               }}
               disabled={isSaving}
             >
-              {isSaving ? 'Saving...' : 'Save'}
+              {isSaving ? "Saving..." : "Save"}
             </Button>
             <button
               className="bg-[#1C2434] text-white px-4 py-1.5 text-sm font-medium rounded-md hover:bg-gray-800 transition-colors flex items-center gap-2"
               onClick={handlePublish}
-              disabled={isSaving || (mode === "product" ? isCreatingProduct || isUpdatingProduct : false)}
+              disabled={
+                isSaving ||
+                (mode === "product"
+                  ? isCreatingProduct || isUpdatingProduct
+                  : false)
+              }
             >
-              {isSaving || (mode === "product" ? isCreatingProduct || isUpdatingProduct : isCreatingProduct) ? 'Saving...' : 'Publish'}
-              {!isSaving && (mode !== "product" || !isCreatingProduct && !isUpdatingProduct) && <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full"></div>}
+              {isSaving ||
+              (mode === "product"
+                ? isCreatingProduct || isUpdatingProduct
+                : isCreatingProduct)
+                ? "Saving..."
+                : "Publish"}
+              {!isSaving &&
+                (mode !== "product" ||
+                  (!isCreatingProduct && !isUpdatingProduct)) && (
+                  <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full"></div>
+                )}
             </button>
           </div>
         </header>
@@ -1263,20 +1589,21 @@ const Builder = () => {
         <main className="flex-1 overflow-auto p-4 md:p-6 flex justify-center bg-[#F5F6F8]">
           {/* Canvas Container */}
           <div className="w-full max-w-[1200px] bg-white rounded-lg shadow-sm border border-gray-200 min-h-[800px] relative flex flex-col">
-
             {/* Device Viewport Toggles */}
             <div className="h-12 flex justify-center items-center shrink-0 w-full border-b bg-gray-50">
               <div className="flex items-center bg-white p-0.5 rounded-md border border-gray-200 gap-1">
-                {Object.entries(VIEWPORTS).map(([key, { label: vLabel, icon: Icon }]) => (
-                  <button
-                    key={key}
-                    className={`p-1.5 ${viewport === key ? 'text-gray-800 bg-gray-100 rounded shadow-sm' : 'text-gray-400 hover:text-gray-700'}`}
-                    onClick={() => setViewport(key)}
-                    title={vLabel}
-                  >
-                    <Icon className="w-4 h-4" />
-                  </button>
-                ))}
+                {Object.entries(VIEWPORTS).map(
+                  ([key, { label: vLabel, icon: Icon }]) => (
+                    <button
+                      key={key}
+                      className={`p-1.5 ${viewport === key ? "text-gray-800 bg-gray-100 rounded shadow-sm" : "text-gray-400 hover:text-gray-700"}`}
+                      onClick={() => setViewport(key)}
+                      title={vLabel}
+                    >
+                      <Icon className="w-4 h-4" />
+                    </button>
+                  ),
+                )}
               </div>
             </div>
 
@@ -1300,8 +1627,12 @@ const Builder = () => {
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none bg-white/80 z-10">
                 <div className="text-center">
                   <div className="text-4xl mb-4">📦</div>
-                  <p className="text-lg font-medium text-gray-300">Your page is empty</p>
-                  <p className="text-sm text-gray-400">Click the + button to add blocks</p>
+                  <p className="text-lg font-medium text-gray-300">
+                    Your page is empty
+                  </p>
+                  <p className="text-sm text-gray-400">
+                    Click the + button to add blocks
+                  </p>
                 </div>
               </div>
             )}

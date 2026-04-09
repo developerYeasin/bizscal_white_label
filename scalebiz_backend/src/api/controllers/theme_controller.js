@@ -290,13 +290,22 @@ exports.create_page = async (req, res, next) => {
       ]
     );
 
+    // Get the newly created page
+    const [newPage] = await connection.query(
+      "SELECT * FROM pages WHERE id = ?",
+      [result.insertId]
+    );
+
     await connection.commit();
     connection.release();
 
     res.status(201).json({
       status: "success",
       message: "Page created successfully.",
-      data: { page_id: result.insertId }
+      data: { 
+        page_id: result.insertId,
+        page: newPage[0]
+      }
     });
   } catch (error) {
     await connection.rollback();
@@ -344,8 +353,8 @@ exports.update_page = async (req, res, next) => {
 
     await connection.query(
       `UPDATE pages SET
-        title = COALESCE(?, title),
-        slug = COALESCE(?, slug),
+        title = ?,
+        slug = ?,
         content = ?,
         meta_title = ?,
         meta_description = ?,
@@ -354,10 +363,10 @@ exports.update_page = async (req, res, next) => {
       [
         title,
         slug,
-        content ? JSON.stringify(content) : undefined,
-        meta_title,
-        meta_description,
-        status,
+        content ? JSON.stringify(content) : JSON.stringify({ blocks: [] }),
+        meta_title || title,
+        meta_description || '',
+        status || 'draft',
         id,
         store_id
       ]
@@ -463,11 +472,12 @@ exports.reorder_pages = async (req, res, next) => {
     }
 
     // Update sort_order for each page
-    const updates = orders.map(o => [o.sort_order, o.id, store_id]);
-    await pool.query(
-      `UPDATE pages SET sort_order = ? WHERE id = ? AND store_id = ?`,
-      updates
-    );
+    for (const item of orders) {
+      await pool.query(
+        `UPDATE pages SET sort_order = ? WHERE id = ? AND store_id = ?`,
+        [item.sort_order, item.id, store_id]
+      );
+    }
 
     res.status(200).json({
       status: "success",

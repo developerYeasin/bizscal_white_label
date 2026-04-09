@@ -1,16 +1,29 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react'; // Added useRef
-import api from '@/utils/api.js';
-import { showSuccess, showError } from '@/utils/toast.js';
-import { login as authLogin, logout as authLogout, getToken, getUserData } from '@/utils/auth.js';
-import axios from 'axios'; // Import axios for the separate logout instance
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+} from "react"; // Added useRef
+import api from "@/utils/api.js";
+import { showSuccess, showError } from "@/utils/toast.js";
+import {
+  login as authLogin,
+  logout as authLogout,
+  getToken,
+  getUserData,
+} from "@/utils/auth.js";
+import axios from "axios"; // Import axios for the separate logout instance
 
 const AuthContext = createContext(null);
-
+const baseURL = "http://localhost:4000/api/v1";
 // Create a separate axios instance for logout that does NOT have the interceptor
 const logoutApi = axios.create({
-  baseURL: "/api/v1", // Use relative URL to go through nginx proxy
+  // baseURL: "/api/v1", // Use relative URL to go through nginx proxy
+  baseURL: baseURL, // Use relative URL to go through nginx proxy
   headers: {
     "Content-Type": "application/json",
   },
@@ -65,14 +78,20 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       const response = await api.post("/owner/auth/login", { email, password });
-      const { token, data: { user: userData } } = response.data; 
+      const {
+        token,
+        data: { user: userData },
+      } = response.data;
       authLogin(token, userData); // Store token and user data
       setUser(userData); // Set user data in context
       showSuccess("Login successful!");
       return true;
     } catch (error) {
       console.error("Login error:", error);
-      showError(error.response?.data?.message || "Login failed. Please check your credentials.");
+      showError(
+        error.response?.data?.message ||
+          "Login failed. Please check your credentials.",
+      );
       return false;
     }
   };
@@ -104,25 +123,31 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const hasRole = useCallback((roles) => {
-    if (loading || !user) return false;
-    if (user.role === 'owner') return true; // Owner has all access
-    if (Array.isArray(roles)) {
-      return roles.includes(user.role);
-    }
-    return user.role === roles;
-  }, [loading, user]);
+  const hasRole = useCallback(
+    (roles) => {
+      if (loading || !user) return false;
+      if (user.role === "owner") return true; // Owner has all access
+      if (Array.isArray(roles)) {
+        return roles.includes(user.role);
+      }
+      return user.role === roles;
+    },
+    [loading, user],
+  );
 
-  const hasPermission = useCallback((permissions) => {
-    if (loading || !user) return false;
-    if (user.role === 'owner') return true; // Owner has all access
-    if (!user.permissions || user.permissions.length === 0) return false;
+  const hasPermission = useCallback(
+    (permissions) => {
+      if (loading || !user) return false;
+      if (user.role === "owner") return true; // Owner has all access
+      if (!user.permissions || user.permissions.length === 0) return false;
 
-    if (Array.isArray(permissions)) {
-      return permissions.some(p => user.permissions.includes(p));
-    }
-    return user.permissions.includes(permissions);
-  }, [loading, user]);
+      if (Array.isArray(permissions)) {
+        return permissions.some((p) => user.permissions.includes(p));
+      }
+      return user.permissions.includes(permissions);
+    },
+    [loading, user],
+  );
 
   const value = {
     user,
@@ -134,9 +159,5 @@ export const AuthProvider = ({ children }) => {
     hasPermission,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

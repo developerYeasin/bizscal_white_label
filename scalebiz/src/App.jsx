@@ -47,7 +47,6 @@ import ProductLandingPageSettings from "./pages/products/ProductLandingPageSetti
 import ProductLandingPageViewPage from "./pages/products/ProductLandingPageViewPage.jsx";
 import ThemeBuilder from "./pages/ThemeBuilder.jsx";
 import ThemeManagement from "./pages/ThemeManagement.jsx";
-import PageBuilderV2 from "./pages/PageBuilderV2.jsx";
 
 // Import shop settings pages (nested under SettingsLayout)
 import SettingsLayout from "./pages/shop-settings/SettingsLayout.jsx";
@@ -130,21 +129,21 @@ const useMode = () => {
   useEffect(() => {
     // Development: allow override via localStorage or query param
     const urlParams = new URLSearchParams(window.location.search);
-    const override = urlParams.get('mode') || localStorage.getItem('app_mode');
+    const override = urlParams.get("mode") || localStorage.getItem("app_mode");
 
-    if (override === 'admin' || override === 'storefront') {
+    if (override === "admin" || override === "storefront") {
       setMode(override);
       return;
     }
 
     // Port-based detection (primary method)
     const port = window.location.port;
-    if (port === '8085') {
-      setMode('admin');
+    if (port === "8085") {
+      setMode("admin");
       return;
     }
-    if (port === '8080') {
-      setMode('storefront');
+    if (port === "8080") {
+      setMode("storefront");
       return;
     }
 
@@ -152,8 +151,11 @@ const useMode = () => {
     const hostname = window.location.hostname;
     // Treat subdomains starting with 'admin.' as admin mode.
     // Also, if hostname is exactly 'admin.localhost' for local development.
-    const isAdmin = hostname.startsWith('admin.') || hostname === 'admin.localhost' || hostname === 'localhost';
-    setMode(isAdmin ? 'admin' : 'storefront');
+    const isAdmin =
+      hostname.startsWith("admin.") ||
+      hostname === "admin.localhost" ||
+      hostname === "localhost";
+    setMode(isAdmin ? "admin" : "storefront");
   }, []);
 
   return mode;
@@ -174,14 +176,16 @@ const AppContent = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-red-100">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-red-600">Loading application mode...</h1>
+          <h1 className="text-2xl font-bold text-red-600">
+            Loading application mode...
+          </h1>
           <p className="text-gray-600">Check console for debug info</p>
         </div>
       </div>
     );
   }
 
-  console.log("Mode determined:", mode, "rendering routes");
+  console.log("Mode determined: >>", mode, "rendering routes");
 
   return (
     <Routes>
@@ -191,7 +195,7 @@ const AppContent = () => {
       <Route path="/index" element={<Index />} />
 
       {/* Admin Mode Routes */}
-      {mode === 'admin' && (
+      {mode === "admin" && (
         <>
           {/* Root redirect for admin */}
           <Route path="/" element={<RootRedirect />} />
@@ -308,7 +312,9 @@ const AppContent = () => {
               <Route
                 path="/manage-shop/header-settings"
                 element={
-                  <ProtectedRoute requiredPermissions={["edit_header_settings"]}>
+                  <ProtectedRoute
+                    requiredPermissions={["edit_header_settings"]}
+                  >
                     <HeaderSettingsPage />
                   </ProtectedRoute>
                 }
@@ -332,7 +338,9 @@ const AppContent = () => {
               <Route
                 path="/manage-shop/delivery-support"
                 element={
-                  <ProtectedRoute requiredPermissions={["edit_delivery_settings"]}>
+                  <ProtectedRoute
+                    requiredPermissions={["edit_delivery_settings"]}
+                  >
                     <DeliverySupportPage />
                   </ProtectedRoute>
                 }
@@ -340,7 +348,9 @@ const AppContent = () => {
               <Route
                 path="/manage-shop/payment-gateway"
                 element={
-                  <ProtectedRoute requiredPermissions={["edit_payment_settings"]}>
+                  <ProtectedRoute
+                    requiredPermissions={["edit_payment_settings"]}
+                  >
                     <PaymentGatewayPage />
                   </ProtectedRoute>
                 }
@@ -380,20 +390,14 @@ const AppContent = () => {
               <Route
                 path="/manage-shop/footer-settings"
                 element={
-                  <ProtectedRoute requiredPermissions={["edit_footer_settings"]}>
+                  <ProtectedRoute
+                    requiredPermissions={["edit_footer_settings"]}
+                  >
                     <FooterSettingsPage />
                   </ProtectedRoute>
                 }
               />
-              {/* Redirect /customize-theme to custom pages builder (page mode) */}
-              <Route
-                path="/customize-theme"
-                element={
-                  <ProtectedRoute requiredPermissions={["customize_theme"]}>
-                    <Navigate to="/custom-pages" replace />
-                  </ProtectedRoute>
-                }
-              />
+
               <Route
                 path="/theme-marketplace"
                 element={
@@ -422,7 +426,9 @@ const AppContent = () => {
               <Route
                 path="/single-product-pages"
                 element={
-                  <ProtectedRoute requiredPermissions={["manage_landing_pages"]}>
+                  <ProtectedRoute
+                    requiredPermissions={["manage_landing_pages"]}
+                  >
                     <Navigate to="/products" replace />
                   </ProtectedRoute>
                 }
@@ -495,7 +501,9 @@ const AppContent = () => {
             <Route
               path="/vendor-dashboard"
               element={
-                <ProtectedRoute requiredPermissions={["access_vendor_dashboard"]}>
+                <ProtectedRoute
+                  requiredPermissions={["access_vendor_dashboard"]}
+                >
                   <VendorDashboard />
                 </ProtectedRoute>
               }
@@ -529,18 +537,9 @@ const AppContent = () => {
           </ProtectedRoute>
         }
       />
-      {/* Page Builder V2 - Advanced page builder with live preview */}
-      <Route
-        path="/custom-pages-v2"
-        element={
-          <ProtectedRoute requiredPermissions={["customize_theme"]}>
-            <PageBuilderV2 />
-          </ProtectedRoute>
-        }
-      />
 
       {/* Storefront Mode Routes */}
-      {mode === 'storefront' && (
+      {mode === "storefront" && (
         <React.Fragment>
           <Route element={<StorefrontLayout />}>
             <Route path="/" element={<StorefrontHomePage />} />
@@ -571,10 +570,12 @@ const App = () => (
           <AuthProvider>
             <StoreConfigurationProvider>
               <ThemeSettingsProvider>
-                <BrowserRouter future={{
-                  v7_startTransition: true,
-                  v7_relativeSplatPath: true
-                }}>
+                <BrowserRouter
+                  future={{
+                    v7_startTransition: true,
+                    v7_relativeSplatPath: true,
+                  }}
+                >
                   <AppContent />
                 </BrowserRouter>
               </ThemeSettingsProvider>

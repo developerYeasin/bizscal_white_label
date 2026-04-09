@@ -6,8 +6,11 @@ import { getToken } from "./auth"; // Only need getToken here
 // or pass a logout function if this file is truly standalone.
 // For now, we'll assume a global logout mechanism or pass it.
 
+const baseURL = "http://localhost:4000/api/v1";
+
 const api = axios.create({
-  baseURL: "/api/v1", // Use relative URL to go through nginx proxy
+  // baseURL: "/api/v1",
+  baseURL: baseURL,
   headers: {
     "Content-Type": "application/json",
   },
@@ -24,7 +27,7 @@ api.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  }
+  },
 );
 
 // Response interceptor to handle 401 Unauthorized errors
@@ -32,7 +35,7 @@ api.interceptors.request.use(
 // We'll adjust `App.jsx` to set up the interceptor with the context's logout function.
 let onUnauthorizedLogout = () => {
   console.error(
-    "AuthContext logout function not yet initialized for API interceptor."
+    "AuthContext logout function not yet initialized for API interceptor.",
   );
   // Fallback to direct localStorage clear and redirect if context isn't ready
   localStorage.removeItem("authToken");
@@ -49,7 +52,7 @@ api.interceptors.response.use(
   (error) => {
     if (error.response && error.response.status === 401) {
       console.error(
-        "API Interceptor: 401 Unauthorized error caught. Logging out user."
+        "API Interceptor: 401 Unauthorized error caught. Logging out user.",
       );
       onUnauthorizedLogout();
       // IMPORTANT CHANGE: Re-throw the error so the original promise chain can reject.
@@ -57,7 +60,7 @@ api.interceptors.response.use(
       return Promise.reject(error);
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 export default api;

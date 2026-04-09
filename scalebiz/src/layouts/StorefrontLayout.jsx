@@ -30,16 +30,42 @@ const StorefrontLayout = () => {
     }
   }, [isAuthenticated, location.pathname, navigate]);
 
-  if (storeConfigLoading || !storeConfig) {
+  if (storeConfigLoading) {
     console.log("StorefrontLayout: storeConfigLoading:", storeConfigLoading, "storeConfig:", storeConfig);
     return (
-      <div className="min-h-screen bg-red-100">
-        <div className="p-4 bg-red-200 font-bold text-red-800">
-          StorefrontLayout: Loading store config... {JSON.stringify({storeConfigLoading, hasConfig: !!storeConfig})}
+      <div className="min-h-screen bg-gray-50">
+        <div className="p-4 bg-gray-100 font-bold text-gray-800">
+          StorefrontLayout: Loading store configuration...
         </div>
-        <Skeleton className="h-16 w-full bg-red-300" />
-        <Skeleton className="h-96 w-full bg-red-300" />
-        <Skeleton className="h-64 w-full bg-red-300" />
+        <Skeleton className="h-16 w-full bg-gray-200" />
+        <Skeleton className="h-96 w-full bg-gray-200" />
+        <Skeleton className="h-64 w-full bg-gray-200" />
+      </div>
+    );
+  }
+
+  // If loading is done but config is null, show error or fallback UI
+  if (!storeConfig) {
+    console.error("StorefrontLayout: No store configuration available after loading.");
+    return (
+      <div className="min-h-screen bg-red-50">
+        <div className="p-4 bg-red-100 font-bold text-red-800">
+          StorefrontLayout: Unable to load store configuration. Please check your authentication or store setup.
+        </div>
+        <div className="p-8 text-center">
+          <p className="mb-4">The store configuration could not be loaded. This may be because:</p>
+          <ul className="list-disc text-left max-w-md mx-auto">
+            <li>You are not authenticated as a store owner.</li>
+            <li>Your store has not been configured yet.</li>
+            <li>The backend API is unavailable.</li>
+          </ul>
+          <button
+            className="mt-6 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            onClick={() => window.location.href = '/login'}
+          >
+            Go to login
+          </button>
+        </div>
       </div>
     );
   }
