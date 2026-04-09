@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const baseURL = "http://localhost:4000/api/v1/store";
+const baseURL = "/api/v1/store";
+// const baseURL = "http://localhost:4000/api/v1/store";
 
 export const apiClient = axios.create({
   // Use relative URL to go through nginx proxy

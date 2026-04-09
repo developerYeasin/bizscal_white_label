@@ -19,7 +19,10 @@ import {
 import axios from "axios"; // Import axios for the separate logout instance
 
 const AuthContext = createContext(null);
-const baseURL = "http://localhost:4000/api/v1";
+
+const baseURL = "/api/v1";
+// const baseURL = "http://localhost:4000/api/v1";
+
 // Create a separate axios instance for logout that does NOT have the interceptor
 const logoutApi = axios.create({
   // baseURL: "/api/v1", // Use relative URL to go through nginx proxy
