@@ -17,11 +17,9 @@ import {
   getUserData,
 } from "@/utils/auth.js";
 import axios from "axios"; // Import axios for the separate logout instance
+import { baseURL } from "../utils/api";
 
 const AuthContext = createContext(null);
-
-const baseURL = "/api/v1";
-// const baseURL = "http://localhost:4000/api/v1";
 
 // Create a separate axios instance for logout that does NOT have the interceptor
 const logoutApi = axios.create({

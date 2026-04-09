@@ -202,32 +202,7 @@ const SortablePageItem = ({
       style={{ opacity: isDragging ? 0.5 : 1 }}
       onClick={async (e) => {
         e.stopPropagation();
-        // Select the row for UI highlight
         toggleRowSelection(page.id);
-        // Load page preview without opening settings
-        try {
-          const resp = await api.get(`/owner/custom-pages/${page.id}`);
-          const cp = resp.data.data;
-          const rawBlocks = cp.content?.blocks;
-          let blocks = Array.isArray(rawBlocks) ? [...rawBlocks] : [];
-          const hasHeader = blocks.some((b) => b.type === "systemHeader");
-          const hasFooter = blocks.some((b) => b.type === "systemFooter");
-          const content = cp.content || {};
-          if (!hasHeader && content.showHeader !== false) {
-            blocks.unshift({
-              id: "systemHeader",
-              type: "systemHeader",
-              data: {},
-            });
-          }
-          if (!hasFooter && content.showFooter !== false) {
-            blocks.push({ id: "systemFooter", type: "systemFooter", data: {} });
-          }
-          canvasState.reset(blocks);
-        } catch (err) {
-          console.error("Failed to load preview page:", err);
-        }
-        // Keep left panel on pages list
         setActiveLeftPanel("pages");
         setLeftPanelOpen(true);
       }}
@@ -645,7 +620,7 @@ const Builder = () => {
 
         // Ensure properties panel is open and active when editing a page
         setLeftPanelOpen(true);
-        setActiveLeftPanel("properties");
+        // setActiveLeftPanel("properties");
       } else if (!selectedPageId) {
         // This is the case for a new page creation
         setFormData({
@@ -658,7 +633,7 @@ const Builder = () => {
         canvasState.reset([]);
         setIsSlugManuallyEdited(false); // Reset for new page
         setLeftPanelOpen(true);
-        setActiveLeftPanel("properties");
+        // setActiveLeftPanel("properties");
       }
     }
   }, [mode, customPage, resetCanvas, selectedPageId]);
@@ -886,6 +861,7 @@ const Builder = () => {
   // Sync orderedPages with pagesData when it changes
   useEffect(() => {
     if (pagesData) {
+      pagesData && pagesData.length > 0 && setSelectedPageId(pagesData[0].id);
       setOrderedPages((prev) => {
         // If lengths differ, definitely different
         if (prev.length !== pagesData.length) return pagesData;
