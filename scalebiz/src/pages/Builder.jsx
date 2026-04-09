@@ -134,7 +134,7 @@ const SortablePageItem = ({ page, pageId, navigate, canvasState, setActiveLeftPa
   const isSelected = selectedRowIds.has(page.id);
   const isEditing = pageId === String(page.id);
 
-  const handleEdit = (e) => {
+  const handleEdit = (e) => { e && e.stopPropagation();
     e.stopPropagation();
     navigate(`/custom-pages?pageId=${page.id}`);
     canvasState.clearSelection();
@@ -154,7 +154,33 @@ const SortablePageItem = ({ page, pageId, navigate, canvasState, setActiveLeftPa
       ref={setNodeRef}
       className={`flex items-center gap-2 h-8 px-2 text-sm rounded-md transition-colors cursor-pointer group ${isSelected ? "bg-muted/70" : "hover:bg-muted/50"}`}
       style={{ opacity: isDragging ? 0.5 : 1 }}
-      onClick={() => toggleRowSelection(page.id)}
+      onClick={async (e) => {
+        e.stopPropagation();
+        // Select the row for UI highlight
+        toggleRowSelection(page.id);
+        // Load page preview without opening settings
+        try {
+          const resp = await api.get(`/owner/custom-pages/${page.id}`);
+          const cp = resp.data.data;
+          const rawBlocks = cp.content?.blocks;
+          let blocks = Array.isArray(rawBlocks) ? [...rawBlocks] : [];
+          const hasHeader = blocks.some(b => b.type === 'systemHeader');
+          const hasFooter = blocks.some(b => b.type === 'systemFooter');
+          const content = cp.content || {};
+          if (!hasHeader && content.showHeader !== false) {
+            blocks.unshift({ id: 'systemHeader', type: 'systemHeader', data: {} });
+          }
+          if (!hasFooter && content.showFooter !== false) {
+            blocks.push({ id: 'systemFooter', type: 'systemFooter', data: {} });
+          }
+          canvasState.reset(blocks);
+        } catch (err) {
+          console.error('Failed to load preview page:', err);
+        }
+        // Keep left panel on pages list
+        setActiveLeftPanel('pages');
+        setLeftPanelOpen(true);
+      } }
     >
       {/* Drag handle */}
       <span {...attributes} {...listeners} className="cursor-grab flex-shrink-0">
@@ -275,6 +301,7 @@ const PagesPanel = ({
 };
 
 const Builder = () => {
+  const [isEditMode, setIsEditMode] = useState(false);
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -695,15 +722,8 @@ const Builder = () => {
 
   // Toggle row selection
   const toggleRowSelection = useCallback((pageId) => {
-    setSelectedRowIds(prev => {
-      const next = new Set(prev);
-      if (next.has(pageId)) {
-        next.delete(pageId);
-      } else {
-        next.add(pageId);
-      }
-      return next;
-    });
+    // Single selection: replace any existing selection with the clicked page
+    setSelectedRowIds(new Set([pageId]));
   }, []);
 
   // Handle panel switching - toggle behavior

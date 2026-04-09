@@ -84,6 +84,7 @@ const PageBuilder = () => {
   // State for page editing
   const [creating, setCreating] = useState(false);
   const [editingPage, setEditingPage] = useState(null);
+  const [selectedPage, setSelectedPage] = useState(null);
   const [activeTab, setActiveTab] = useState("blocks");
 
   // Use history for blocks
@@ -218,7 +219,7 @@ const PageBuilder = () => {
   };
 
   const handleEdit = (page) => {
-    setEditingPage(page);
+    setSelectedPage(page);
     setFormData({
       title: page.title,
       slug: page.slug,
@@ -229,6 +230,7 @@ const PageBuilder = () => {
     const pageBlocks = page.content?.blocks || [];
     setBlocks(Array.isArray(pageBlocks) ? pageBlocks : []);
     setCreating(false);
+    setEditingPage(null);
     setSelectedBlockId(null);
   };
 
@@ -624,7 +626,14 @@ const PageBuilder = () => {
                 </thead>
                 <tbody className="divide-y divide-border">
                   {pagesData?.map((page) => (
-                    <tr key={page.id} className="hover:bg-muted/50">
+                    <tr
+                      key={page.id}
+                      className={`hover:bg-muted/50 ${selectedPage?.id === page.id ? 'bg-muted' : ''}`}
+                      onClick={() => {
+                        setSelectedPage(page);
+                        setEditingPage(false); // Ensure we don't enter edit mode when selecting
+                      }}
+                    >
                       <td className="px-4 py-3 text-sm font-medium">{page.title}</td>
                       <td className="px-4 py-3 text-sm text-muted-foreground">/pages/{page.slug}</td>
                       <td className="px-4 py-3 text-sm">
@@ -647,7 +656,10 @@ const PageBuilder = () => {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className="w-[80px]">
-                              <DropdownMenuItem onClick={() => handleEdit(page)}>
+                              <DropdownMenuItem onClick={() => {
+                                setEditingPage(page);
+                                setSelectedPage(null); // Clear selection when editing
+                              }}>
                                 Edit
                               </DropdownMenuItem>
                               <DropdownMenuItem onClick={() => handleDelete(page.id)} disabled={deleteMutation.isPending}>
