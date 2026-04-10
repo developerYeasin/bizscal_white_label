@@ -6,8 +6,8 @@ import { getToken } from "./auth"; // Only need getToken here
 // or pass a logout function if this file is truly standalone.
 // For now, we'll assume a global logout mechanism or pass it.
 
-export  const baseURL = "/api/v1";
-//  export const baseURL = "http://localhost:4000/api/v1";
+// export  const baseURL = "/api/v1";
+ export const baseURL = "http://localhost:4000/api/v1";
 
 const api = axios.create({
   // baseURL: "/api/v1",

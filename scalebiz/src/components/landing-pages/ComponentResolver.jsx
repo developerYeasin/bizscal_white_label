@@ -27,6 +27,13 @@ import VideoBlock from "@/components/page-builder/blocks/VideoBlock.jsx";
 import ContactBlock from "@/components/page-builder/blocks/ContactBlock.jsx";
 import MapBlock from "@/components/page-builder/blocks/MapBlock.jsx";
 
+// Basic blocks
+import TitleBlock from "@/components/page-builder/blocks/TitleBlock.jsx";
+import DescriptionBlock from "@/components/page-builder/blocks/DescriptionBlock.jsx";
+import TextBlock from "@/components/page-builder/blocks/TextBlock.jsx";
+import ButtonBlock from "@/components/page-builder/blocks/ButtonBlock.jsx";
+import ImageBlock from "@/components/page-builder/blocks/ImageBlock.jsx";
+
 // Map component types to their respective rendering components
 const componentMap = {
   heroBanner: HeroBanner,
@@ -60,6 +67,12 @@ const componentMap = {
   contact: ContactBlock,
   contactForm: ContactBlock, // Alias
   map: MapBlock,
+  // Basic blocks
+  title: TitleBlock,
+  description: DescriptionBlock,
+  text: TextBlock,
+  button: ButtonBlock,
+  image: ImageBlock,
 };
 
 const ComponentResolver = ({ components, themeConfig, storeConfig }) => {

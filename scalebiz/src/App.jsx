@@ -29,7 +29,6 @@ import Categories from "./pages/Categories.jsx";
 import Customers from "./pages/Customers.jsx";
 import ManageShop from "./pages/ManageShop.jsx";
 import ThemeMarketplace from "./pages/ThemeMarketplace.jsx";
-import Builder from "./pages/Builder.jsx";
 import PromoCodes from "./pages/PromoCodes.jsx";
 import UsersAndPermissions from "./pages/UsersAndPermissions.jsx";
 import Settings from "./pages/Settings.jsx";
@@ -81,6 +80,7 @@ import { ThemeProvider } from "next-themes";
 import { setUnauthorizedLogoutHandler } from "./utils/api.js";
 import { useHasStore } from "./hooks/use-has-store.js";
 import RootRedirect from "./components/RootRedirect.jsx";
+import Builder from "./pages/builder/Builder.jsx";
 
 const queryClient = new QueryClient();
 

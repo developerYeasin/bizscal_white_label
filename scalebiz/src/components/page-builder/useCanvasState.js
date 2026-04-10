@@ -33,10 +33,12 @@ const useCanvasState = (initialItems = []) => {
 
   // Find a node by id anywhere in the tree
   const findNode = useCallback((nodes, id) => {
+    if (!id) return null;
+    const targetId = String(id);
     for (const node of nodes) {
-      if (node.id === id) return node;
+      if (String(node.id) === targetId) return node;
       if (node.children) {
-        const found = findNode(node.children, id);
+        const found = findNode(node.children, targetId);
         if (found) return found;
       }
     }
@@ -45,12 +47,16 @@ const useCanvasState = (initialItems = []) => {
 
   // Update nodes recursively: returns a new array with updater applied to node with given id
   const updateNodesRecursive = useCallback((nodes, id, updater) => {
-    return nodes.map(node => {
-      if (node.id === id) {
+    const targetId = String(id);
+    return nodes.map((node) => {
+      if (String(node.id) === targetId) {
         return updater(node);
       }
       if (node.children) {
-        return { ...node, children: updateNodesRecursive(node.children, id, updater) };
+        return {
+          ...node,
+          children: updateNodesRecursive(node.children, targetId, updater),
+        };
       }
       return node;
     });
@@ -58,12 +64,16 @@ const useCanvasState = (initialItems = []) => {
 
   // Remove node (and its subtree) from tree, returns new array
   const removeNodeFromTree = useCallback((nodes, id) => {
+    const targetId = String(id);
     return nodes.reduce((acc, node) => {
-      if (node.id === id) {
+      if (String(node.id) === targetId) {
         return acc; // skip this node (remove)
       }
       if (node.children) {
-        acc.push({ ...node, children: removeNodeFromTree(node.children, id) });
+        acc.push({
+          ...node,
+          children: removeNodeFromTree(node.children, targetId),
+        });
       } else {
         acc.push(node);
       }
@@ -72,45 +82,58 @@ const useCanvasState = (initialItems = []) => {
   }, []);
 
   // Insert a node under a parent (parentId null = root). Supports index insertion.
-  const insertNodeIntoTree = useCallback((nodes, parentId, newNode, index = null) => {
-    if (parentId === null) {
-      if (index !== null) {
-        const newNodes = [...nodes];
-        newNodes.splice(index, 0, newNode);
-        return newNodes;
-      }
-      return [...nodes, newNode];
-    }
-
-    return nodes.map(node => {
-      if (node.id === parentId) {
-        const children = node.children || [];
+  const insertNodeIntoTree = useCallback(
+    (nodes, parentId, newNode, index = null) => {
+      if (parentId === null) {
         if (index !== null) {
-          const newChildren = [...children];
-          newChildren.splice(index, 0, newNode);
-          return { ...node, children: newChildren };
+          const newNodes = [...nodes];
+          newNodes.splice(index, 0, newNode);
+          return newNodes;
         }
-        return { ...node, children: [...children, newNode] };
+        return [...nodes, newNode];
       }
-      if (node.children) {
-        return { ...node, children: insertNodeIntoTree(node.children, parentId, newNode, index) };
-      }
-      return node;
-    });
-  }, []);
+
+      const targetParentId = String(parentId);
+      return nodes.map((node) => {
+        if (String(node.id) === targetParentId) {
+          const children = node.children || [];
+          if (index !== null) {
+            const newChildren = [...children];
+            newChildren.splice(index, 0, newNode);
+            return { ...node, children: newChildren };
+          }
+          return { ...node, children: [...children, newNode] };
+        }
+        if (node.children) {
+          return {
+            ...node,
+            children: insertNodeIntoTree(
+              node.children,
+              targetParentId,
+              newNode,
+              index,
+            ),
+          };
+        }
+        return node;
+      });
+    },
+    [],
+  );
 
   // Extract a subtree (node with its children) from the tree, returns {extracted, remaining}
   const extractSubtree = useCallback((nodes, id) => {
+    const targetId = String(id);
     for (let i = 0; i < nodes.length; i++) {
       const node = nodes[i];
-      if (node.id === id) {
+      if (String(node.id) === targetId) {
         // Remove this node from array, return it and remaining nodes
         const newNodes = [...nodes];
         newNodes.splice(i, 1);
         return { extracted: node, remaining: newNodes };
       }
       if (node.children) {
-        const result = extractSubtree(node.children, id);
+        const result = extractSubtree(node.children, targetId);
         if (result.extracted) {
           // Update the parent's children with the remaining children subtree
           const newNodes = [...nodes];

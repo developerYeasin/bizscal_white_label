@@ -30,7 +30,7 @@ const VIEWPORT_WIDTHS = {
 };
 
 // Check if a block type is a container (can have children)
-const CONTAINER_TYPES = ["section", "row", "column", "grid", "systemHeader", "systemFooter"];
+const CONTAINER_TYPES = ["section", "row", "column", "grid", "container", "systemHeader", "systemFooter"];
 
 const isContainer = (type) => CONTAINER_TYPES.includes(type);
 
@@ -140,10 +140,12 @@ const NestedBlockList = ({
 
 // Helper function to find node in tree
 const findNodeInTree = (nodes, id) => {
+  if (!id) return null;
+  const targetId = String(id);
   for (const node of nodes) {
-    if (node.id === id) return node;
+    if (String(node.id) === targetId) return node;
     if (node.children) {
-      const found = findNodeInTree(node.children, id);
+      const found = findNodeInTree(node.children, targetId);
       if (found) return found;
     }
   }
@@ -286,25 +288,45 @@ const Canvas = ({
               if (parsed.type === 'new-block') {
                 // Find the block element under the cursor
                 const elements = document.elementsFromPoint(e.clientX, e.clientY);
+                
+                // Find if we are dropping onto a block
                 const blockElement = elements.find(el => el.closest('[data-block-id]'));
-
-                let insertIndex = items.length; // default to end
+                
+                let targetParentId = null;
+                let insertIndex = items.length;
 
                 if (blockElement) {
                   const targetBlock = blockElement.closest('[data-block-id]');
                   const blockId = targetBlock.getAttribute('data-block-id');
-                  const overIndex = items.findIndex(item => item.id.toString() === blockId);
-
-                  if (overIndex !== -1) {
-                    // Determine insertion position based on where we dropped relative to the block
-                    const rect = targetBlock.getBoundingClientRect();
-                    const midpoint = rect.top + rect.height / 2;
-                    // If dropped above midpoint, insert before; otherwise after
-                    insertIndex = e.clientY < midpoint ? overIndex : overIndex + 1;
+                  const blockType = targetBlock.getAttribute('data-block-type');
+                  
+                  // If dropping onto a container, we might want to drop INSIDE it
+                  if (isContainer(blockType)) {
+                    targetParentId = blockId;
+                    // For now, just append to the end of container children
+                    const containerNode = findNodeInTree(items, blockId);
+                    insertIndex = containerNode?.children?.length || 0;
+                  } else {
+                    // Dropping next to a non-container block
+                    // Find parent of this block
+                    const parentId = findParentId(items, blockId);
+                    targetParentId = parentId === undefined ? null : parentId;
+                    
+                    const parentNode = targetParentId === null ? { children: items } : findNodeInTree(items, targetParentId);
+                    const siblings = parentNode?.children || items;
+                    
+                    const overIndex = siblings.findIndex(item => item.id.toString() === blockId);
+                    if (overIndex !== -1) {
+                      const rect = targetBlock.getBoundingClientRect();
+                      const midpoint = rect.top + rect.height / 2;
+                      insertIndex = e.clientY < midpoint ? overIndex : overIndex + 1;
+                    }
                   }
                 }
 
-                onDropBlock(parsed.blockType, insertIndex, parsed.defaultConfig || {});
+                // Call handleAddBlock with parentId support
+                // signature: (blockType, index, defaultConfig, parentId)
+                onDropBlock(parsed.blockType, insertIndex, parsed.defaultConfig || {}, targetParentId);
               }
             } catch (err) {
               console.error('Failed to parse drop data', err);
@@ -365,12 +387,14 @@ const Canvas = ({
 
 // Helper to find parent ID of a node
 const findParentId = (nodes, targetId, parentId = null) => {
+  if (!targetId) return undefined;
+  const tId = String(targetId);
   for (const node of nodes) {
-    if (node.id === targetId) {
+    if (String(node.id) === tId) {
       return parentId;
     }
     if (node.children) {
-      const found = findParentId(node.children, targetId, node.id);
+      const found = findParentId(node.children, tId, node.id);
       if (found !== undefined) return found;
     }
   }
@@ -378,7 +402,13 @@ const findParentId = (nodes, targetId, parentId = null) => {
 };
 
 // Helper to handle moving item to a nested parent
-const handleMoveToNestedParent = (activeId, overId, overParentId, items, onUpdateItems) => {
+const handleMoveToNestedParent = (
+  activeId,
+  overId,
+  overParentId,
+  items,
+  onUpdateItems,
+) => {
   const { extracted, remaining } = extractSubtree(items, activeId);
   if (!extracted) return;
 
@@ -386,10 +416,16 @@ const handleMoveToNestedParent = (activeId, overId, overParentId, items, onUpdat
   if (!overParent || !overParent.children) return;
 
   // Insert at appropriate index
-  const overIndex = overParent.children.findIndex((item) => item.id === overId);
+  const tOverId = String(overId);
+  const overIndex = overParent.children.findIndex(
+    (item) => String(item.id) === tOverId,
+  );
   const newChildren = [...overParent.children];
   const insertIndex = overIndex === -1 ? newChildren.length : overIndex;
-  newChildren.splice(insertIndex, 0, { ...extracted, children: extracted.children || [] });
+  newChildren.splice(insertIndex, 0, {
+    ...extracted,
+    children: extracted.children || [],
+  });
 
   onUpdateItems((draft) => {
     const draftOverParent = findNodeInTree(draft, overParentId);
@@ -400,7 +436,14 @@ const handleMoveToNestedParent = (activeId, overId, overParentId, items, onUpdat
 };
 
 // Helper to handle moving item between different parents
-const handleMoveToDifferentParent = (activeId, overId, activeParentId, overParentId, items, onUpdateItems) => {
+const handleMoveToDifferentParent = (
+  activeId,
+  overId,
+  activeParentId,
+  overParentId,
+  items,
+  onUpdateItems,
+) => {
   // Extract from current parent
   const { extracted, remaining } = extractSubtree(items, activeId);
   if (!extracted) return;
@@ -409,10 +452,16 @@ const handleMoveToDifferentParent = (activeId, overId, activeParentId, overParen
   const overParent = findNodeInTree(remaining, overParentId);
   if (!overParent || !overParent.children) return;
 
-  const overIndex = overParent.children.findIndex((item) => item.id === overId);
+  const tOverId = String(overId);
+  const overIndex = overParent.children.findIndex(
+    (item) => String(item.id) === tOverId,
+  );
   const newChildren = [...overParent.children];
   const insertIndex = overIndex === -1 ? newChildren.length : overIndex;
-  newChildren.splice(insertIndex, 0, { ...extracted, children: extracted.children || [] });
+  newChildren.splice(insertIndex, 0, {
+    ...extracted,
+    children: extracted.children || [],
+  });
 
   onUpdateItems((draft) => {
     const draftOverParent = findNodeInTree(draft, overParentId);
@@ -424,15 +473,17 @@ const handleMoveToDifferentParent = (activeId, overId, activeParentId, overParen
 
 // Extract subtree helper (same as useCanvasState but standalone)
 const extractSubtree = (nodes, id) => {
+  if (!id) return { extracted: null, remaining: nodes };
+  const targetId = String(id);
   for (let i = 0; i < nodes.length; i++) {
     const node = nodes[i];
-    if (node.id === id) {
+    if (String(node.id) === targetId) {
       const newNodes = [...nodes];
       newNodes.splice(i, 1);
       return { extracted: node, remaining: newNodes };
     }
     if (node.children) {
-      const result = extractSubtree(node.children, id);
+      const result = extractSubtree(node.children, targetId);
       if (result.extracted) {
         const newNodes = [...nodes];
         newNodes[i] = { ...node, children: result.remaining };

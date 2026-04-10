@@ -127,7 +127,7 @@ const BlockRenderer = ({
   };
 
   // Determine if this is a container block (layout blocks only)
-  const containerTypes = ["section", "row", "column", "grid"];
+  const containerTypes = ["section", "row", "column", "grid", "container"];
   const isContainer = containerTypes.includes(item.type);
   const childCount = item.children?.length || 0;
 

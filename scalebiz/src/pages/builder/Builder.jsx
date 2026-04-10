@@ -29,7 +29,8 @@ const fetchThemeBlocks = async () => {
 };
 
 // Page Builder components
-import { Canvas, useCanvasState } from "@/components/page-builder/index.js";
+import { Canvas } from "@/components/page-builder/index.js";
+import useCanvasState from "@/components/page-builder/useCanvasState.js";
 
 // DnD Kit imports for page reordering
 import {
@@ -72,6 +73,13 @@ import SectionBlockSettings from "@/components/page-builder/settings/SectionBloc
 import RowBlockSettings from "@/components/page-builder/settings/RowBlockSettings.jsx";
 import ColumnBlockSettings from "@/components/page-builder/settings/ColumnBlockSettings.jsx";
 import GridBlockSettings from "@/components/page-builder/settings/GridBlockSettings.jsx";
+
+// Basic block settings
+import TitleBlockSettings from "@/components/page-builder/settings/TitleBlockSettings.jsx";
+import DescriptionBlockSettings from "@/components/page-builder/settings/DescriptionBlockSettings.jsx";
+import TextBlockSettings from "@/components/page-builder/settings/TextBlockSettings.jsx";
+import ButtonBlockSettings from "@/components/page-builder/settings/ButtonBlockSettings.jsx";
+import ImageBlockSettings from "@/components/page-builder/settings/ImageBlockSettings.jsx";
 
 // Theme customization components
 import ThemeSelection from "@/components/customize-theme/ThemeSelection.jsx";
@@ -121,6 +129,9 @@ import {
   Sliders,
   GripVertical,
   MoreHorizontal,
+  Type,
+  AlignLeft,
+  MousePointer2,
 } from "lucide-react";
 
 // UI Components
@@ -355,6 +366,17 @@ const PagesPanel = ({
   );
 };
 
+// Check if a block type is a container (can have children)
+const CONTAINER_TYPES = [
+  "section",
+  "row",
+  "column",
+  "grid",
+  "container",
+  "systemHeader",
+  "systemFooter",
+];
+
 const Builder = () => {
   const [isEditMode, setIsEditMode] = useState(false);
   const { isAuthenticated } = useAuth();
@@ -513,6 +535,12 @@ const Builder = () => {
       columns: ColumnBlockSettings, // Alias for compatibility
       grid: GridBlockSettings,
       container: SectionBlockSettings, // Fallback: use section settings
+      // Basic blocks
+      title: TitleBlockSettings,
+      description: DescriptionBlockSettings,
+      text: TextBlockSettings,
+      button: ButtonBlockSettings,
+      image: ImageBlockSettings,
     }),
     [],
   );
@@ -676,18 +704,28 @@ const Builder = () => {
 
   // Handlers
   const handleAddBlock = useCallback(
-    (blockType, arg2, arg3) => {
+    (blockType, arg2, arg3, arg4) => {
       let defaultConfig = {};
       let index = null;
+      let parentId = null;
 
       // Handle both signatures:
       // - (blockType, defaultConfig) from palette click
-      // - (blockType, index, defaultConfig) from drag-drop
+      // - (blockType, index, defaultConfig, parentId) from drag-drop
       if (typeof arg2 === "number") {
         index = arg2;
         defaultConfig = arg3 || {};
+        parentId = arg4 || null;
       } else if (typeof arg2 === "object" && arg2 !== null) {
         defaultConfig = arg2;
+        // If clicking from palette, and a container is selected, add as child
+        if (
+          canvasState.selectedId &&
+          canvasState.selectedItem &&
+          CONTAINER_TYPES.includes(canvasState.selectedItem.type)
+        ) {
+          parentId = canvasState.selectedId;
+        }
       }
 
       const newBlock = {
@@ -695,11 +733,11 @@ const Builder = () => {
         type: blockType,
         data: defaultConfig,
       };
-      canvasState.addItem(newBlock, null, index);
+      canvasState.addItem(newBlock, parentId, index);
       // Keep left panel open after adding block
       setActiveLeftPanel("blocks");
     },
-    [resetCanvas],
+    [canvasState.selectedId, canvasState.selectedItem, canvasState.addItem],
   );
 
   const handleMetaChange = useCallback((field, value) => {
@@ -925,6 +963,209 @@ const Builder = () => {
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             </div>
             <div className="grid grid-cols-2 gap-3 text-sm">
+              {/* Layout Blocks */}
+              <div className="col-span-2 mt-4 mb-2 first:mt-0">
+                <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                  Layout
+                </h3>
+              </div>
+              <div
+                className="border border-gray-200 bg-white hover:border-blue-500 hover:shadow-sm transition-all p-3 rounded-md cursor-pointer flex flex-col items-center gap-2 text-center"
+                onClick={() => handleAddBlock("section", { container: true })}
+                draggable
+                onDragStart={(e) => {
+                  e.dataTransfer.setData(
+                    "application/json",
+                    JSON.stringify({
+                      type: "new-block",
+                      blockType: "section",
+                      defaultConfig: { container: true },
+                    }),
+                  );
+                  e.dataTransfer.effectAllowed = "copy";
+                }}
+              >
+                <Layout className="w-6 h-6 text-gray-400" />
+                <span className="text-xs font-medium">Section</span>
+              </div>
+              <div
+                className="border border-gray-200 bg-white hover:border-blue-500 hover:shadow-sm transition-all p-3 rounded-md cursor-pointer flex flex-col items-center gap-2 text-center"
+                onClick={() => handleAddBlock("row", {})}
+                draggable
+                onDragStart={(e) => {
+                  e.dataTransfer.setData(
+                    "application/json",
+                    JSON.stringify({
+                      type: "new-block",
+                      blockType: "row",
+                      defaultConfig: {},
+                    }),
+                  );
+                  e.dataTransfer.effectAllowed = "copy";
+                }}
+              >
+                <List className="w-6 h-6 text-gray-400" />
+                <span className="text-xs font-medium">Row</span>
+              </div>
+              <div
+                className="border border-gray-200 bg-white hover:border-blue-500 hover:shadow-sm transition-all p-3 rounded-md cursor-pointer flex flex-col items-center gap-2 text-center"
+                onClick={() => handleAddBlock("column", { width: "1/2" })}
+                draggable
+                onDragStart={(e) => {
+                  e.dataTransfer.setData(
+                    "application/json",
+                    JSON.stringify({
+                      type: "new-block",
+                      blockType: "column",
+                      defaultConfig: { width: "1/2" },
+                    }),
+                  );
+                  e.dataTransfer.effectAllowed = "copy";
+                }}
+              >
+                <Table className="w-6 h-6 text-gray-400" />
+                <span className="text-xs font-medium">Column</span>
+              </div>
+              <div
+                className="border border-gray-200 bg-white hover:border-blue-500 hover:shadow-sm transition-all p-3 rounded-md cursor-pointer flex flex-col items-center gap-2 text-center"
+                onClick={() => handleAddBlock("grid", { columns: 3 })}
+                draggable
+                onDragStart={(e) => {
+                  e.dataTransfer.setData(
+                    "application/json",
+                    JSON.stringify({
+                      type: "new-block",
+                      blockType: "grid",
+                      defaultConfig: { columns: 3 },
+                    }),
+                  );
+                  e.dataTransfer.effectAllowed = "copy";
+                }}
+              >
+                <Layout className="w-6 h-6 text-gray-400" />
+                <span className="text-xs font-medium">Grid</span>
+              </div>
+
+              {/* Basic Blocks */}
+              <div className="col-span-2 mt-4 mb-2">
+                <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                  Basic
+                </h3>
+              </div>
+              <div
+                className="border border-gray-200 bg-white hover:border-blue-500 hover:shadow-sm transition-all p-3 rounded-md cursor-pointer flex flex-col items-center gap-2 text-center"
+                onClick={() =>
+                  handleAddBlock("title", { text: "New Title", tag: "h2" })
+                }
+                draggable
+                onDragStart={(e) => {
+                  e.dataTransfer.setData(
+                    "application/json",
+                    JSON.stringify({
+                      type: "new-block",
+                      blockType: "title",
+                      defaultConfig: { text: "New Title", tag: "h2" },
+                    }),
+                  );
+                  e.dataTransfer.effectAllowed = "copy";
+                }}
+              >
+                <Type className="w-6 h-6 text-gray-400" />
+                <span className="text-xs font-medium">Title</span>
+              </div>
+              <div
+                className="border border-gray-200 bg-white hover:border-blue-500 hover:shadow-sm transition-all p-3 rounded-md cursor-pointer flex flex-col items-center gap-2 text-center"
+                onClick={() =>
+                  handleAddBlock("description", {
+                    text: "Add your description here...",
+                  })
+                }
+                draggable
+                onDragStart={(e) => {
+                  e.dataTransfer.setData(
+                    "application/json",
+                    JSON.stringify({
+                      type: "new-block",
+                      blockType: "description",
+                      defaultConfig: { text: "Add your description here..." },
+                    }),
+                  );
+                  e.dataTransfer.effectAllowed = "copy";
+                }}
+              >
+                <FileText className="w-6 h-6 text-gray-400" />
+                <span className="text-xs font-medium">Description</span>
+              </div>
+              <div
+                className="border border-gray-200 bg-white hover:border-blue-500 hover:shadow-sm transition-all p-3 rounded-md cursor-pointer flex flex-col items-center gap-2 text-center"
+                onClick={() =>
+                  handleAddBlock("text", {
+                    content: "<p>Add your content here...</p>",
+                  })
+                }
+                draggable
+                onDragStart={(e) => {
+                  e.dataTransfer.setData(
+                    "application/json",
+                    JSON.stringify({
+                      type: "new-block",
+                      blockType: "text",
+                      defaultConfig: {
+                        content: "<p>Add your content here...</p>",
+                      },
+                    }),
+                  );
+                  e.dataTransfer.effectAllowed = "copy";
+                }}
+              >
+                <AlignLeft className="w-6 h-6 text-gray-400" />
+                <span className="text-xs font-medium">Text</span>
+              </div>
+              <div
+                className="border border-gray-200 bg-white hover:border-blue-500 hover:shadow-sm transition-all p-3 rounded-md cursor-pointer flex flex-col items-center gap-2 text-center"
+                onClick={() => handleAddBlock("button", { text: "Click Me" })}
+                draggable
+                onDragStart={(e) => {
+                  e.dataTransfer.setData(
+                    "application/json",
+                    JSON.stringify({
+                      type: "new-block",
+                      blockType: "button",
+                      defaultConfig: { text: "Click Me" },
+                    }),
+                  );
+                  e.dataTransfer.effectAllowed = "copy";
+                }}
+              >
+                <MousePointer2 className="w-6 h-6 text-gray-400" />
+                <span className="text-xs font-medium">Button</span>
+              </div>
+              <div
+                className="border border-gray-200 bg-white hover:border-blue-500 hover:shadow-sm transition-all p-3 rounded-md cursor-pointer flex flex-col items-center gap-2 text-center"
+                onClick={() => handleAddBlock("image", {})}
+                draggable
+                onDragStart={(e) => {
+                  e.dataTransfer.setData(
+                    "application/json",
+                    JSON.stringify({
+                      type: "new-block",
+                      blockType: "image",
+                      defaultConfig: {},
+                    }),
+                  );
+                  e.dataTransfer.effectAllowed = "copy";
+                }}
+              >
+                <Image className="w-6 h-6 text-gray-400" />
+                <span className="text-xs font-medium">Image</span>
+              </div>
+
+              {/* Theme Blocks */}
+              <div className="col-span-2 mt-4 mb-2">
+                <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                  Theme Blocks
+                </h3>
+              </div>
               {filteredThemeBlocks.map((block) => (
                 <div
                   key={block.id}
