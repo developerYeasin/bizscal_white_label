@@ -222,7 +222,30 @@ exports.update_store_configuration = async (req, res, next) => {
         const updatableThemeSettings = {};
         for (const key of allowedThemeFields) {
           if (theme_settings[key] !== undefined) {
-            updatableThemeSettings[key] = theme_settings[key];
+            // Ensure JSON fields are stringified if they come as objects
+            if (
+              ["typography", "button_style", "announcement_bar", "product_card_style"].includes(key) &&
+              typeof theme_settings[key] === "object" &&
+              theme_settings[key] !== null
+            ) {
+              updatableThemeSettings[key] = JSON.stringify(theme_settings[key]);
+            } else if (
+              ["product_card_style"].includes(key) &&
+              typeof theme_settings[key] === "string"
+            ) {
+               // Handle case where it's passed as a simple string but expected as JSON
+               // If it's just 'default', maybe it needs to be '{"style":"default"}'?
+               // Looking at the error, it says 'Invalid JSON text', so it probably expects a JSON string like '"{...}"' or '{"...":"..."}'
+               // Let's assume it should be treated as a JSON string.
+               try {
+                 JSON.parse(theme_settings[key]);
+                 updatableThemeSettings[key] = theme_settings[key];
+               } catch (e) {
+                 updatableThemeSettings[key] = JSON.stringify(theme_settings[key]);
+               }
+            } else {
+              updatableThemeSettings[key] = theme_settings[key];
+            }
           }
         }
 

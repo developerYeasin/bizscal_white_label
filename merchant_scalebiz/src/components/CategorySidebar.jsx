@@ -130,76 +130,36 @@ const CategorySidebar = ({ onLinkClick, className }) => { // Added className pro
   }
 
   return (
-    <div className={cn("relative bg-card", className)}> {/* Apply className here, removed w-full */}
-      {/* <ul className="space-y-1"> */}
-      <ul className="">
-        {categories.map((category) => {
-          const IconComponent =
-            categoryIconMap[category.slug] || MoreHorizontal;
-          const hasSubCategories =
-            category.subCategories && category.subCategories.length > 0;
-          const isHovered = hoveredCategory?.id === category.id;
+    <div className={cn("relative", className)}>
+      {/* ALL CATEGORIES Dropdown Button */}
+      <div className="relative">
+        <button
+          className="flex items-center justify-between w-full p-3 px-5 text-base font-medium bg-[#111111] text-white hover:bg-[#222222] transition-colors"
+          onMouseEnter={() => setHoveredCategory('all-categories')}
+          onMouseLeave={handleMouseLeave}
+        >
+          <span className="flex items-center">
+            <Menu className="h-4 w-4 mr-2" />
+            ALL CATEGORIES
+          </span>
+          <ChevronRight className="h-4 w-4" />
+        </button>
 
-          return (
-            <li
-              key={category.id}
-              className="relative m-0 mt-0"
-              ref={(el) => (categoryRefs.current[category.id] = el)} // Assign ref
-              onMouseEnter={(e) => handleMouseEnter(category, e)}
-              onMouseLeave={handleMouseLeave}
-            >
-              <Link
-                to={getPath(category.path)}
-                onClick={onLinkClick}
-                className={cn(
-                  "flex items-center justify-between p-3 px-5 text-base font-medium transition-colors border-b border-[#11111112]",
-                  isHovered
-                    ? "bg-accent text-dynamic-primary-color"
-                    : "text-foreground hover:bg-accent hover:text-dynamic-primary-color"
-                )}
-              >
-                <span className="flex items-center">
-                  {/* <IconComponent className="h-4 w-4 mr-3" /> */}
-                  <img src={category?.imageUrl} alt={category?.name} className="h-6 w-6 mr-3" />
-                  {category?.name}
-                </span>
-                {hasSubCategories && (
-                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                )}
-              </Link>
-
-              {/* Mega Menu for subcategories, appears on hover */}
-              {isHovered && hasSubCategories && (
-                <div
-                  className="absolute left-full ml-2 w-[800px] bg-background border border-border shadow-lg z-50 animate-in fade-in-0 zoom-in-95 flex"
-                  style={menuPosition} // Apply dynamic style
-                  onMouseEnter={() =>
-                    handleMouseEnter(category, {
-                      currentTarget: categoryRefs.current[category.id],
-                    })
-                  } // Pass stored ref
-                  onMouseLeave={handleMouseLeave}
-                >
-                  <MegaMenuContentColumns
-                    categories={category.subCategories}
-                    onLinkClick={onLinkClick}
-                  />
-                  {/* Optional: Add a promotional image/banner here if desired, similar to the original request */}
-                  {/* <div
-                    className="w-1/3 bg-cover bg-center flex items-center justify-center text-white"
-                    style={{ backgroundImage: `url('https://elessi.b-cdn.net/elementor/wp-content/uploads/2019/02/megamenu-banner.jpg')` }}
-                  >
-                    <div className="text-center p-4 bg-black/30 rounded-md">
-                      <h3 className="text-2xl font-bold">Mega Menu Banner</h3>
-                      <p className="text-sm">Shop the latest trends</p>
-                    </div>
-                  </div> */}
-                </div>
-              )}
-            </li>
-          );
-        })}
-      </ul>
+        {/* Mega Menu for all categories, appears on hover */}
+        {(hoveredCategory === 'all-categories' || hoveredCategory?.id === 'all-categories') && (
+          <div
+            className="absolute left-full ml-2 w-[800px] bg-white border border-gray-200 shadow-lg z-50 animate-in fade-in-0 zoom-in-95 flex"
+            style={{ top: 0, bottom: 'auto' }}
+            onMouseEnter={() => setHoveredCategory('all-categories')}
+            onMouseLeave={handleMouseLeave}
+          >
+            <MegaMenuContentColumns
+              categories={categories}
+              onLinkClick={onLinkClick}
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 };

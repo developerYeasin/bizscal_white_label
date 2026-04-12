@@ -9,10 +9,10 @@ import { ChevronDown } from "lucide-react";
  *
  * Simplified preview of the storefront header based on layout_settings.header
  */
-const SystemHeader = ({ config }) => {
+const SystemHeader = ({ data, config }) => {
   const { config: storeConfig, isLoading } = useStoreConfig();
 
-  if (isLoading || !storeConfig) {
+  if (isLoading || (!storeConfig && !data)) {
     return (
       <div className="w-full bg-background border-b h-16 flex items-center justify-center text-sm text-muted-foreground">
         Loading header...
@@ -20,12 +20,11 @@ const SystemHeader = ({ config }) => {
     );
   }
 
-  const header = storeConfig.layout_settings?.header || {};
-
-  const topBar = header.topBar || {};
+  const header = data ? (data.mainNav || data) : (storeConfig.layout_settings?.header || {});
+  const topBar = data ? (data.topBar || {}) : (storeConfig.layout_settings?.header?.topBar || {});
   const utilityBar = header.utilityBar || {};
-  const mainNav = header.mainNav || {};
-  const navItems = header.navItems || [];
+  const mainNav = header;
+  const navItems = data ? (data.navItems || data.mainNav?.navItems || []) : (storeConfig.layout_settings?.header?.navItems || []);
 
   const storeName = storeConfig?.store_name || "Store";
   const logoUrl = mainNav.logoUrl;

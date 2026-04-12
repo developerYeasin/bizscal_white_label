@@ -8,10 +8,10 @@ import { useStoreConfig } from "@/contexts/StoreConfigurationContext.jsx";
  *
  * Simplified preview of the storefront footer based on layout_settings.footer
  */
-const SystemFooter = ({ config }) => {
+const SystemFooter = ({ data, config }) => {
   const { config: storeConfig, isLoading } = useStoreConfig();
 
-  if (isLoading || !storeConfig) {
+  if (isLoading || (!storeConfig && !data)) {
     return (
       <div className="w-full bg-muted/30 border-t h-20 flex items-center justify-center text-sm text-muted-foreground">
         Loading footer...
@@ -19,7 +19,7 @@ const SystemFooter = ({ config }) => {
     );
   }
 
-  const footer = storeConfig.layout_settings?.footer || {};
+  const footer = data ? (data.footer || data) : (storeConfig.layout_settings?.footer || {});
   const storeInfo = footer.storeInfo || {};
   const newsletter = footer.newsletter || {};
   const bottomLinks = footer.bottomLinks || [];

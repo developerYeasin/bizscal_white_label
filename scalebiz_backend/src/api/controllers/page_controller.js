@@ -6,7 +6,7 @@ exports.get_page_by_slug = async (req, res, next) => {
   try {
     const { page_slug } = req.params;
     const [rows] = await pool.query(
-        'SELECT title, slug, content FROM pages WHERE store_id = ? AND slug = ?',
+        'SELECT title, slug, content, meta_title, meta_description FROM pages WHERE store_id = ? AND slug = ?',
         [req.store_id, page_slug]
     );
 
@@ -28,7 +28,7 @@ exports.get_page_by_slug = async (req, res, next) => {
 exports.get_all_pages = async (req, res, next) => {
   try {
     const [rows] = await pool.query(
-      'SELECT title, slug, content FROM pages WHERE store_id = ?',
+      'SELECT title, slug, content, meta_title, meta_description FROM pages WHERE store_id = ?',
       [req.store_id]
     );
 

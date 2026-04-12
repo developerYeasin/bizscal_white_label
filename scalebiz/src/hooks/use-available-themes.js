@@ -8,7 +8,6 @@ const fetchAvailableThemes = async () => {
   const response = await api.get("/owner/themes");
   return response.data.data.themes.map(theme => ({
     id: theme.id, // Database ID (integer)
-    theme_id: theme.theme_id, // Theme identifier string (e.g., "basic-1")
     name: theme.name,
     imageSrc: theme.preview_image_url,
     status: theme.access_level === 'free' ? 'active' : (theme.access_level === 'standard' ? 'premium' : 'coming-soon'),

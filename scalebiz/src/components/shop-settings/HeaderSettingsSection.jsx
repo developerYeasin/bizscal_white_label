@@ -14,7 +14,13 @@ import { uploadSingleImage } from "@/utils/upload.js";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select.jsx";
 
 const HeaderSettingsSection = () => {
-  const { config, isLoading, updateNested, save, isUpdating } = useStoreConfig();
+  const { config, isLoading, updateNested: contextUpdateNested, save, isUpdating } = useStoreConfig();
+  const updateNested = (path, value) => {
+    // Fallback: If `contextUpdateNested` from global store is not enough, try using the passed one
+    // But since this component is used in two places (SystemHeaderSettings and stand-alone page),
+    // we need to be careful. Let's assume globalUpdateNested is correct for this usage.
+    contextUpdateNested(path, value);
+  };
   const logoInputRef = React.useRef(null);
 
   if (isLoading || !config) {

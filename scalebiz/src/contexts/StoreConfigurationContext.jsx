@@ -1,68 +1,68 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
+import React, { createContext, useContext, useReducer, useEffect, useCallback } from 'react';
 import { useStoreConfiguration } from '@/hooks/use-store-configuration';
+import { useAuth } from './AuthContext'; // Assuming AuthContext is available
 
-// Provide a default value to createContext to ensure useContext always returns an object
-const StoreConfigurationContext = createContext({
+const initialState = {
   config: null,
-  isLoading: true, // Default loading state
+  isLoading: true,
   error: null,
   isUpdating: false,
-  updateNested: () => {},
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  save: () => {}, 
-});
+  // For undo/redo
+  history: [null], // Array of past configurations
+  currentIndex: 0,
+  canUndo: false,
+  canRedo: false,
+};
 
-export const useStoreConfig = () => useContext(StoreConfigurationContext);
-
-export const StoreConfigurationProvider = ({ children }) => {
-  const { configuration, isLoading, error, updateConfiguration, isUpdating } = useStoreConfiguration();
-  const [localConfig, setLocalConfig] = useState(null);
-  const localConfigRef = useRef(localConfig); // Create a ref for localConfig
-
-  useEffect(() => {
-    if (configuration) {
-      setLocalConfig(JSON.parse(JSON.stringify(configuration))); // Deep copy for initial load
+function storeConfigReducer(state, action) {
+  switch (action.type) {
+    case "SET_CONFIG": {
+      const newConfig = action.payload;
+      const newHistory = state.history.slice(0, state.currentIndex + 1);
+      return {
+        ...state,
+        config: newConfig,
+        isLoading: false,
+        error: null,
+        history: [...newHistory, newConfig],
+        currentIndex: newHistory.length,
+        canUndo: newHistory.length > 0,
+        canRedo: false,
+      };
     }
-  }, [configuration]);
+    case "IS_LOADING":
+      return { ...state, isLoading: action.payload };
+    case "ERROR":
+      return { ...state, error: action.payload, isLoading: false };
+    case "IS_UPDATING":
+      return { ...state, isUpdating: action.payload };
+    case "UPDATE_CONFIG": {
+      const { path, value } = action.payload;
+      if (!state.config) return state;
 
-  // Keep the ref updated with the latest localConfig
-  useEffect(() => {
-    localConfigRef.current = localConfig;
-  }, [localConfig]);
-
-  const updateNested = useCallback((path, value) => {
-    setLocalConfig(prev => {
-      if (!prev) return null;
-
-      const keys = path.split('.');
-      const newConfig = JSON.parse(JSON.stringify(prev)); // Deep copy for immutability
-
+      const newConfig = JSON.parse(JSON.stringify(state.config));
       let current = newConfig;
+      const keys = path.split('.');
+
       for (let i = 0; i < keys.length; i++) {
         const key = keys[i];
         if (i === keys.length - 1) {
-          // This is the final key, set the value
           if (Array.isArray(current) && !isNaN(parseInt(key))) {
             current[parseInt(key)] = value;
           } else {
             current[key] = value;
           }
         } else {
-          // Not the final key, ensure the path exists
           if (Array.isArray(current) && !isNaN(parseInt(key))) {
-            // If current is an array and key is an index
             if (!current[parseInt(key)]) {
-              // Determine if the next part of the path is an array index or object key
               const nextKeyIsIndex = !isNaN(parseInt(keys[i + 1]));
               current[parseInt(key)] = nextKeyIsIndex ? [] : {};
             }
             current = current[parseInt(key)];
           } else {
-            // If current is an object
             if (!current[key]) {
-              // Determine if the next part of the path is an array index or object key
               const nextKeyIsIndex = !isNaN(parseInt(keys[i + 1]));
               current[key] = nextKeyIsIndex ? [] : {};
             }
@@ -70,26 +70,129 @@ export const StoreConfigurationProvider = ({ children }) => {
           }
         }
       }
-      return newConfig;
-    });
-  }, []); // setLocalConfig is stable, so no deps needed
 
-  const saveChanges = useCallback(() => {
-    if (localConfigRef.current) { // Use the ref to get the latest config
-      const payload = { ...localConfigRef.current };
-      console.log("StoreConfigurationContext: Sending payload to API:", payload); // Added log
-      updateConfiguration(payload);
+      const newHistory = state.history.slice(0, state.currentIndex + 1);
+      return {
+        ...state,
+        config: newConfig,
+        history: [...newHistory, newConfig],
+        currentIndex: newHistory.length,
+        canUndo: true,
+        canRedo: false,
+      };
     }
-  }, [updateConfiguration]); // updateConfiguration may change? It comes from useStoreConfiguration which returns a stable mutate function? Actually updateConfiguration is a mutation function from useMutation, which is stable (returns mutate). So safe.
+    case "UNDO": {
+      if (!state.canUndo) return state;
+      const newIndex = state.currentIndex - 1;
+      return {
+        ...state,
+        config: state.history[newIndex],
+        currentIndex: newIndex,
+        canUndo: newIndex > 0,
+        canRedo: true,
+      };
+    }
+    case "REDO": {
+      if (!state.canRedo) return state;
+      const newIndex = state.currentIndex + 1;
+      return {
+        ...state,
+        config: state.history[newIndex],
+        currentIndex: newIndex,
+        canUndo: true,
+        canRedo: newIndex < state.history.length - 1,
+      };
+    }
+    default:
+      return state;
+  }
+}
+
+const StoreConfigurationContext = createContext(initialState);
+
+export const useStoreConfig = () => useContext(StoreConfigurationContext);
+
+export const StoreConfigurationProvider = ({ children }) => {
+  const [state, dispatch] = useReducer(storeConfigReducer, initialState);
+  const { isAuthenticated } = useAuth();
+  const {
+    fetchConfigurationManually,
+    updateConfigurationAsync,
+    isUpdating: apiIsUpdating,
+  } = useStoreConfiguration();
+
+  // Initial fetch of configuration
+  useEffect(() => {
+    const loadConfiguration = async () => {
+      if (isAuthenticated) {
+        dispatch({ type: "IS_LOADING", payload: true });
+        try {
+          const fetchedConfig = await fetchConfigurationManually();
+          dispatch({ type: "SET_CONFIG", payload: fetchedConfig });
+        } catch (err) {
+          console.error("Failed to fetch store configuration:", err);
+          dispatch({ type: "ERROR", payload: err });
+        }
+      } else {
+        // If not authenticated, ensure loading state is false and config is null
+        dispatch({ type: "IS_LOADING", payload: false });
+        dispatch({ type: "SET_CONFIG", payload: null });
+      }
+    };
+    loadConfiguration();
+  }, [isAuthenticated, fetchConfigurationManually]);
+
+  // When API is updating, update context's isUpdating state
+  useEffect(() => {
+    dispatch({ type: "IS_UPDATING", payload: apiIsUpdating });
+  }, [apiIsUpdating]);
+
+  const updateNested = useCallback((path, value) => {
+    dispatch({ type: "UPDATE_CONFIG", payload: { path, value } });
+  }, []);
+
+  const saveChanges = useCallback(async () => {
+    if (state.config) {
+      dispatch({ type: "IS_UPDATING", payload: true });
+      try {
+        // The `updateConfigurationAsync` from the hook handles the API call.
+        // It returns the updated configuration from the API response.
+        const updatedConfig = await updateConfigurationAsync(state.config);
+        // Correctly handle the update. If the API returns the updated config, use it.
+        if (updatedConfig && updatedConfig.data && updatedConfig.data.configuration) {
+           dispatch({ type: "SET_CONFIG", payload: updatedConfig.data.configuration });
+        }
+
+      } catch (err) {
+        console.error("Error saving store configuration:", err);
+        dispatch({ type: "ERROR", payload: err });
+      } finally {
+        dispatch({ type: "IS_UPDATING", payload: false });
+      }
+    }
+  }, [state.config, updateConfigurationAsync]);
+
+  const undo = useCallback(() => {
+    dispatch({ type: "UNDO" });
+  }, []);
+
+  const redo = useCallback(() => {
+    dispatch({ type: "REDO" });
+  }, []);
 
   const value = React.useMemo(() => ({
-    config: localConfig,
-    isLoading,
-    error,
-    isUpdating,
+    config: state.config,
+    isLoading: state.isLoading,
+    error: state.error,
+    isUpdating: state.isUpdating,
     updateNested,
     save: saveChanges,
-  }), [localConfig, isLoading, error, isUpdating, updateNested]);
+    undo,
+    redo,
+    canUndo: state.canUndo,
+    canRedo: state.canRedo,
+    dispatch, // Expose dispatch for more granular control if needed by ConfigLoader
+  }), [state, updateNested, saveChanges, undo, redo, dispatch]);
 
   return (
     <StoreConfigurationContext.Provider value={value}>

@@ -8,6 +8,7 @@ import React, {
   useRef,
 } from "react";
 import { useNavigate } from "react-router-dom";
+import { X } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext.jsx";
 import { useThemeConfig } from "@/contexts/ThemeSettingsContext.jsx";
@@ -17,37 +18,21 @@ import { useProductLandingPage } from "@/hooks/use-product-landing-page.js";
 import api from "@/utils/api.js";
 import { showSuccess, showError } from "@/utils/toast.js";
 
-// Fetch all theme blocks
-const fetchThemeBlocks = async () => {
-  try {
-    const response = await api.get("/owner/theme-blocks");
-    return response.data.data.theme_blocks || [];
-  } catch (error) {
-    console.error("Failed to fetch theme blocks:", error);
-    return [];
-  }
-};
-
 // Page Builder components
 import { Canvas } from "@/components/page-builder/index.js";
 import useCanvasState from "@/components/page-builder/useCanvasState.js";
+import PropertySidebar from "@/components/page-builder/PropertySidebar.jsx";
 
-// DnD Kit imports for page reordering
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-} from "@dnd-kit/core";
-import {
-  SortableContext,
-  verticalListSortingStrategy,
-  useSortable,
-  arrayMove,
-  sortableKeyboardCoordinates,
-} from "@dnd-kit/sortable";
+// Refactored components
+import BlockPalette from "./BlockPalette.jsx";
+import PagesPanel from "./PagesPanel.jsx";
+import ThemeSettings from "./ThemeSettings.jsx";
+import AppSettings from "./AppSettings.jsx";
+import PageProperties from "./PageProperties.jsx";
+import BlockProperties from "./BlockProperties.jsx";
+import BuilderHeader from "./BuilderHeader.jsx";
+import BuilderViewport from "./BuilderViewport.jsx";
+import BuilderToolRail from "./BuilderToolRail.jsx";
 
 // Block settings components
 import HeroBannerSettings from "@/components/landing-pages/settings/HeroBannerSettings.jsx";
@@ -56,7 +41,7 @@ import FeaturedCategoriesSettings from "@/components/landing-pages/settings/Feat
 import HeroBannerSliderSection from "@/components/landing-pages/HeroBannerSliderSection.jsx";
 import MarketingBannerSettings from "@/components/landing-pages/settings/MarketingBannerSettings.jsx";
 import FeatureBlocksSettings from "@/components/landing-pages/settings/FeatureBlocksSettings.jsx";
-import ProductSectionSettings from "@/components/landing-pages/settings/ProductSectionSettings.jsx";
+import ProductBlockSettings from "@/components/page-builder/settings/ProductBlockSettings.jsx";
 import BrandShowcaseSettings from "@/components/landing-pages/settings/BrandShowcaseSettings.jsx";
 import LatestNewsSettings from "@/components/landing-pages/settings/LatestNewsSettings.jsx";
 import CategorySidebarSettings from "@/components/landing-pages/settings/CategorySidebarSettings.jsx";
@@ -64,91 +49,35 @@ import PromotionalBannersSettings from "@/components/landing-pages/settings/Prom
 import MidPageCallToActionSettings from "@/components/landing-pages/settings/MidPageCallToActionSettings.jsx";
 import NewsletterSubscriptionSettings from "@/components/landing-pages/settings/NewsletterSubscriptionSettings.jsx";
 import BlogPostsSectionSettings from "@/components/landing-pages/settings/BlogPostsSectionSettings.jsx";
-
-// System blocks settings
+import ContactFormSettings from "@/components/page-builder/settings/ContactFormSettings.jsx";
+import PolicyPageSettings from "@/components/page-builder/settings/PolicyPageSettings.jsx";
+import CartSettings from "@/components/page-builder/settings/CartSettings.jsx";
+import CheckoutSettings from "@/components/page-builder/settings/CheckoutSettings.jsx";
 import SystemHeaderSettings from "@/components/page-builder/settings/SystemHeaderSettings.jsx";
 import SystemFooterSettings from "@/components/page-builder/settings/SystemFooterSettings.jsx";
-// Layout block settings
 import SectionBlockSettings from "@/components/page-builder/settings/SectionBlockSettings.jsx";
 import RowBlockSettings from "@/components/page-builder/settings/RowBlockSettings.jsx";
 import ColumnBlockSettings from "@/components/page-builder/settings/ColumnBlockSettings.jsx";
 import GridBlockSettings from "@/components/page-builder/settings/GridBlockSettings.jsx";
-
-// Basic block settings
+import CardLayoutSettings from "@/components/page-builder/settings/CardLayoutSettings.jsx";
+import CardSettings from "@/components/page-builder/settings/CardSettings.jsx";
+import HeroSectionSettings from "@/components/page-builder/settings/HeroSectionSettings.jsx";
+import ThemeSectionSettings from "@/components/page-builder/settings/ThemeSectionSettings.jsx";
+import MegaMenuHeaderSettings from "@/components/page-builder/settings/MegaMenuHeaderSettings.jsx";
 import TitleBlockSettings from "@/components/page-builder/settings/TitleBlockSettings.jsx";
 import DescriptionBlockSettings from "@/components/page-builder/settings/DescriptionBlockSettings.jsx";
 import TextBlockSettings from "@/components/page-builder/settings/TextBlockSettings.jsx";
 import ButtonBlockSettings from "@/components/page-builder/settings/ButtonBlockSettings.jsx";
 import ImageBlockSettings from "@/components/page-builder/settings/ImageBlockSettings.jsx";
-
-// Theme customization components
-import ThemeSelection from "@/components/customize-theme/ThemeSelection.jsx";
-import ThemeControls from "@/components/customize-theme/ThemeControls.jsx";
-import ThemePreviewPanel from "@/components/customize-theme/ThemePreviewPanel.jsx";
-
-// UI Components
-import { Skeleton } from "@/components/ui/skeleton.jsx";
-import { Input } from "@/components/ui/input.jsx";
-import { Textarea } from "@/components/ui/textarea.jsx";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select.jsx";
-import { Button } from "@/components/ui/button.jsx";
-import { ScrollArea } from "@/components/ui/scroll-area.jsx";
-
-// Icons
-import {
-  Home,
-  Eye,
-  Monitor,
-  Tablet,
-  Smartphone,
-  Plus,
-  FileText,
-  Palette,
-  Settings,
-  ChevronDown,
-  X,
-  PanelTop,
-  PanelBottom,
-  Globe,
-  Search,
-  CreditCard,
-  Truck,
-  Share2,
-  Layout,
-  LayoutPanelTop,
-  List,
-  Table,
-  Image,
-  FileInput,
-  Sliders,
-  GripVertical,
-  MoreHorizontal,
-  Type,
-  AlignLeft,
-  MousePointer2,
-} from "lucide-react";
-
-// UI Components
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu.jsx";
-
-// Viewport definitions
-const VIEWPORTS = {
-  desktop: { label: "Desktop", icon: Monitor },
-  tablet: { label: "Tablet", icon: Tablet },
-  mobile: { label: "Mobile", icon: Smartphone },
-};
+import NewsletterCouponBannerSettings from "@/components/page-builder/settings/NewsletterCouponBannerSettings.jsx";
+import AnnouncementBarSettings from "@/components/page-builder/settings/AnnouncementBarSettings.jsx";
+import PromotionalBannerGridSettings from "@/components/page-builder/settings/PromotionalBannerGridSettings.jsx";
+import SaleBannerSettings from "@/components/page-builder/settings/SaleBannerSettings.jsx";
+import FeaturesTrustBadgesSettings from "@/components/page-builder/settings/FeaturesTrustBadgesSettings.jsx";
+import ContactInfoBarSettings from "@/components/page-builder/settings/ContactInfoBarSettings.jsx";
+import CategoryNavigationSettings from "@/components/page-builder/settings/CategoryNavigationSettings.jsx";
+import HeroBannerWithProductSettings from "@/components/page-builder/settings/HeroBannerWithProductSettings.jsx";
+import MegaMenuWithCategoriesSettings from "@/components/page-builder/settings/MegaMenuWithCategoriesSettings.jsx";
 
 // Helper to update nested data object given a dot path
 const updateNestedData = (obj, path, value) => {
@@ -168,204 +97,6 @@ const updateNestedData = (obj, path, value) => {
   return result;
 };
 
-// Pages Panel with DnD reordering - separate component to comply with Rules of Hooks
-const SortablePageItem = ({
-  page,
-  selectedPageId,
-  setSelectedPageId,
-  setMode,
-  navigate,
-  canvasState,
-  setActiveLeftPanel,
-  setLeftPanelOpen,
-  selectedRowIds,
-  toggleRowSelection,
-  onDelete,
-}) => {
-  const { attributes, listeners, setNodeRef, isDragging } = useSortable({
-    id: page.id,
-  });
-
-  const isSelected = selectedRowIds.has(page.id);
-  const isEditing = selectedPageId === String(page.id);
-
-  const handleEdit = (e) => {
-    e && e.stopPropagation();
-    e.stopPropagation();
-    setSelectedPageId(page.id);
-    setMode("page");
-    canvasState.clearSelection();
-    setActiveLeftPanel("properties");
-    setLeftPanelOpen(true);
-  };
-
-  const handleDelete = (e) => {
-    e.stopPropagation();
-    if (window.confirm("Delete this page? This action cannot be undone.")) {
-      onDelete(page.id);
-    }
-  };
-
-  return (
-    <div
-      ref={setNodeRef}
-      className={`flex items-center gap-2 h-8 px-2 text-sm rounded-md transition-colors cursor-pointer group ${isSelected ? "bg-muted/70" : "hover:bg-muted/50"}`}
-      style={{ opacity: isDragging ? 0.5 : 1 }}
-      onClick={async (e) => {
-        e.stopPropagation();
-        toggleRowSelection(page.id);
-        setActiveLeftPanel("pages");
-        setLeftPanelOpen(true);
-      }}
-    >
-      {/* Drag handle */}
-      <span
-        {...attributes}
-        {...listeners}
-        className="cursor-grab flex-shrink-0"
-      >
-        <GripVertical className="h-4 w-4 text-gray-400" />
-      </span>
-
-      {/* Page title */}
-      <span className="truncate flex-1">{page.title || page.slug}</span>
-
-      {/* 3-dot dropdown menu */}
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            size="sm"
-            variant="ghost"
-            className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 focus:opacity-100"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <MoreHorizontal className="h-4 w-4" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={handleEdit}>Edit</DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem
-            onClick={handleDelete}
-            className="text-destructive focus:text-destructive"
-          >
-            Delete
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
-  );
-};
-
-const PagesPanel = ({
-  orderedPages,
-  setOrderedPages,
-  selectedPageId,
-  setSelectedPageId,
-  setMode,
-  navigate,
-  canvasState,
-  setActiveLeftPanel,
-  setLeftPanelOpen,
-  queryClient,
-  showLoading,
-  selectedRowIds,
-  toggleRowSelection,
-  deleteMutation,
-}) => {
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    }),
-  );
-
-  const handlePagesDragEnd = useCallback(
-    (event) => {
-      const { active, over } = event;
-      if (over && active.id !== over.id && orderedPages.length > 0) {
-        setOrderedPages((items) => {
-          const oldIndex = items.findIndex((p) => p.id === active.id);
-          const newIndex = items.findIndex((p) => p.id === over.id);
-          if (oldIndex === -1 || newIndex === -1) return items;
-          const newItems = arrayMove(items, oldIndex, newIndex);
-
-          // Prepare orders for API
-          const orders = newItems.map((page, idx) => ({
-            id: page.id,
-            sort_order: idx,
-          }));
-
-          // Send to server
-          api
-            .put("/owner/custom-pages/reorder", { orders })
-            .then(() => {
-              showSuccess("Page order updated");
-              queryClient.invalidateQueries({ queryKey: ["customPages"] });
-            })
-            .catch((err) => {
-              showError(
-                err.response?.data?.message || "Failed to update page order",
-              );
-              queryClient.invalidateQueries({ queryKey: ["customPages"] });
-            });
-
-          return newItems;
-        });
-      }
-    },
-    [orderedPages, queryClient],
-  );
-
-  if (showLoading) {
-    return (
-      <div className="space-y-2">
-        {[1, 2, 3, 4, 5].map((i) => (
-          <Skeleton key={i} className="h-8 w-full" />
-        ))}
-      </div>
-    );
-  }
-
-  if (!orderedPages || orderedPages.length === 0) {
-    return (
-      <p className="text-sm text-gray-500 text-center py-4">No pages yet</p>
-    );
-  }
-
-  return (
-    <DndContext
-      sensors={sensors}
-      onDragEnd={handlePagesDragEnd}
-      collisionDetection={closestCenter}
-    >
-      <SortableContext
-        items={orderedPages.map((p) => p.id)}
-        strategy={verticalListSortingStrategy}
-      >
-        <div className="space-y-1">
-          {orderedPages.map((page) => (
-            <SortablePageItem
-              key={page.id}
-              page={page}
-              selectedPageId={selectedPageId}
-              setSelectedPageId={setSelectedPageId}
-              setMode={setMode}
-              navigate={navigate}
-              canvasState={canvasState}
-              setActiveLeftPanel={setActiveLeftPanel}
-              setLeftPanelOpen={setLeftPanelOpen}
-              selectedRowIds={selectedRowIds}
-              toggleRowSelection={toggleRowSelection}
-              onDelete={(id) => deleteMutation.mutate(id)}
-            />
-          ))}
-        </div>
-      </SortableContext>
-    </DndContext>
-  );
-};
-
 // Check if a block type is a container (can have children)
 const CONTAINER_TYPES = [
   "section",
@@ -373,8 +104,6 @@ const CONTAINER_TYPES = [
   "column",
   "grid",
   "container",
-  "systemHeader",
-  "systemFooter",
 ];
 
 const Builder = () => {
@@ -389,6 +118,7 @@ const Builder = () => {
   // Active panel in left sidebar: 'blocks' | 'pages' | 'theme' | 'settings' | null
   const [activeLeftPanel, setActiveLeftPanel] = useState("blocks");
   const [leftPanelOpen, setLeftPanelOpen] = useState(true);
+  const [leftPanelWidth, setLeftPanelWidth] = useState(280);
   const [blockSearchQuery, setBlockSearchQuery] = useState("");
 
   // Viewport state
@@ -409,9 +139,51 @@ const Builder = () => {
   const canvasState = useCanvasState([]);
   const canvasStateRef = useRef(canvasState);
 
+  // Right sidebar state
+  const [rightPanelOpen, setRightPanelOpen] = useState(false);
+  const [rightPanelWidth, setRightPanelWidth] = useState(320);
+  const [isLeftResizing, setIsLeftResizing] = useState(false);
+  const [isRightResizing, setIsRightResizing] = useState(false);
+
   useEffect(() => {
     canvasStateRef.current = canvasState;
   }, [canvasState]);
+
+  // Left panel resize handlers
+  const startLeftResizing = useCallback((e) => {
+    e.preventDefault();
+    setIsLeftResizing(true);
+  }, []);
+
+  const stopLeftResizing = useCallback(() => {
+    setIsLeftResizing(false);
+  }, []);
+
+  const leftResize = useCallback(
+    (e) => {
+      if (isLeftResizing) {
+        const newWidth = e.clientX - 68; // 68px is the tool rail width
+        if (newWidth >= 200 && newWidth <= 500) {
+          setLeftPanelWidth(newWidth);
+        }
+      }
+    },
+    [isLeftResizing]
+  );
+
+  useEffect(() => {
+    if (isLeftResizing) {
+      window.addEventListener("mousemove", leftResize);
+      window.addEventListener("mouseup", stopLeftResizing);
+    } else {
+      window.removeEventListener("mousemove", leftResize);
+      window.removeEventListener("mouseup", stopLeftResizing);
+    }
+    return () => {
+      window.removeEventListener("mousemove", leftResize);
+      window.removeEventListener("mouseup", stopLeftResizing);
+    };
+  }, [isLeftResizing, leftResize, stopLeftResizing]);
 
   // Track manual panel close state for auto-open logic
   const manualCloseRef = useRef(false);
@@ -459,7 +231,15 @@ const Builder = () => {
   // Fetch all theme blocks
   const { data: themeBlocksData } = useQuery({
     queryKey: ["themeBlocks"],
-    queryFn: fetchThemeBlocks,
+    queryFn: async () => {
+      try {
+        const response = await api.get("/owner/theme-blocks");
+        return response.data.data.theme_blocks || [];
+      } catch (error) {
+        console.error("Failed to fetch theme blocks:", error);
+        return [];
+      }
+    },
     enabled: isAuthenticated,
     staleTime: Infinity,
   });
@@ -480,6 +260,7 @@ const Builder = () => {
   // Determine current theme blocks
   const currentTheme = useMemo(() => {
     if (!storeConfig || !availableThemes) return null;
+    // Find theme by database ID (storeConfig.theme_id is the database ID)
     const theme =
       availableThemes.find((t) => t.id === storeConfig.theme_id) ||
       availableThemes[0];
@@ -509,16 +290,17 @@ const Builder = () => {
     );
   }, [themeBlocks, blockSearchQuery]);
 
-  // Settings components map
+  // Settings components map - direct imports
   const settingsComponentMap = useMemo(
     () => ({
+      // Hero & Product Blocks
       heroBanner: HeroBannerSettings,
       productCarousel: ProductCarouselSettings,
       featuredCategories: FeaturedCategoriesSettings,
       heroBannerSlider: HeroBannerSliderSection,
       marketingBanner: MarketingBannerSettings,
       featureBlocks: FeatureBlocksSettings,
-      productSection: ProductSectionSettings,
+      productSection: ProductBlockSettings,
       brandShowcase: BrandShowcaseSettings,
       latestNews: LatestNewsSettings,
       categorySidebar: CategorySidebarSettings,
@@ -526,21 +308,93 @@ const Builder = () => {
       midPageCallToAction: MidPageCallToActionSettings,
       newsletterSubscription: NewsletterSubscriptionSettings,
       blogPostsSection: BlogPostsSectionSettings,
+      
+      // System blocks
+      Header: SystemHeaderSettings,
       systemHeader: SystemHeaderSettings,
+      Footer: SystemFooterSettings,
       systemFooter: SystemFooterSettings,
+      
       // Layout blocks
       section: SectionBlockSettings,
       row: RowBlockSettings,
       column: ColumnBlockSettings,
-      columns: ColumnBlockSettings, // Alias for compatibility
+      columns: ColumnBlockSettings,
       grid: GridBlockSettings,
-      container: SectionBlockSettings, // Fallback: use section settings
+      container: SectionBlockSettings,
+      cardLayout: CardLayoutSettings,
+      card: CardSettings,
+      heroSection: HeroSectionSettings,
+      readyMadeSection: HeroSectionSettings,
+      themeSection: ThemeSectionSettings,
+      megaMenuHeader: MegaMenuHeaderSettings,
+      
       // Basic blocks
       title: TitleBlockSettings,
       description: DescriptionBlockSettings,
       text: TextBlockSettings,
       button: ButtonBlockSettings,
       image: ImageBlockSettings,
+      
+      // Product page blocks
+      productGallery: ProductBlockSettings,
+      productInfo: ProductBlockSettings,
+      productPolicyBlocks: ProductBlockSettings,
+      productDescriptionTabs: ProductBlockSettings,
+      productRelatedCarousel: ProductBlockSettings,
+      rightColumnBanner: ProductBlockSettings,
+      
+      // Cart & Checkout blocks
+      cart: CartSettings,
+      checkout: CheckoutSettings,
+      orderConfirmation: CartSettings,
+      receiptPage: CartSettings,
+      
+      // Form blocks
+      contactForm: ContactFormSettings,
+      policyPage: PolicyPageSettings,
+      
+      // Template blocks
+      nirvanaTemplate: ProductBlockSettings,
+      arcadiaTemplate: ProductBlockSettings,
+      productHeroSectionOne: ProductBlockSettings,
+      productBrandLogos: ProductBlockSettings,
+      productShowcaseSection: ProductBlockSettings,
+      productFeatureBlocksOne: ProductBlockSettings,
+      customerTestimonialsOne: ProductBlockSettings,
+      newsletterSectionOne: ProductBlockSettings,
+      nirvanaHeroSection: ProductBlockSettings,
+      nirvanaWhyChooseUs: ProductBlockSettings,
+      nirvanaAboutUs: ProductBlockSettings,
+      nirvanaProductShowcase: ProductBlockSettings,
+      nirvanaWhyWeAreBest: ProductBlockSettings,
+      nirvanaTestimonials: ProductBlockSettings,
+      nirvanaNewsletter: ProductBlockSettings,
+      
+      // All products section
+      allProducts: ProductBlockSettings,
+      
+      // Timer/Countdown
+      timerSetting: ProductBlockSettings,
+      
+      // Simple details theme
+      simpleDetailsTheme: ProductBlockSettings,
+      
+      // Akira Theme Blocks
+      promotionalBannerGrid: PromotionalBannerGridSettings,
+      saleBanner: SaleBannerSettings,
+      featuresTrustBadges: FeaturesTrustBadgesSettings,
+      newsletterCouponBanner: NewsletterCouponBannerSettings,
+      
+      // Axon Theme Blocks
+      announcementBar: AnnouncementBarSettings,
+      megaMenuWithCategories: MegaMenuWithCategoriesSettings,
+      productTabsFilter: ProductBlockSettings,
+      
+      // Ghorer Bazar Theme Blocks
+      contactInfoBar: ContactInfoBarSettings,
+      categoryNavigation: CategoryNavigationSettings,
+      heroBannerWithProduct: HeroBannerWithProductSettings,
     }),
     [],
   );
@@ -557,7 +411,6 @@ const Builder = () => {
     onSuccess: (data) => {
       showSuccess("Page created successfully!");
       queryClient.invalidateQueries({ queryKey: ["customPages"] });
-      // Navigate to edit the new page
       setSelectedPageId(data.data.page_id);
     },
     onError: (err) => {
@@ -597,7 +450,7 @@ const Builder = () => {
     queryKey: ["customPage", selectedPageId],
     queryFn: async () => {
       const response = await api.get(`/owner/custom-pages/${selectedPageId}`);
-      return response.data.data.page; // Extract the page object from the response
+      return response.data.data.page;
     },
     enabled: mode === "page" && !!selectedPageId,
   });
@@ -611,29 +464,11 @@ const Builder = () => {
   useEffect(() => {
     if (mode === "page") {
       if (customPage) {
-        // Activate editor mode for this page
         setEditingPage(customPage);
         setCreating(false);
 
-        // Copy blocks to avoid mutating the query cached data
-        // Safely ensure it's an array
         const rawBlocks = customPage.content?.blocks;
         let blocks = Array.isArray(rawBlocks) ? [...rawBlocks] : [];
-
-        const hasHeader = blocks.some((b) => b.type === "systemHeader");
-        const hasFooter = blocks.some((b) => b.type === "systemFooter");
-        const content = customPage.content || {};
-
-        if (!hasHeader && content.showHeader !== false) {
-          blocks.unshift({
-            id: "systemHeader",
-            type: "systemHeader",
-            data: {},
-          });
-        }
-        if (!hasFooter && content.showFooter !== false) {
-          blocks.push({ id: "systemFooter", type: "systemFooter", data: {} });
-        }
 
         canvasState.reset(blocks);
         setFormData((prev) => ({
@@ -644,13 +479,10 @@ const Builder = () => {
           meta_description: customPage.meta_description || "",
           status: customPage.status || "draft",
         }));
-        setIsSlugManuallyEdited(false); // Reset for existing page
+        setIsSlugManuallyEdited(false);
 
-        // Ensure properties panel is open and active when editing a page
         setLeftPanelOpen(true);
-        // setActiveLeftPanel("properties");
       } else if (!selectedPageId) {
-        // This is the case for a new page creation
         setFormData({
           title: "",
           slug: "",
@@ -659,29 +491,16 @@ const Builder = () => {
           status: "draft",
         });
         canvasState.reset([]);
-        setIsSlugManuallyEdited(false); // Reset for new page
+        setIsSlugManuallyEdited(false);
         setLeftPanelOpen(true);
-        // setActiveLeftPanel("properties");
       }
     }
   }, [mode, customPage, resetCanvas, selectedPageId]);
 
   useEffect(() => {
     if (mode === "product" && productLandingPage) {
-      // Copy blocks to avoid mutating the cached data
       const rawBlocks = productLandingPage.settings_json?.components;
       let blocks = Array.isArray(rawBlocks) ? [...rawBlocks] : [];
-
-      const hasHeader = blocks.some((b) => b.type === "systemHeader");
-      const hasFooter = blocks.some((b) => b.type === "systemFooter");
-      const settingsJson = productLandingPage.settings_json || {};
-
-      if (!hasHeader && settingsJson.showHeader !== false) {
-        blocks.unshift({ id: "systemHeader", type: "systemHeader", data: {} });
-      }
-      if (!hasFooter && settingsJson.showFooter !== false) {
-        blocks.push({ id: "systemFooter", type: "systemFooter", data: {} });
-      }
 
       canvasState.reset(blocks);
 
@@ -696,7 +515,6 @@ const Builder = () => {
         status: productLandingPage.status || "draft",
       }));
 
-      // Ensure properties panel is open and active when editing a product landing page
       setLeftPanelOpen(true);
       setActiveLeftPanel("properties");
     }
@@ -709,16 +527,12 @@ const Builder = () => {
       let index = null;
       let parentId = null;
 
-      // Handle both signatures:
-      // - (blockType, defaultConfig) from palette click
-      // - (blockType, index, defaultConfig, parentId) from drag-drop
       if (typeof arg2 === "number") {
         index = arg2;
         defaultConfig = arg3 || {};
         parentId = arg4 || null;
       } else if (typeof arg2 === "object" && arg2 !== null) {
         defaultConfig = arg2;
-        // If clicking from palette, and a container is selected, add as child
         if (
           canvasState.selectedId &&
           canvasState.selectedItem &&
@@ -734,7 +548,6 @@ const Builder = () => {
         data: defaultConfig,
       };
       canvasState.addItem(newBlock, parentId, index);
-      // Keep left panel open after adding block
       setActiveLeftPanel("blocks");
     },
     [canvasState.selectedId, canvasState.selectedItem, canvasState.addItem],
@@ -748,7 +561,6 @@ const Builder = () => {
   }, []);
 
   const handleCreateNewPage = useCallback(() => {
-    // Reset form and canvas for a new page
     setFormData({
       title: "",
       slug: "",
@@ -757,12 +569,8 @@ const Builder = () => {
       status: "draft",
     });
     canvasState.reset([]);
-
-    // Navigate to custom-pages without pageId to enter create mode
     setSelectedPageId(null);
     setMode("page");
-
-    // Open left panel and switch to properties to show page form
     setLeftPanelOpen(true);
     setActiveLeftPanel("properties");
   }, [canvasState, navigate]);
@@ -868,7 +676,6 @@ const Builder = () => {
 
   // Toggle row selection
   const toggleRowSelection = useCallback((pageId) => {
-    // Single selection: replace any existing selection with the clicked page
     console.log("toggleRowSelection", pageId);
     setSelectedPageId(pageId);
     setSelectedRowIds(new Set([pageId]));
@@ -878,14 +685,12 @@ const Builder = () => {
   const openPanel = useCallback(
     (panelId) => {
       if (activeLeftPanel === panelId && leftPanelOpen) {
-        // If clicking the same open panel, close it (manual close)
         setLeftPanelOpen(false);
         manualCloseRef.current = true;
       } else {
-        // Open new panel (manual open)
         setActiveLeftPanel(panelId);
         setLeftPanelOpen(true);
-        manualCloseRef.current = false; // User manually opened, allow auto-reopen if needed
+        manualCloseRef.current = false;
       }
     },
     [activeLeftPanel, leftPanelOpen],
@@ -896,44 +701,244 @@ const Builder = () => {
     setLeftPanelOpen(false);
   }, []);
 
+  // Function to create pages for a theme dynamically
+  const createThemePages = async (themeId) => {
+    try {
+      const response = await api.get(`/owner/theme-blocks?theme_id=${themeId}`);
+      const themeBlocks = response.data.data.theme_blocks || [];
+
+      const standardPages = [
+        { title: 'Home', slug: 'home' },
+        { title: 'About Us', slug: 'about-us' },
+        { title: 'Contact Us', slug: 'contact' },
+        { title: 'Privacy Policy', slug: 'privacy-policy' },
+        { title: 'Terms of Service', slug: 'terms-of-service' },
+        { title: 'Shipping & Returns', slug: 'shipping-returns' }
+      ];
+
+      const pagesResponse = await api.get("/owner/custom-pages");
+      const pages = pagesResponse.data.data.pages || [];
+      
+      for (const page of pages) {
+        await api.delete(`/owner/custom-pages/${page.id}`);
+      }
+
+      let blockIdCounter = 0;
+      const generateUniqueId = () => `block-${Date.now()}-${blockIdCounter++}`;
+
+      for (const page of standardPages) {
+        let blocks = [];
+
+        if (page.slug === 'home') {
+          const headerBlock = themeBlocks.find(b => b.block_type === 'Header');
+          blocks.push({
+            id: generateUniqueId(),
+            type: 'Header',
+            data: headerBlock ? headerBlock.default_config : {}
+          });
+          
+          const announcementBarBlock = themeBlocks.find(b => b.block_type === 'announcementBar');
+          if (announcementBarBlock) {
+            blocks.push({
+              id: generateUniqueId(),
+              type: 'announcementBar',
+              data: announcementBarBlock.default_config || {}
+            });
+          }
+
+          const heroBannerBlock = themeBlocks.find(b => b.block_type === 'heroBanner' || b.block_type === 'heroBannerSlider');
+          if (heroBannerBlock) {
+            blocks.push({
+              id: generateUniqueId(),
+              type: heroBannerBlock.block_type,
+              data: heroBannerBlock.default_config || {}
+            });
+          }
+
+          const productCarouselBlock = themeBlocks.find(b => b.block_type === 'productCarousel' || b.block_type === 'productSection');
+          if (productCarouselBlock) {
+            blocks.push({
+              id: generateUniqueId(),
+              type: productCarouselBlock.block_type,
+              data: productCarouselBlock.default_config || {}
+            });
+          }
+
+          const featuredCategoriesBlock = themeBlocks.find(b => b.block_type === 'featuredCategories');
+          if (featuredCategoriesBlock) {
+            blocks.push({
+              id: generateUniqueId(),
+              type: featuredCategoriesBlock.block_type,
+              data: featuredCategoriesBlock.default_config || {}
+            });
+          }
+
+          themeBlocks.forEach(block => {
+            if (['promotionalBannerGrid', 'saleBanner', 'featuresTrustBadges', 'newsletterCouponBanner'].includes(block.block_type)) {
+              blocks.push({
+                id: generateUniqueId(),
+                type: block.block_type,
+                data: block.default_config || {}
+              });
+            }
+          });
+
+          themeBlocks.forEach(block => {
+            if (['productTabsFilter'].includes(block.block_type)) {
+              blocks.push({
+                id: generateUniqueId(),
+                type: block.block_type,
+                data: block.default_config || {}
+              });
+            }
+          });
+
+          const categorySidebarBlock = themeBlocks.find(b => b.block_type === 'categorySidebar');
+          if (categorySidebarBlock) {
+            blocks.push({
+              id: generateUniqueId(),
+              type: 'categorySidebar',
+              data: categorySidebarBlock.default_config || {}
+            });
+          }
+
+          themeBlocks.forEach(block => {
+            if (['contactInfoBar', 'heroBannerWithProduct'].includes(block.block_type)) {
+              blocks.push({
+                id: generateUniqueId(),
+                type: block.block_type,
+                data: block.default_config || {}
+              });
+            }
+          });
+
+          blocks.push({ id: generateUniqueId(), type: 'Footer', data: {} });
+        } else if (page.slug === 'about-us') {
+          blocks.push({ id: generateUniqueId(), type: 'Header', data: {} });
+          
+          const heroBannerBlock = themeBlocks.find(b => b.block_type === 'heroBanner');
+          if (heroBannerBlock) {
+            blocks.push({
+              id: generateUniqueId(),
+              type: heroBannerBlock.block_type,
+              data: {
+                ...heroBannerBlock.default_config,
+                title: 'About Our Brand',
+                subtitle: 'Quality products since 2024'
+              }
+            });
+          }
+
+          const featureBlocksBlock = themeBlocks.find(b => b.block_type === 'featureBlocks');
+          if (featureBlocksBlock) {
+            blocks.push({
+              id: generateUniqueId(),
+              type: featureBlocksBlock.block_type,
+              data: {
+                ...featureBlocksBlock.default_config,
+                title: 'Our Story',
+                features: [
+                  { icon: 'check-circle', title: 'Quality Products', description: 'We offer only the best items' },
+                  { icon: 'truck', title: 'Fast Shipping', description: 'Quick delivery worldwide' },
+                  { icon: 'heart', title: 'Customer Care', description: '24/7 support for our customers' }
+                ]
+              }
+            });
+          }
+
+          blocks.push({ id: generateUniqueId(), type: 'Footer', data: {} });
+        } else if (page.slug === 'contact') {
+          blocks.push({ id: generateUniqueId(), type: 'Header', data: {} });
+          
+          blocks.push({
+            id: generateUniqueId(),
+            type: 'contactForm',
+            data: {
+              title: 'Contact Us',
+              description: 'Have questions? Reach out!',
+              emailTo: 'info@store.com',
+              fields: [
+                { name: 'name', label: 'Your Name', type: 'text', required: true, placeholder: 'Enter your name' },
+                { name: 'email', label: 'Your Email', type: 'email', required: true, placeholder: 'Enter your email' },
+                { name: 'message', label: 'Your Message', type: 'textarea', required: true, placeholder: 'Enter your message' }
+              ],
+              submitLabel: 'Send Message'
+            }
+          });
+
+          blocks.push({ id: generateUniqueId(), type: 'Footer', data: {} });
+        } else if (page.slug === 'privacy-policy' || page.slug === 'terms-of-service') {
+          blocks.push({ id: generateUniqueId(), type: 'Header', data: {} });
+          
+          blocks.push({
+            id: generateUniqueId(),
+            type: 'text',
+            data: {
+              content: `<h2>${page.title}</h2><p>This is the ${page.title.toLowerCase()} page content. Please customize this content in the page builder.</p>`
+            }
+          });
+
+          blocks.push({ id: generateUniqueId(), type: 'Footer', data: {} });
+        } else if (page.slug === 'shipping-returns') {
+          blocks.push({ id: generateUniqueId(), type: 'Header', data: {} });
+          
+          const featureBlocksBlock = themeBlocks.find(b => b.block_type === 'featureBlocks');
+          if (featureBlocksBlock) {
+            blocks.push({
+              id: generateUniqueId(),
+              type: featureBlocksBlock.block_type,
+              data: {
+                ...featureBlocksBlock.default_config,
+                title: 'Shipping Information',
+                features: [
+                  { icon: 'truck', title: 'Free Shipping', description: 'Free shipping on orders over $50' },
+                  { icon: 'clock', title: 'Fast Delivery', description: '3-5 business days' },
+                  { icon: 'globe', title: 'International Shipping', description: 'We ship worldwide' }
+                ]
+              }
+            });
+          }
+
+          blocks.push({ id: generateUniqueId(), type: 'Footer', data: {} });
+        }
+
+        await api.post("/owner/custom-pages", {
+          title: page.title,
+          slug: page.slug,
+          meta_title: page.title,
+          meta_description: `Learn more about ${page.title}`,
+          status: "published",
+          content: { blocks },
+        });
+      }
+
+      queryClient.invalidateQueries({ queryKey: ["customPages"] });
+      showSuccess(`Pages created successfully for theme!`);
+    } catch (error) {
+      console.error("Error creating theme pages:", error);
+      showError(error.response?.data?.message || "Failed to create theme pages");
+      throw error;
+    }
+  };
+
   // Sync orderedPages with pagesData when it changes
   useEffect(() => {
     if (pagesData) {
       pagesData && pagesData.length > 0 && setSelectedPageId(pagesData[0].id);
       setOrderedPages((prev) => {
-        // If lengths differ, definitely different
         if (prev.length !== pagesData.length) return pagesData;
-        // Check if any ID differs
         const idsMatch = prev.every((p, idx) => p.id === pagesData[idx]?.id);
         return idsMatch ? prev : pagesData;
       });
     }
   }, [pagesData]);
 
-  // Auto-open properties panel when a block is selected (unless user manually closed)
+  // Auto-open right sidebar when a block is selected
   useEffect(() => {
     if (canvasState.selectedItem && (mode === "page" || mode === "product")) {
-      if (!leftPanelOpen && manualCloseRef.current) {
-        // User manually closed, don't auto-reopen
-        return;
-      }
-      setActiveLeftPanel("properties");
-      setLeftPanelOpen(true);
+      setRightPanelOpen(true);
     }
-  }, [canvasState.selectedId, mode, leftPanelOpen]);
-
-  // Auth guard
-  if (!isAuthenticated) {
-    return <div className="p-6">Please login to access the builder.</div>;
-  }
-
-  if (themeLoading || storeLoading) {
-    return (
-      <div className="h-screen flex items-center center">
-        <Skeleton className="h-screen w-full" />
-      </div>
-    );
-  }
+  }, [canvasState.selectedId, mode]);
 
   if (themeError) {
     return (
@@ -943,749 +948,30 @@ const Builder = () => {
     );
   }
 
-  // Panel titles and content
-  const getPanelContent = () => {
-    switch (activeLeftPanel) {
-      case "blocks":
-        return (
-          <>
-            <h2 className="font-semibold text-sm text-gray-800 mb-4">
-              Add New Block
-            </h2>
-            <div className="relative mb-4">
-              <input
-                type="text"
-                placeholder="Search blocks..."
-                className="w-full text-sm border border-gray-200 rounded-md px-3 py-2 pl-9 focus:outline-none focus:border-blue-500"
-                value={blockSearchQuery}
-                onChange={(e) => setBlockSearchQuery(e.target.value)}
-              />
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            </div>
-            <div className="grid grid-cols-2 gap-3 text-sm">
-              {/* Layout Blocks */}
-              <div className="col-span-2 mt-4 mb-2 first:mt-0">
-                <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
-                  Layout
-                </h3>
-              </div>
-              <div
-                className="border border-gray-200 bg-white hover:border-blue-500 hover:shadow-sm transition-all p-3 rounded-md cursor-pointer flex flex-col items-center gap-2 text-center"
-                onClick={() => handleAddBlock("section", { container: true })}
-                draggable
-                onDragStart={(e) => {
-                  e.dataTransfer.setData(
-                    "application/json",
-                    JSON.stringify({
-                      type: "new-block",
-                      blockType: "section",
-                      defaultConfig: { container: true },
-                    }),
-                  );
-                  e.dataTransfer.effectAllowed = "copy";
-                }}
-              >
-                <Layout className="w-6 h-6 text-gray-400" />
-                <span className="text-xs font-medium">Section</span>
-              </div>
-              <div
-                className="border border-gray-200 bg-white hover:border-blue-500 hover:shadow-sm transition-all p-3 rounded-md cursor-pointer flex flex-col items-center gap-2 text-center"
-                onClick={() => handleAddBlock("row", {})}
-                draggable
-                onDragStart={(e) => {
-                  e.dataTransfer.setData(
-                    "application/json",
-                    JSON.stringify({
-                      type: "new-block",
-                      blockType: "row",
-                      defaultConfig: {},
-                    }),
-                  );
-                  e.dataTransfer.effectAllowed = "copy";
-                }}
-              >
-                <List className="w-6 h-6 text-gray-400" />
-                <span className="text-xs font-medium">Row</span>
-              </div>
-              <div
-                className="border border-gray-200 bg-white hover:border-blue-500 hover:shadow-sm transition-all p-3 rounded-md cursor-pointer flex flex-col items-center gap-2 text-center"
-                onClick={() => handleAddBlock("column", { width: "1/2" })}
-                draggable
-                onDragStart={(e) => {
-                  e.dataTransfer.setData(
-                    "application/json",
-                    JSON.stringify({
-                      type: "new-block",
-                      blockType: "column",
-                      defaultConfig: { width: "1/2" },
-                    }),
-                  );
-                  e.dataTransfer.effectAllowed = "copy";
-                }}
-              >
-                <Table className="w-6 h-6 text-gray-400" />
-                <span className="text-xs font-medium">Column</span>
-              </div>
-              <div
-                className="border border-gray-200 bg-white hover:border-blue-500 hover:shadow-sm transition-all p-3 rounded-md cursor-pointer flex flex-col items-center gap-2 text-center"
-                onClick={() => handleAddBlock("grid", { columns: 3 })}
-                draggable
-                onDragStart={(e) => {
-                  e.dataTransfer.setData(
-                    "application/json",
-                    JSON.stringify({
-                      type: "new-block",
-                      blockType: "grid",
-                      defaultConfig: { columns: 3 },
-                    }),
-                  );
-                  e.dataTransfer.effectAllowed = "copy";
-                }}
-              >
-                <Layout className="w-6 h-6 text-gray-400" />
-                <span className="text-xs font-medium">Grid</span>
-              </div>
-
-              {/* Basic Blocks */}
-              <div className="col-span-2 mt-4 mb-2">
-                <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
-                  Basic
-                </h3>
-              </div>
-              <div
-                className="border border-gray-200 bg-white hover:border-blue-500 hover:shadow-sm transition-all p-3 rounded-md cursor-pointer flex flex-col items-center gap-2 text-center"
-                onClick={() =>
-                  handleAddBlock("title", { text: "New Title", tag: "h2" })
-                }
-                draggable
-                onDragStart={(e) => {
-                  e.dataTransfer.setData(
-                    "application/json",
-                    JSON.stringify({
-                      type: "new-block",
-                      blockType: "title",
-                      defaultConfig: { text: "New Title", tag: "h2" },
-                    }),
-                  );
-                  e.dataTransfer.effectAllowed = "copy";
-                }}
-              >
-                <Type className="w-6 h-6 text-gray-400" />
-                <span className="text-xs font-medium">Title</span>
-              </div>
-              <div
-                className="border border-gray-200 bg-white hover:border-blue-500 hover:shadow-sm transition-all p-3 rounded-md cursor-pointer flex flex-col items-center gap-2 text-center"
-                onClick={() =>
-                  handleAddBlock("description", {
-                    text: "Add your description here...",
-                  })
-                }
-                draggable
-                onDragStart={(e) => {
-                  e.dataTransfer.setData(
-                    "application/json",
-                    JSON.stringify({
-                      type: "new-block",
-                      blockType: "description",
-                      defaultConfig: { text: "Add your description here..." },
-                    }),
-                  );
-                  e.dataTransfer.effectAllowed = "copy";
-                }}
-              >
-                <FileText className="w-6 h-6 text-gray-400" />
-                <span className="text-xs font-medium">Description</span>
-              </div>
-              <div
-                className="border border-gray-200 bg-white hover:border-blue-500 hover:shadow-sm transition-all p-3 rounded-md cursor-pointer flex flex-col items-center gap-2 text-center"
-                onClick={() =>
-                  handleAddBlock("text", {
-                    content: "<p>Add your content here...</p>",
-                  })
-                }
-                draggable
-                onDragStart={(e) => {
-                  e.dataTransfer.setData(
-                    "application/json",
-                    JSON.stringify({
-                      type: "new-block",
-                      blockType: "text",
-                      defaultConfig: {
-                        content: "<p>Add your content here...</p>",
-                      },
-                    }),
-                  );
-                  e.dataTransfer.effectAllowed = "copy";
-                }}
-              >
-                <AlignLeft className="w-6 h-6 text-gray-400" />
-                <span className="text-xs font-medium">Text</span>
-              </div>
-              <div
-                className="border border-gray-200 bg-white hover:border-blue-500 hover:shadow-sm transition-all p-3 rounded-md cursor-pointer flex flex-col items-center gap-2 text-center"
-                onClick={() => handleAddBlock("button", { text: "Click Me" })}
-                draggable
-                onDragStart={(e) => {
-                  e.dataTransfer.setData(
-                    "application/json",
-                    JSON.stringify({
-                      type: "new-block",
-                      blockType: "button",
-                      defaultConfig: { text: "Click Me" },
-                    }),
-                  );
-                  e.dataTransfer.effectAllowed = "copy";
-                }}
-              >
-                <MousePointer2 className="w-6 h-6 text-gray-400" />
-                <span className="text-xs font-medium">Button</span>
-              </div>
-              <div
-                className="border border-gray-200 bg-white hover:border-blue-500 hover:shadow-sm transition-all p-3 rounded-md cursor-pointer flex flex-col items-center gap-2 text-center"
-                onClick={() => handleAddBlock("image", {})}
-                draggable
-                onDragStart={(e) => {
-                  e.dataTransfer.setData(
-                    "application/json",
-                    JSON.stringify({
-                      type: "new-block",
-                      blockType: "image",
-                      defaultConfig: {},
-                    }),
-                  );
-                  e.dataTransfer.effectAllowed = "copy";
-                }}
-              >
-                <Image className="w-6 h-6 text-gray-400" />
-                <span className="text-xs font-medium">Image</span>
-              </div>
-
-              {/* Theme Blocks */}
-              <div className="col-span-2 mt-4 mb-2">
-                <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
-                  Theme Blocks
-                </h3>
-              </div>
-              {filteredThemeBlocks.map((block) => (
-                <div
-                  key={block.id}
-                  className="border border-gray-200 bg-white hover:border-blue-500 hover:shadow-sm transition-all p-3 rounded-md cursor-pointer flex flex-col items-center gap-2 text-center"
-                  onClick={() =>
-                    handleAddBlock(block.block_type, block.default_config || {})
-                  }
-                  draggable
-                  onDragStart={(e) => {
-                    e.dataTransfer.setData(
-                      "application/json",
-                      JSON.stringify({
-                        type: "new-block",
-                        blockType: block.block_type,
-                        defaultConfig: block.default_config || {},
-                      }),
-                    );
-                    e.dataTransfer.effectAllowed = "copy";
-                  }}
-                >
-                  <Layout className="w-6 h-6 text-gray-400" />
-                  <span className="text-xs font-medium">
-                    {block.name || block.block_type}
-                  </span>
-                </div>
-              ))}
-              {/* System blocks */}
-              <div
-                className="border border-gray-200 bg-white hover:border-blue-500 hover:shadow-sm transition-all p-3 rounded-md cursor-pointer flex flex-col items-center gap-2 text-center"
-                onClick={() => handleAddBlock("systemHeader", {})}
-                draggable
-                onDragStart={(e) => {
-                  e.dataTransfer.setData(
-                    "application/json",
-                    JSON.stringify({
-                      type: "new-block",
-                      blockType: "systemHeader",
-                      defaultConfig: {},
-                    }),
-                  );
-                  e.dataTransfer.effectAllowed = "copy";
-                }}
-              >
-                <PanelTop className="w-6 h-6 text-gray-400" />
-                <span className="text-xs font-medium">Header</span>
-              </div>
-              <div
-                className="border border-gray-200 bg-white hover:border-blue-500 hover:shadow-sm transition-all p-3 rounded-md cursor-pointer flex flex-col items-center gap-2 text-center"
-                onClick={() => handleAddBlock("systemFooter", {})}
-                draggable
-                onDragStart={(e) => {
-                  e.dataTransfer.setData(
-                    "application/json",
-                    JSON.stringify({
-                      type: "new-block",
-                      blockType: "systemFooter",
-                      defaultConfig: {},
-                    }),
-                  );
-                  e.dataTransfer.effectAllowed = "copy";
-                }}
-              >
-                <PanelBottom className="w-6 h-6 text-gray-400" />
-                <span className="text-xs font-medium">Footer</span>
-              </div>
-            </div>
-          </>
-        );
-
-      case "pages":
-        return (
-          <>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="font-semibold text-sm text-gray-800">Pages</h2>
-              <Button size="sm" variant="outline" onClick={handleCreateNewPage}>
-                Add Page
-              </Button>
-            </div>
-            <PagesPanel
-              orderedPages={orderedPages}
-              setOrderedPages={setOrderedPages}
-              selectedPageId={selectedPageId}
-              setSelectedPageId={setSelectedPageId}
-              setMode={setMode}
-              navigate={navigate}
-              canvasState={canvasState}
-              setActiveLeftPanel={setActiveLeftPanel}
-              setLeftPanelOpen={setLeftPanelOpen}
-              queryClient={queryClient}
-              showLoading={pagesLoading}
-              selectedRowIds={selectedRowIds}
-              toggleRowSelection={toggleRowSelection}
-              deleteMutation={deletePageMutation}
-            />
-          </>
-        );
-
-      case "theme":
-        return (
-          <>
-            <h2 className="font-semibold text-sm text-gray-800 mb-4">
-              Theme Settings
-            </h2>
-            <ScrollArea className="h-[calc(100vh-200px)]">
-              <ThemeSelection />
-            </ScrollArea>
-          </>
-        );
-
-      case "settings":
-        return (
-          <>
-            <h2 className="font-semibold text-sm text-gray-800 mb-4">
-              Settings
-            </h2>
-            <div className="space-y-1">
-              <Button
-                variant="ghost"
-                className="w-full justify-start h-8 px-2"
-                onClick={() => {
-                  navigate("/manage-shop/shop-settings");
-                }}
-              >
-                <Settings className="w-4 h-4 mr-2" /> Shop Settings
-              </Button>
-              <Button
-                variant="ghost"
-                className="w-full justify-start h-8 px-2"
-                onClick={() => {
-                  navigate("/manage-shop/header-settings");
-                }}
-              >
-                <PanelTop className="w-4 h-4 mr-2" /> Header
-              </Button>
-              <Button
-                variant="ghost"
-                className="w-full justify-start h-8 px-2"
-                onClick={() => {
-                  navigate("/manage-shop/footer-settings");
-                }}
-              >
-                <PanelBottom className="w-4 h-4 mr-2" /> Footer
-              </Button>
-              <Button
-                variant="ghost"
-                className="w-full justify-start h-8 px-2"
-                onClick={() => {
-                  navigate("/manage-shop/seo-marketing");
-                }}
-              >
-                <Search className="w-4 h-4 mr-2" /> SEO & Marketing
-              </Button>
-              <Button
-                variant="ghost"
-                className="w-full justify-start h-8 px-2"
-                onClick={() => {
-                  navigate("/manage-shop/shop-domain");
-                }}
-              >
-                <Globe className="w-4 h-4 mr-2" /> Domain
-              </Button>
-              <Button
-                variant="ghost"
-                className="w-full justify-start h-8 px-2"
-                onClick={() => {
-                  navigate("/manage-shop/shop-policy");
-                }}
-              >
-                <FileText className="w-4 h-4 mr-2" /> Shop Policy
-              </Button>
-              <Button
-                variant="ghost"
-                className="w-full justify-start h-8 px-2"
-                onClick={() => {
-                  navigate("/manage-shop/payment-gateway");
-                }}
-              >
-                <CreditCard className="w-4 h-4 mr-2" /> Payment Gateway
-              </Button>
-              <Button
-                variant="ghost"
-                className="w-full justify-start h-8 px-2"
-                onClick={() => {
-                  navigate("/manage-shop/delivery-support");
-                }}
-              >
-                <Truck className="w-4 h-4 mr-2" /> Delivery & Support
-              </Button>
-              <Button
-                variant="ghost"
-                className="w-full justify-start h-8 px-2"
-                onClick={() => {
-                  navigate("/manage-shop/social-links");
-                }}
-              >
-                <Share2 className="w-4 h-4 mr-2" /> Social Links
-              </Button>
-            </div>
-          </>
-        );
-
-      case "properties":
-        return (
-          <>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="font-semibold text-sm text-gray-800">
-                Properties
-              </h2>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-6 w-6"
-                onClick={() => {
-                  const hadSelection = !!canvasState.selectedId;
-                  canvasState.selectItem(null);
-                  // If we were viewing Page Settings (no block selected), go to Pages list
-                  // Otherwise if we were viewing block properties, go to Blocks list
-                  if (
-                    !hadSelection &&
-                    (mode === "page" || mode === "product")
-                  ) {
-                    setActiveLeftPanel("pages");
-                  } else {
-                    setActiveLeftPanel("blocks");
-                  }
-                }}
-              >
-                <X className="w-4 h-4" />
-              </Button>
-            </div>
-            <div className="overflow-y-auto">
-              <div className="space-y-4">
-                {/* Page-level settings (shown when no block is selected in page/product mode) */}
-                {(mode === "page" || mode === "product") &&
-                  !canvasState.selectedId && (
-                    <div className="border-b pb-4">
-                      <h3 className="text-xs font-semibold text-gray-500 uppercase mb-2">
-                        {mode === "page" && !selectedPageId
-                          ? "Create New Page"
-                          : "Page Settings"}
-                      </h3>
-                      <div className="space-y-3">
-                        <div>
-                          <label className="text-xs font-medium text-gray-600">
-                            Title
-                          </label>
-                          <Input
-                            value={formData.title || formData.page_title || ""}
-                            onChange={(e) => {
-                              const newTitle = e.target.value;
-                              handleMetaChange("title", newTitle);
-                              if (!selectedPageId && !isSlugManuallyEdited) {
-                                const newSlug = newTitle
-                                  .toLowerCase()
-                                  .replace(/[^a-z0-9-]/g, "-")
-                                  .replace(/-+/g, "-");
-                                setFormData((prev) => ({
-                                  ...prev,
-                                  slug: newSlug,
-                                }));
-                              }
-                            }}
-                            className="h-8 text-sm mt-1"
-                          />
-                        </div>
-                        <div>
-                          <label className="text-xs font-medium text-gray-600">
-                            URL Slug
-                          </label>
-                          <Input
-                            value={formData.slug}
-                            onChange={(e) => {
-                              const newSlugValue = e.target.value
-                                .toLowerCase()
-                                .replace(/[^a-z0-9-]/g, "-")
-                                .replace(/-+/g, "-");
-                              handleMetaChange("slug", newSlugValue);
-                            }}
-                            className="h-8 text-sm mt-1"
-                          />
-                        </div>
-                        <div>
-                          <label className="text-xs font-medium text-gray-600">
-                            Status
-                          </label>
-                          <Select
-                            value={formData.status}
-                            onValueChange={(value) =>
-                              handleMetaChange("status", value)
-                            }
-                          >
-                            <SelectTrigger className="h-8 text-sm mt-1">
-                              <SelectValue placeholder="Status" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="draft">Draft</SelectItem>
-                              <SelectItem value="published">
-                                Published
-                              </SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div className="pt-4 space-y-2">
-                          <Button
-                            className="w-full"
-                            onClick={handleSave}
-                            disabled={isSaving}
-                          >
-                            {isSaving
-                              ? "Saving..."
-                              : selectedPageId
-                                ? "Update Page Settings"
-                                : "Create Page"}
-                          </Button>
-                          {!selectedPageId && (
-                            <p className="text-[10px] text-center text-gray-400">
-                              Configure your page title and slug, then click
-                              Create Page to start building.
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                {/* Block-specific settings or empty state */}
-                {!canvasState.selectedId ||
-                (canvasState.selectedId !== "systemHeader" &&
-                  canvasState.selectedId !== "systemFooter" &&
-                  !canvasState.selectedItem) ? (
-                  !(mode === "page" || mode === "product") ? (
-                    <p className="text-sm text-gray-500 text-center py-8">
-                      Select a block to edit its properties.
-                    </p>
-                  ) : null
-                ) : (
-                  <div className="space-y-4 pt-4">
-                    {/* Header/Footer settings */}
-                    {canvasState.selectedId === "systemHeader" && (
-                      <SystemHeaderSettings
-                        component={{
-                          id: "systemHeader",
-                          type: "systemHeader",
-                          data: {},
-                        }}
-                        index={0}
-                        updateNested={(path, value) => {
-                          console.log("Header setting:", path, value);
-                        }}
-                        isUpdating={false}
-                      />
-                    )}
-
-                    {canvasState.selectedId === "systemFooter" && (
-                      <SystemFooterSettings
-                        component={{
-                          id: "systemFooter",
-                          type: "systemFooter",
-                          data: {},
-                        }}
-                        index={0}
-                        updateNested={(path, value) => {
-                          console.log("Footer setting:", path, value);
-                        }}
-                        isUpdating={false}
-                      />
-                    )}
-
-                    {/* Regular block settings */}
-                    {canvasState.selectedItem &&
-                      (() => {
-                        const SettingsComp =
-                          settingsComponentMap[canvasState.selectedItem.type];
-                        if (!SettingsComp) {
-                          return (
-                            <p className="text-sm text-gray-500">
-                              No settings available for this block type.
-                            </p>
-                          );
-                        }
-                        return (
-                          <SettingsComp
-                            component={canvasState.selectedItem}
-                            index={0}
-                            updateNested={(path, value) => {
-                              if (path.startsWith("data.")) {
-                                const dataPath = path.substring(5);
-                                const currentData =
-                                  canvasState.selectedItem?.data || {};
-                                const newData = updateNestedData(
-                                  currentData,
-                                  dataPath,
-                                  value,
-                                );
-                                canvasState.updateItem(canvasState.selectedId, {
-                                  data: newData,
-                                });
-                              } else {
-                                canvasState.updateItem(canvasState.selectedId, {
-                                  [path]: value,
-                                });
-                              }
-                            }}
-                            isUpdating={false}
-                          />
-                        );
-                      })()}
-
-                    {/* Delete button for non-system blocks */}
-                    {canvasState.selectedId &&
-                      canvasState.selectedId !== "systemHeader" &&
-                      canvasState.selectedId !== "systemFooter" && (
-                        <div className="pt-4 border-t">
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            className="w-full"
-                            onClick={() => {
-                              if (window.confirm("Remove this block?")) {
-                                canvasState.deleteItem(canvasState.selectedId);
-                                // Switch to blocks panel to show component palette
-                                setActiveLeftPanel("blocks");
-                                setLeftPanelOpen(true);
-                              }
-                            }}
-                          >
-                            Delete Block
-                          </Button>
-                        </div>
-                      )}
-                  </div>
-                )}
-              </div>
-            </div>
-          </>
-        );
-
-      default:
-        return null;
-    }
-  };
-
   return (
     <div className="h-screen w-screen overflow-hidden flex bg-[#F5F6F8]">
       {/* 1. LEFT TOOL RAIL (68px) */}
-      <aside className="w-[68px] bg-white border-r border-gray-200 flex flex-col items-center py-4 shrink-0 z-30">
-        {/* Logo */}
-        <div className="w-8 h-8 rounded mb-6 shadow-sm overflow-hidden flex items-center justify-center">
-          <img
-            src="https://res.cloudinary.com/dfsqtffsg/image/upload/v1775561997/sx9jtrmomuabzwi7imuh.png"
-            alt="Logo"
-            className="w-full h-full object-contain"
-          />
-        </div>
+      <BuilderToolRail
+        activeLeftPanel={activeLeftPanel}
+        rightPanelOpen={rightPanelOpen}
+        storeConfig={storeConfig}
+        openPanel={openPanel}
+        setRightPanelOpen={setRightPanelOpen}
+      />
 
-        {/* Tool Buttons */}
-        <nav className="flex flex-col gap-4 w-full items-center flex-1">
-          {/* Add Block Button (highlighted) */}
-          <button
-            className={`flex items-center justify-center w-10 h-10 rounded-lg transition-colors shadow-sm ${activeLeftPanel === "blocks" ? "bg-[#1C2434] text-white" : "bg-white text-gray-400 hover:text-gray-900 border border-gray-200"}`}
-            onClick={() => openPanel("blocks")}
-            title="Add Block"
-          >
-            <Plus className="w-5 h-5" />
-          </button>
-
-          <div className="w-8 h-px bg-gray-200 my-2"></div>
-
-          {/* Pages Button */}
-          <button
-            className={`flex flex-col items-center justify-center w-12 h-12 rounded-lg transition-colors ${activeLeftPanel === "pages" ? "bg-gray-100 text-gray-900" : "text-gray-400 hover:text-gray-900 hover:bg-gray-50"}`}
-            onClick={() => openPanel("pages")}
-            title="Pages"
-          >
-            <FileText className="w-5 h-5 mb-1" />
-            <span className="text-[9px] font-medium">Pages</span>
-          </button>
-
-          {/* Properties Button */}
-          <button
-            className={`flex flex-col items-center justify-center w-12 h-12 rounded-lg transition-colors ${activeLeftPanel === "properties" ? "bg-gray-100 text-gray-900" : "text-gray-400 hover:text-gray-900 hover:bg-gray-50"}`}
-            onClick={() => openPanel("properties")}
-            title="Properties"
-          >
-            <Sliders className="w-5 h-5 mb-1" />
-            <span className="text-[9px] font-medium">Edit</span>
-          </button>
-
-          {/* Theme Button */}
-          <button
-            className={`flex flex-col items-center justify-center w-12 h-12 rounded-lg transition-colors ${activeLeftPanel === "theme" ? "bg-gray-100 text-gray-900" : "text-gray-400 hover:text-gray-900 hover:bg-gray-50"}`}
-            onClick={() => openPanel("theme")}
-            title="Theme"
-          >
-            <Palette className="w-5 h-5 mb-1" />
-            <span className="text-[9px] font-medium">Theme</span>
-          </button>
-
-          {/* Settings Button */}
-          <button
-            className={`flex flex-col items-center justify-center w-12 h-12 rounded-lg transition-colors ${activeLeftPanel === "settings" ? "bg-gray-100 text-gray-900" : "text-gray-400 hover:text-gray-900 hover:bg-gray-50"}`}
-            onClick={() => openPanel("settings")}
-            title="Settings"
-          >
-            <Settings className="w-5 h-5 mb-1" />
-            <span className="text-[9px] font-medium">Settings</span>
-          </button>
-        </nav>
-
-        {/* Store info at bottom */}
-        <div className="border-t w-full py-3 px-2 text-center mt-auto">
-          <p className="text-[10px] text-gray-400 truncate w-full">
-            {storeConfig?.store_name || "Store"}
-          </p>
-        </div>
-      </aside>
-
-      {/* 2. DYNAMIC LEFT PANEL (280px) */}
+      {/* 2. DYNAMIC LEFT PANEL (Resizable) */}
       {leftPanelOpen && (
-        <aside className="w-[280px] bg-white border-r border-gray-200 flex flex-col shrink-0 z-20 relative">
+        <aside
+          style={{ width: `${leftPanelWidth}px` }}
+          className="bg-white border-r border-gray-200 flex flex-col shrink-0 z-20 relative"
+        >
+          {/* Left Panel Resize Handle */}
+          <div
+            className={`absolute top-0 right-[-3px] w-[6px] h-full cursor-col-resize hover:bg-blue-500/30 transition-colors z-30 ${
+              isLeftResizing ? "bg-blue-500/50" : ""
+            }`}
+            onMouseDown={startLeftResizing}
+          />
           {/* Panel Header */}
           <div className="h-14 border-b border-gray-100 flex items-center justify-between px-4 shrink-0">
             <h2 className="font-semibold text-sm text-gray-800">
@@ -1705,124 +991,118 @@ const Builder = () => {
           </div>
 
           {/* Panel Content */}
-          <div className="flex-1 overflow-y-auto p-4">{getPanelContent()}</div>
+          <div className="flex-1 overflow-y-auto p-4">
+            {activeLeftPanel === "blocks" && (
+              <BlockPalette
+                blockSearchQuery={blockSearchQuery}
+                setBlockSearchQuery={setBlockSearchQuery}
+                handleAddBlock={handleAddBlock}
+                filteredThemeBlocks={filteredThemeBlocks}
+              />
+            )}
+            {activeLeftPanel === "pages" && (
+              <PagesPanel
+                orderedPages={orderedPages}
+                setOrderedPages={setOrderedPages}
+                selectedPageId={selectedPageId}
+                setSelectedPageId={setSelectedPageId}
+                setMode={setMode}
+                navigate={navigate}
+                canvasState={canvasState}
+                setActiveLeftPanel={setActiveLeftPanel}
+                setLeftPanelOpen={setLeftPanelOpen}
+                queryClient={queryClient}
+                showLoading={pagesLoading}
+                selectedRowIds={selectedRowIds}
+                toggleRowSelection={toggleRowSelection}
+                deleteMutation={deletePageMutation}
+                onCreateNewPage={handleCreateNewPage}
+              />
+            )}
+            {activeLeftPanel === "theme" && (
+              <ThemeSettings
+                availableThemes={availableThemes}
+                storeConfig={storeConfig}
+                queryClient={queryClient}
+                createThemePages={createThemePages}
+              />
+            )}
+            {activeLeftPanel === "settings" && (
+              <AppSettings navigate={navigate} />
+            )}
+            {activeLeftPanel === "properties" && (
+              <>
+                {/* Page-level settings (shown when no block is selected in page/product mode) */}
+                {(mode === "page" || mode === "product") && !canvasState.selectedId && (
+                  <PageProperties
+                    mode={mode}
+                    selectedPageId={selectedPageId}
+                    formData={formData}
+                    handleMetaChange={handleMetaChange}
+                    handleSave={handleSave}
+                    isSaving={isSaving}
+                    canvasState={canvasState}
+                    setActiveLeftPanel={setActiveLeftPanel}
+                    setLeftPanelOpen={setLeftPanelOpen}
+                  />
+                )}
+                
+                {/* Block-specific settings - shown when a block is selected */}
+                {canvasState.selectedId && (
+                  <BlockProperties
+                    canvasState={canvasState}
+                    settingsComponentMap={settingsComponentMap}
+                    setActiveLeftPanel={setActiveLeftPanel}
+                    setLeftPanelOpen={setLeftPanelOpen}
+                  />
+                )}
+                
+                {/* Empty state when no block is selected and not in page/product mode */}
+                {mode !== "page" && mode !== "product" && !canvasState.selectedId && (
+                  <p className="text-sm text-gray-500 text-center py-8">
+                    Select a block to edit its properties.
+                  </p>
+                )}
+              </>
+            )}
+          </div>
         </aside>
       )}
 
       {/* 3. MAIN COLUMN */}
       <div className="flex-1 flex flex-col min-w-0 h-full">
         {/* Header */}
-        <header className="h-14 bg-white border-b border-gray-200 flex items-center justify-between px-4 shrink-0 z-10">
-          {/* Left: Home + App name */}
-          <div className="flex items-center gap-3 w-1/3">
-            <button
-              className="p-1.5 text-gray-500 hover:bg-gray-100 rounded"
-              onClick={handleBack}
-              title="Back"
-            >
-              <Home className="w-4 h-4" />
-            </button>
-            <div className="flex flex-col leading-tight">
-              <div className="flex items-center gap-1">
-                <span className="text-sm font-semibold text-gray-800">
-                  {storeConfig?.store_name || "ScaleBiz"}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Center: Page selector (dropdown for pages) */}
-          <div className="flex items-center justify-center h-full w-1/3">
-            {mode === "page" ? (
-              <div className="relative">
-                <button
-                  className="flex items-center gap-2 text-sm text-gray-500 font-medium bg-gray-100 px-3 py-1 rounded-md border border-gray-200 hover:bg-gray-50"
-                  onClick={() => openPanel("pages")}
-                >
-                  <FileText className="w-4 h-4" />
-                  <span>{customPage?.title || "New Page"}</span>
-                  <ChevronDown className="w-3 h-3 text-gray-400" />
-                </button>
-              </div>
-            ) : (
-              <span className="text-sm text-gray-500 font-medium">
-                {(() => {
-                  if (mode === "product")
-                    return (
-                      productLandingPage?.product?.name ||
-                      "Product Landing Page"
-                    );
-                  return "Page Builder";
-                })()}
-              </span>
-            )}
-          </div>
-
-          {/* Right: Actions */}
-          <div className="flex items-center justify-end gap-3 w-1/3">
-            <button
-              className="p-1.5 text-gray-500 hover:bg-gray-100 rounded-full border border-gray-200"
-              title="Preview"
-            >
-              <Eye className="w-4 h-4" />
-            </button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                setFormData((prev) => ({ ...prev, status: "draft" }));
-                handleSave();
-              }}
-              disabled={isSaving}
-            >
-              {isSaving ? "Saving..." : "Save"}
-            </Button>
-            <button
-              className="bg-[#1C2434] text-white px-4 py-1.5 text-sm font-medium rounded-md hover:bg-gray-800 transition-colors flex items-center gap-2"
-              onClick={handlePublish}
-              disabled={
-                isSaving ||
-                (mode === "product"
-                  ? isCreatingProduct || isUpdatingProduct
-                  : false)
-              }
-            >
-              {isSaving ||
-              (mode === "product"
-                ? isCreatingProduct || isUpdatingProduct
-                : isCreatingProduct)
-                ? "Saving..."
-                : "Publish"}
-              {!isSaving &&
-                (mode !== "product" ||
-                  (!isCreatingProduct && !isUpdatingProduct)) && (
-                  <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full"></div>
-                )}
-            </button>
-          </div>
-        </header>
+        <BuilderHeader
+          storeConfig={storeConfig}
+          mode={mode}
+          customPage={customPage}
+          productLandingPage={productLandingPage}
+          isSaving={isSaving}
+          isCreatingProduct={isCreatingProduct}
+          isUpdatingProduct={isUpdatingProduct}
+          handleBack={handleBack}
+          handleSave={handleSave}
+          handlePublish={handlePublish}
+          openPanel={openPanel}
+        />
 
         {/* Workspace Area */}
         <main className="flex-1 overflow-auto p-4 md:p-6 flex justify-center bg-[#F5F6F8]">
           {/* Canvas Container */}
-          <div className="w-full max-w-[1200px] bg-white rounded-lg shadow-sm border border-gray-200 min-h-[800px] relative flex flex-col">
+          <div
+            className={`bg-white rounded-lg shadow-sm border border-gray-200 min-h-[800px] relative flex flex-col ${
+              viewport === "mobile"
+                ? "w-[375px]"
+                : viewport === "tablet"
+                ? "w-[768px]"
+                : "w-full max-w-[1200px]"
+            }`}
+          >
             {/* Device Viewport Toggles */}
-            <div className="h-12 flex justify-center items-center shrink-0 w-full border-b bg-gray-50">
-              <div className="flex items-center bg-white p-0.5 rounded-md border border-gray-200 gap-1">
-                {Object.entries(VIEWPORTS).map(
-                  ([key, { label: vLabel, icon: Icon }]) => (
-                    <button
-                      key={key}
-                      className={`p-1.5 ${viewport === key ? "text-gray-800 bg-gray-100 rounded shadow-sm" : "text-gray-400 hover:text-gray-700"}`}
-                      onClick={() => setViewport(key)}
-                      title={vLabel}
-                    >
-                      <Icon className="w-4 h-4" />
-                    </button>
-                  ),
-                )}
-              </div>
-            </div>
+            <BuilderViewport
+              viewport={viewport}
+              setViewport={setViewport}
+            />
 
             {/* Canvas */}
             <div className="flex-1 relative">
@@ -1856,6 +1136,24 @@ const Builder = () => {
           </div>
         </main>
       </div>
+
+      {/* 4. RIGHT SIDEBAR (Properties) */}
+      {rightPanelOpen && (
+        <PropertySidebar
+          canvasState={canvasState}
+          mode={mode}
+          selectedPageId={selectedPageId}
+          formData={formData}
+          handleMetaChange={handleMetaChange}
+          handleSave={handleSave}
+          isSaving={isSaving}
+          settingsComponentMap={settingsComponentMap}
+          storeConfig={storeConfig}
+          onClose={() => setRightPanelOpen(false)}
+          width={rightPanelWidth}
+          setWidth={setRightPanelWidth}
+        />
+      )}
     </div>
   );
 };

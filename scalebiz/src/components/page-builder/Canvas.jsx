@@ -30,7 +30,7 @@ const VIEWPORT_WIDTHS = {
 };
 
 // Check if a block type is a container (can have children)
-const CONTAINER_TYPES = ["section", "row", "column", "grid", "container", "systemHeader", "systemFooter"];
+const CONTAINER_TYPES = ["section", "row", "column", "grid", "container", "Header", "Footer", "cardLayout"];
 
 const isContainer = (type) => CONTAINER_TYPES.includes(type);
 
@@ -51,6 +51,7 @@ const NestedBlockList = ({
   nextProductId,
   prevProductId,
   direction = "vertical",
+  viewMode = "blocks",
 }) => {
   if (!items || items.length === 0) {
     return null;
@@ -106,6 +107,7 @@ const NestedBlockList = ({
               prevProductId={prevProductId}
               parentId={parentId}
               depth={depth}
+              viewMode={viewMode}
             >
               {container && children.length > 0 && (
                 <SortableContext
@@ -127,6 +129,7 @@ const NestedBlockList = ({
                     nextProductId={nextProductId}
                     prevProductId={prevProductId}
                     direction={item.type === "row" ? "horizontal" : "vertical"}
+                    viewMode={viewMode}
                   />
                 </SortableContext>
               )}
@@ -165,6 +168,7 @@ const Canvas = ({
   themeConfig,
   storeConfig,
   viewport = "desktop",
+  viewMode = "blocks",
   product,
   onBuyNowClick,
   nextProductId,
@@ -186,7 +190,18 @@ const Canvas = ({
   // Handle drag start
   const handleDragStart = useCallback((event) => {
     const { active } = event;
-    // Could add visual feedback here
+    // Store block data in the event for drag and drop from palette
+    if (active.data?.current?.dataset) {
+      const blockType = active.data.current.dataset.blockType;
+      const defaultConfig = active.data.current.dataset.defaultConfig;
+      event.dataTransfer.setData(
+        "application/json",
+        JSON.stringify({
+          blockType,
+          defaultConfig,
+        })
+      );
+    }
   }, []);
 
   // Handle drag over - supports moving between containers
@@ -194,304 +209,190 @@ const Canvas = ({
     const { active, over } = event;
     if (!over) return;
 
-    // Could show drop indicator here
-  }, []);
+    const overId = over.id;
+    const activeId = active.id;
 
-  // Handle drag end - reorder or move items between containers
-  const handleDragEnd = useCallback(
-    (event) => {
-      const { active, over } = event;
+    if (activeId === overId) return;
 
-      if (!over || active.id === over.id) return;
+    // Find parent arrays for both active and over items
+    const findParent = (nodes, targetId) => {
+      for (let i = 0; i < nodes.length; i++) {
+        const node = nodes[i];
 
-      // Only handle block reordering (new components from palette added via click)
-      if (active.data.current?.type !== "block") return;
-
-      const activeId = active.id;
-      const overId = over.id;
-
-      // Find active item in the tree
-      const activeItem = findNodeInTree(items, activeId);
-      if (!activeItem) return;
-
-      // Determine parent of active item
-      const activeParentId = findParentId(items, activeId);
-
-      // Handle reordering within same container
-      if (activeParentId !== null) {
-        // Active is in a nested container
-        const activeParent = findNodeInTree(items, activeParentId);
-        if (activeParent && activeParent.children) {
-          const oldIndex = activeParent.children.findIndex((item) => item.id === activeId);
-          const overParentId = findParentId(items, overId);
-
-          if (overParentId === activeParentId) {
-            // Reordering within same parent
-            const newIndex = activeParent.children.findIndex((item) => item.id === overId);
-            const reordered = arrayMove(activeParent.children, oldIndex, newIndex);
-            onUpdateItems((draft) => {
-              const draftParent = findNodeInTree(draft, activeParentId);
-              if (draftParent) {
-                draftParent.children = reordered;
-              }
-            });
-          } else {
-            // Moving to different parent
-            handleMoveToDifferentParent(activeId, overId, activeParentId, overParentId, items, onUpdateItems);
-          }
+        if (node.id === targetId) {
+          return { parentArray: nodes, index: i };
         }
-      } else {
-        // Active is at root level
-        const oldIndex = items.findIndex((item) => item.id === activeId);
-        const overParentId = findParentId(items, overId);
 
-        if (overParentId === null) {
-          // Reordering at root level
-          const newIndex = items.findIndex((item) => item.id === overId);
-          const reordered = arrayMove(items, oldIndex, newIndex);
-          onUpdateItems(() => reordered);
-        } else {
-          // Moving from root to nested container
-          handleMoveToNestedParent(activeId, overId, overParentId, items, onUpdateItems);
+        if (node.children) {
+          const found = findParent(node.children, targetId);
+          if (found) return found;
         }
       }
-    },
-    [items, onUpdateItems]
-  );
+      return null;
+    };
 
-  const viewportWidth = VIEWPORT_WIDTHS[viewport] || "100%";
+    const activeInfo = findParent(items, activeId);
+    const overInfo = findParent(items, overId);
+
+    if (!activeInfo || !overInfo) return;
+
+    // Get the target parent array (where over item lives)
+    const targetArray = overInfo.parentArray;
+    const targetIndex = overInfo.index;
+
+    // Remove active item from its current position
+    const sourceArray = activeInfo.parentArray;
+    const sourceIndex = activeInfo.index;
+    const [movedItem] = sourceArray.splice(sourceIndex, 1);
+
+    // Insert at new position
+    // Adjust index if moving to a position after the original position
+    const insertIndex = targetIndex > sourceIndex ? targetIndex - 1 : targetIndex;
+    targetArray.splice(insertIndex, 0, movedItem);
+
+    onUpdateItems((draft) => draft);
+  }, [items, onUpdateItems]);
+
+  // Handle drag end
+  const handleDragEnd = useCallback((event) => {
+    const { active, over } = event;
+    if (!over) return;
+
+    const overId = over.id;
+    const activeId = active.id;
+
+    if (activeId === overId) return;
+
+    // Check if this is a drag from the palette (new block)
+    // Get data from dataTransfer
+    const blockType = event.dataTransfer.getData("blockType");
+    const defaultConfigStr = event.dataTransfer.getData("defaultConfig");
+    
+    if (blockType) {
+      // This is a new block being dragged from the palette
+      const defaultConfig = defaultConfigStr ? JSON.parse(defaultConfigStr) : {};
+
+      // Find the drop target
+      const findDropTarget = (nodes, targetId) => {
+        for (let i = 0; i < nodes.length; i++) {
+          const node = nodes[i];
+
+          if (node.id === targetId) {
+            return { parentArray: nodes, index: i };
+          }
+
+          if (node.children) {
+            const found = findDropTarget(node.children, targetId);
+            if (found) return found;
+          }
+        }
+        return null;
+      };
+
+      const overInfo = findDropTarget(items, overId);
+      if (overInfo) {
+        // Add the new block at the drop position
+        const newIndex = overInfo.index;
+        const newBlock = {
+          id: Date.now() + Math.random(),
+          type: blockType,
+          data: defaultConfig,
+        };
+        overInfo.parentArray.splice(newIndex, 0, newBlock);
+        onUpdateItems((draft) => draft);
+      }
+      return;
+    }
+
+    // Find parent arrays for both active and over items
+    const findParent = (nodes, targetId) => {
+      for (let i = 0; i < nodes.length; i++) {
+        const node = nodes[i];
+
+        if (node.id === targetId) {
+          return { parentArray: nodes, index: i };
+        }
+
+        if (node.children) {
+          const found = findParent(node.children, targetId);
+          if (found) return found;
+        }
+      }
+      return null;
+    };
+
+    const activeInfo = findParent(items, activeId);
+    const overInfo = findParent(items, overId);
+
+    if (!activeInfo || !overInfo) return;
+
+    // Get the target parent array (where over item lives)
+    const targetArray = overInfo.parentArray;
+    const targetIndex = overInfo.index;
+
+    // Remove active item from its current position
+    const sourceArray = activeInfo.parentArray;
+    const sourceIndex = activeInfo.index;
+    const [movedItem] = sourceArray.splice(sourceIndex, 1);
+
+    // Insert at new position
+    // Adjust index if moving to a position after the original position
+    const insertIndex = targetIndex > sourceIndex ? targetIndex - 1 : targetIndex;
+    targetArray.splice(insertIndex, 0, movedItem);
+
+    onUpdateItems((draft) => draft);
+  }, [items, onUpdateItems]);
 
   return (
     <DndContext
       sensors={sensors}
-      collisionDetection={closestCenter}
       onDragStart={handleDragStart}
       onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
+      collisionDetection={closestCenter}
     >
       <div
-        className={cn("flex-1 overflow-auto p-6 flex justify-center canvas-grid-bg", className)}
-        onClick={(e) => {
-          if (e.target === e.currentTarget) {
-            onSelectItem(null);
-          }
-        }}
-        onDragOver={(e) => {
-          e.preventDefault();
-        }}
+        className={cn("canvas-container", className)}
+        onDragOver={(e) => e.preventDefault()}
         onDrop={(e) => {
           e.preventDefault();
-          const data = e.dataTransfer.getData('application/json');
-          if (data && onDropBlock) {
-            try {
-              const parsed = JSON.parse(data);
-              if (parsed.type === 'new-block') {
-                // Find the block element under the cursor
-                const elements = document.elementsFromPoint(e.clientX, e.clientY);
-                
-                // Find if we are dropping onto a block
-                const blockElement = elements.find(el => el.closest('[data-block-id]'));
-                
-                let targetParentId = null;
-                let insertIndex = items.length;
-
-                if (blockElement) {
-                  const targetBlock = blockElement.closest('[data-block-id]');
-                  const blockId = targetBlock.getAttribute('data-block-id');
-                  const blockType = targetBlock.getAttribute('data-block-type');
-                  
-                  // If dropping onto a container, we might want to drop INSIDE it
-                  if (isContainer(blockType)) {
-                    targetParentId = blockId;
-                    // For now, just append to the end of container children
-                    const containerNode = findNodeInTree(items, blockId);
-                    insertIndex = containerNode?.children?.length || 0;
-                  } else {
-                    // Dropping next to a non-container block
-                    // Find parent of this block
-                    const parentId = findParentId(items, blockId);
-                    targetParentId = parentId === undefined ? null : parentId;
-                    
-                    const parentNode = targetParentId === null ? { children: items } : findNodeInTree(items, targetParentId);
-                    const siblings = parentNode?.children || items;
-                    
-                    const overIndex = siblings.findIndex(item => item.id.toString() === blockId);
-                    if (overIndex !== -1) {
-                      const rect = targetBlock.getBoundingClientRect();
-                      const midpoint = rect.top + rect.height / 2;
-                      insertIndex = e.clientY < midpoint ? overIndex : overIndex + 1;
-                    }
-                  }
-                }
-
-                // Call handleAddBlock with parentId support
-                // signature: (blockType, index, defaultConfig, parentId)
-                onDropBlock(parsed.blockType, insertIndex, parsed.defaultConfig || {}, targetParentId);
-              }
-            } catch (err) {
-              console.error('Failed to parse drop data', err);
-            }
+          const blockType = e.dataTransfer.getData("blockType");
+          const defaultConfigStr = e.dataTransfer.getData("defaultConfig");
+          
+          if (blockType) {
+            const defaultConfig = defaultConfigStr ? JSON.parse(defaultConfigStr) : {};
+            const newBlock = {
+              id: Date.now() + Math.random(),
+              type: blockType,
+              data: defaultConfig,
+            };
+            
+            // Add the new block at the end of the items array
+            onUpdateItems((draft) => {
+              draft.push(newBlock);
+            });
           }
         }}
       >
-        {/* Canvas container with constrained width */}
-        <div
-          className="min-h-[500px] bg-background/80 backdrop-blur-sm border shadow-lg rounded-lg transition-all duration-300"
-          style={{ width: viewportWidth, maxWidth: "100%" }}
-        >
-          {items.length === 0 ? (
-            <div className="h-full min-h-[500px] flex items-center justify-center border-2 border-dashed rounded-lg m-4">
-              <div className="text-center p-8">
-                <div className="text-4xl mb-4">📦</div>
-                <h3 className="text-lg font-medium mb-2">Your page is empty</h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Add components from the sidebar to start building
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  Drag and drop components here or click to add
-                </p>
-              </div>
-            </div>
-          ) : (
-            <SortableContext
-              items={items.map((i) => i.id)}
-              strategy={verticalListSortingStrategy}
-              id="root"
-            >
-              <NestedBlockList
-                items={items}
-                selectedId={selectedId}
-                onSelectItem={onSelectItem}
-                onUpdateItems={onUpdateItems}
-                parentId={null}
-                depth={0}
-                themeConfig={themeConfig}
-                storeConfig={storeConfig}
-                product={product}
-                onBuyNowClick={onBuyNowClick}
-                nextProductId={nextProductId}
-                prevProductId={prevProductId}
-                direction="vertical"
-              />
-            </SortableContext>
-          )}
-        </div>
+        <NestedBlockList
+          items={items}
+          selectedId={selectedId}
+          onSelectItem={onSelectItem}
+          onUpdateItems={onUpdateItems}
+          themeConfig={themeConfig}
+          storeConfig={storeConfig}
+          product={product}
+          onBuyNowClick={onBuyNowClick}
+          nextProductId={nextProductId}
+          prevProductId={prevProductId}
+          viewMode={viewMode}
+        />
       </div>
-
       <DragOverlay>
-        {/* Could show a preview of dragged component */}
+        {/* Could add custom drag overlay component here */}
       </DragOverlay>
     </DndContext>
   );
-};
-
-// Helper to find parent ID of a node
-const findParentId = (nodes, targetId, parentId = null) => {
-  if (!targetId) return undefined;
-  const tId = String(targetId);
-  for (const node of nodes) {
-    if (String(node.id) === tId) {
-      return parentId;
-    }
-    if (node.children) {
-      const found = findParentId(node.children, tId, node.id);
-      if (found !== undefined) return found;
-    }
-  }
-  return undefined;
-};
-
-// Helper to handle moving item to a nested parent
-const handleMoveToNestedParent = (
-  activeId,
-  overId,
-  overParentId,
-  items,
-  onUpdateItems,
-) => {
-  const { extracted, remaining } = extractSubtree(items, activeId);
-  if (!extracted) return;
-
-  const overParent = findNodeInTree(remaining, overParentId);
-  if (!overParent || !overParent.children) return;
-
-  // Insert at appropriate index
-  const tOverId = String(overId);
-  const overIndex = overParent.children.findIndex(
-    (item) => String(item.id) === tOverId,
-  );
-  const newChildren = [...overParent.children];
-  const insertIndex = overIndex === -1 ? newChildren.length : overIndex;
-  newChildren.splice(insertIndex, 0, {
-    ...extracted,
-    children: extracted.children || [],
-  });
-
-  onUpdateItems((draft) => {
-    const draftOverParent = findNodeInTree(draft, overParentId);
-    if (draftOverParent) {
-      draftOverParent.children = newChildren;
-    }
-  });
-};
-
-// Helper to handle moving item between different parents
-const handleMoveToDifferentParent = (
-  activeId,
-  overId,
-  activeParentId,
-  overParentId,
-  items,
-  onUpdateItems,
-) => {
-  // Extract from current parent
-  const { extracted, remaining } = extractSubtree(items, activeId);
-  if (!extracted) return;
-
-  // Find over's parent and index
-  const overParent = findNodeInTree(remaining, overParentId);
-  if (!overParent || !overParent.children) return;
-
-  const tOverId = String(overId);
-  const overIndex = overParent.children.findIndex(
-    (item) => String(item.id) === tOverId,
-  );
-  const newChildren = [...overParent.children];
-  const insertIndex = overIndex === -1 ? newChildren.length : overIndex;
-  newChildren.splice(insertIndex, 0, {
-    ...extracted,
-    children: extracted.children || [],
-  });
-
-  onUpdateItems((draft) => {
-    const draftOverParent = findNodeInTree(draft, overParentId);
-    if (draftOverParent) {
-      draftOverParent.children = newChildren;
-    }
-  });
-};
-
-// Extract subtree helper (same as useCanvasState but standalone)
-const extractSubtree = (nodes, id) => {
-  if (!id) return { extracted: null, remaining: nodes };
-  const targetId = String(id);
-  for (let i = 0; i < nodes.length; i++) {
-    const node = nodes[i];
-    if (String(node.id) === targetId) {
-      const newNodes = [...nodes];
-      newNodes.splice(i, 1);
-      return { extracted: node, remaining: newNodes };
-    }
-    if (node.children) {
-      const result = extractSubtree(node.children, targetId);
-      if (result.extracted) {
-        const newNodes = [...nodes];
-        newNodes[i] = { ...node, children: result.remaining };
-        return { extracted: result.extracted, remaining: newNodes };
-      }
-    }
-  }
-  return { extracted: null, remaining: nodes };
 };
 
 export default Canvas;

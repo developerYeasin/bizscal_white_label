@@ -62,19 +62,12 @@ import FooterSettingsPage from "./pages/shop-settings/FooterSettingsPage.jsx";
 import HeaderSettingsPage from "./pages/shop-settings/HeaderSettingsPage.jsx";
 
 // Import storefront pages and layout
-import StorefrontLayout from "./layouts/StorefrontLayout.jsx";
-import StorefrontHomePage from "./pages/storefront/HomePage.jsx";
-import ProductsPage from "./pages/storefront/ProductsPage.jsx";
-import ProductDetailPage from "./pages/storefront/ProductDetailPage.jsx";
-import CategoryPage from "./pages/storefront/CategoryPage.jsx";
-import CartPage from "./pages/storefront/CartPage.jsx";
-import CheckoutPage from "./pages/storefront/CheckoutPage.jsx";
-import PageViewPage from "./pages/storefront/PageViewPage.jsx";
 
 // Contexts & Providers
 import { AuthProvider, useAuth } from "./contexts/AuthContext.jsx";
 import { StoreConfigurationProvider } from "./contexts/StoreConfigurationContext.jsx";
-import { ThemeSettingsProvider } from "./contexts/ThemeSettingsContext.jsx";
+import ConfigLoader from "./components/ConfigLoader.jsx";
+
 import LoadingProgressBar from "./components/LoadingProgressBar.jsx";
 import { ThemeProvider } from "next-themes";
 import { setUnauthorizedLogoutHandler } from "./utils/api.js";
@@ -151,11 +144,7 @@ const useMode = () => {
     const hostname = window.location.hostname;
     // Treat subdomains starting with 'admin.' as admin mode.
     // Also, if hostname is exactly 'admin.localhost' for local development.
-    const isAdmin =
-      hostname.startsWith("admin.") ||
-      hostname === "admin.localhost" ||
-      hostname === "localhost";
-    setMode(isAdmin ? "admin" : "storefront");
+    setMode("admin");
   }, []);
 
   return mode;
@@ -538,21 +527,6 @@ const AppContent = () => {
         }
       />
 
-      {/* Storefront Mode Routes */}
-      {mode === "storefront" && (
-        <React.Fragment>
-          <Route element={<StorefrontLayout />}>
-            <Route path="/" element={<StorefrontHomePage />} />
-            <Route path="/products" element={<ProductsPage />} />
-            <Route path="/products/:id" element={<ProductDetailPage />} />
-            <Route path="/categories/:slug" element={<CategoryPage />} />
-            <Route path="/cart" element={<CartPage />} />
-            <Route path="/checkout" element={<CheckoutPage />} />
-            <Route path="/pages/:slug" element={<PageViewPage />} />
-          </Route>
-        </React.Fragment>
-      )}
-
       {/* Global 404 */}
       <Route path="*" element={<NotFound />} />
     </Routes>
@@ -569,16 +543,16 @@ const App = () => (
           <Sonner position="top-center" />
           <AuthProvider>
             <StoreConfigurationProvider>
-              <ThemeSettingsProvider>
-                <BrowserRouter
-                  future={{
-                    v7_startTransition: true,
-                    v7_relativeSplatPath: true,
-                  }}
-                >
+              <BrowserRouter
+                future={{
+                  v7_startTransition: true,
+                  v7_relativeSplatPath: true,
+                }}
+              >
+                <ConfigLoader>
                   <AppContent />
-                </BrowserRouter>
-              </ThemeSettingsProvider>
+                </ConfigLoader>
+              </BrowserRouter>
             </StoreConfigurationProvider>
           </AuthProvider>
         </TooltipProvider>

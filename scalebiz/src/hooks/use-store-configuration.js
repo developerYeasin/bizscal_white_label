@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useCallback } from "react";
 import api from "@/utils/api.js";
 import { showSuccess, showError } from "@/utils/toast.js";
 import { useAuth } from "@/contexts/AuthContext.jsx";
@@ -198,18 +199,19 @@ export const useStoreConfiguration = () => {
   const { isAuthenticated } = useAuth();
   // Removed: const location = useLocation(); // No longer needed here
 
-  const { data: configuration, isLoading, error } = useQuery({
-    queryKey: ["storeConfiguration"],
-    queryFn: fetchStoreConfiguration,
-    // Change: Always enable if authenticated. The ProtectedRoute will handle redirects.
-    enabled: isAuthenticated,
-  });
+  const fetchConfigurationManually = useCallback(async () => {
+    try {
+      const config = await fetchStoreConfiguration();
+      return config;
+    } catch (err) {
+      console.error("Error fetching store configuration manually:", err);
+      throw err; // Re-throw to be caught by the caller
+    }
+  }, []);
 
   const updateMutation = useMutation({
     mutationFn: updateStoreConfiguration,
     onSuccess: (responsePayload) => {
-      // If the API returns the updated configuration, update the cache directly.
-      // Otherwise, invalidate the query to trigger a refetch.
       if (responsePayload.data && responsePayload.data.configuration) {
         queryClient.setQueryData(["storeConfiguration"], responsePayload.data.configuration);
       } else {
@@ -222,11 +224,24 @@ export const useStoreConfiguration = () => {
     },
   });
 
+  const updateConfigurationAsync = useCallback(async (payload) => {
+    return updateMutation.mutateAsync(payload);
+  }, [updateMutation]);
+
+  // Using useQuery to fetch the configuration, but it will be enabled/disabled via context
+  const { data: configuration, isLoading, error } = useQuery({
+    queryKey: ["storeConfiguration"],
+    queryFn: fetchStoreConfiguration,
+    enabled: isAuthenticated, // Keep this for initial load within the context, if used.
+  });
+
   return {
     configuration,
     isLoading,
     error,
     updateConfiguration: updateMutation.mutate,
+    updateConfigurationAsync,
     isUpdating: updateMutation.isPending,
+    fetchConfigurationManually,
   };
 };

@@ -15,7 +15,7 @@ import ProductLandingPage from "./pages/ProductLandingPage.jsx";
 import SimpleDetailsProductPage from "./pages/SimpleDetailsProductPage.jsx";
 import ReceiptPage from "./pages/ReceiptPage.jsx"; // NEW: Import ReceiptPage
 import Contact from "./pages/Contact.jsx";
-import StorePage from "./pages/StorePage.jsx";
+import DynamicPageRenderer from "./pages/DynamicPageRenderer.jsx";
 import StoreLayout from "./components/StoreLayout.jsx";
 import React, { useState, useEffect } from "react"; // Import useState, useEffect
 import InitializeTrackers from "./components/InitializeTrackers/InitializeTrackers.jsx";
@@ -37,14 +37,17 @@ const getStoreRoutes = () => (
     <Route path="checkout" element={<Checkout />} />
     <Route path="order-confirmation" element={<OrderConfirmation />} />
     <Route path="policies/:policyKey" element={<PolicyPage />} />
-    <Route
-      path="single-product/:id"
-      element={<ProductLandingPage />}
-    />
+    <Route path="single-product/:id" element={<ProductLandingPage />} />
     <Route path="receipt/:orderId?" element={<ReceiptPage />} />{" "}
     {/* NEW: Receipt Page Route */}
     <Route path="contact" element={<Contact />} />
-    <Route path="pages/:slug" element={<StorePage />} />
+    <Route path="payment/nagad/verify" element={<NagadPaymentVerify />} />
+    <Route
+      path="payment/success"
+      element={<SslCommerzStatus status="success" />}
+    />
+    <Route path="payment/fail" element={<SslCommerzStatus status="fail" />} />
+    <Route path="pages/:slug" element={<DynamicPageRenderer />} />
     <Route path="*" element={<NotFound />} />
   </React.Fragment>
 );
@@ -85,33 +88,17 @@ const App = () => {
           <ScrollToTop />
           <Routes>
             {/* Routes for payment callbacks, outside StoreLayout */}
-            <Route
-              path="/payment/nagad/verify"
-              element={<NagadPaymentVerify />}
-            />
-            <Route
-              path="/payment/success"
-              element={<SslCommerzStatus status="success" />}
-            />
-            <Route
-              path="/payment/fail"
-              element={<SslCommerzStatus status="fail" />}
-            />
 
             <Route
               path="/merchant/:storeId/*"
               element={<StoreLayout livePreviewConfig={livePreviewConfig} />}
             >
-              {" "}
-              {/* Pass livePreviewConfig */}
               {getStoreRoutes()}
             </Route>
             <Route
               path="/*"
               element={<StoreLayout livePreviewConfig={livePreviewConfig} />}
             >
-              {" "}
-              {/* Pass livePreviewConfig */}
               {getStoreRoutes()}
             </Route>
           </Routes>

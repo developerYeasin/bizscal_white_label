@@ -13,7 +13,8 @@ import { showSuccess, showError } from "@/utils/toast.js";
 import { uploadSingleImage } from "@/utils/upload.js";
 
 const FooterSettingsSection = () => {
-  const { config, isLoading, updateNested, save, isUpdating } = useStoreConfig();
+  const { config, isLoading, updateNested: contextUpdateNested, save, isUpdating } = useStoreConfig();
+  const updateNested = contextUpdateNested;
   const paymentIconInputRef = React.useRef(null);
 
   if (isLoading || !config) {

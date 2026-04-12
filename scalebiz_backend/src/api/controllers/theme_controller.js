@@ -14,7 +14,7 @@ exports.get_all_themes = async (req, res, next) => {
 
     res.status(200).json({
       status: "success",
-      data: { themes }
+      data: { themes },
     });
   } catch (error) {
     console.error("Error fetching themes:", error);
@@ -33,15 +33,21 @@ exports.get_all_theme_blocks = async (req, res, next) => {
     `);
 
     // Parse JSON fields
-    const parsedBlocks = blocks.map(block => ({
+    const parsedBlocks = blocks.map((block) => ({
       ...block,
-      default_config: typeof block.default_config === 'string' ? JSON.parse(block.default_config) : block.default_config,
-      config_schema: typeof block.config_schema === 'string' ? JSON.parse(block.config_schema) : block.config_schema
+      default_config:
+        typeof block.default_config === "string"
+          ? JSON.parse(block.default_config)
+          : block.default_config,
+      config_schema:
+        typeof block.config_schema === "string"
+          ? JSON.parse(block.config_schema)
+          : block.config_schema,
     }));
 
     res.status(200).json({
       status: "success",
-      data: { theme_blocks: parsedBlocks }
+      data: { theme_blocks: parsedBlocks },
     });
   } catch (error) {
     console.error("Error fetching theme blocks:", error);
@@ -55,10 +61,9 @@ exports.get_theme_detail = async (req, res, next) => {
     const { id } = req.params;
 
     // Fetch theme
-    const [themeRows] = await pool.query(
-      "SELECT * FROM themes WHERE id = ?",
-      [id]
-    );
+    const [themeRows] = await pool.query("SELECT * FROM themes WHERE id = ?", [
+      id,
+    ]);
 
     if (themeRows.length === 0) {
       return next(new ApiError(404, "Theme not found."));
@@ -69,18 +74,36 @@ exports.get_theme_detail = async (req, res, next) => {
     // Fetch blocks for this theme
     const [blocks] = await pool.query(
       "SELECT * FROM theme_blocks WHERE theme_id = ? ORDER BY sort_order ASC",
-      [id]
+      [id],
     );
 
     // Parse JSON fields
-    if (theme.config) theme.config = typeof theme.config === 'string' ? JSON.parse(theme.config) : theme.config;
-    if (theme.blocks) theme.blocks = typeof theme.blocks === 'string' ? JSON.parse(theme.blocks) : theme.blocks;
-    if (theme.features) theme.features = typeof theme.features === 'string' ? JSON.parse(theme.features) : theme.features;
+    if (theme.config)
+      theme.config =
+        typeof theme.config === "string"
+          ? JSON.parse(theme.config)
+          : theme.config;
+    if (theme.blocks)
+      theme.blocks =
+        typeof theme.blocks === "string"
+          ? JSON.parse(theme.blocks)
+          : theme.blocks;
+    if (theme.features)
+      theme.features =
+        typeof theme.features === "string"
+          ? JSON.parse(theme.features)
+          : theme.features;
 
-    const parsedBlocks = blocks.map(block => ({
+    const parsedBlocks = blocks.map((block) => ({
       ...block,
-      default_config: typeof block.default_config === 'string' ? JSON.parse(block.default_config) : block.default_config,
-      config_schema: typeof block.config_schema === 'string' ? JSON.parse(block.config_schema) : block.config_schema
+      default_config:
+        typeof block.default_config === "string"
+          ? JSON.parse(block.default_config)
+          : block.default_config,
+      config_schema:
+        typeof block.config_schema === "string"
+          ? JSON.parse(block.config_schema)
+          : block.config_schema,
     }));
 
     res.status(200).json({
@@ -88,9 +111,9 @@ exports.get_theme_detail = async (req, res, next) => {
       data: {
         theme: {
           ...theme,
-          available_blocks: parsedBlocks
-        }
-      }
+          available_blocks: parsedBlocks,
+        },
+      },
     });
   } catch (error) {
     console.error("Error fetching theme detail:", error);
@@ -109,7 +132,7 @@ exports.apply_theme = async (req, res, next) => {
     // Validate theme exists
     const [themeRows] = await connection.query(
       "SELECT * FROM themes WHERE id = ?",
-      [theme_id]
+      [theme_id],
     );
 
     if (themeRows.length === 0) {
@@ -120,16 +143,20 @@ exports.apply_theme = async (req, res, next) => {
     const theme = themeRows[0];
 
     // Parse theme config
-    const themeConfig = typeof theme.config === 'string' ? JSON.parse(theme.config) : theme.config;
+    const themeConfig =
+      typeof theme.config === "string"
+        ? JSON.parse(theme.config)
+        : theme.config;
 
     // Update store's theme_id
-    await connection.query(
-      "UPDATE stores SET theme_id = ? WHERE id = ?",
-      [theme_id, store_id]
-    );
+    await connection.query("UPDATE stores SET theme_id = ? WHERE id = ?", [
+      theme_id,
+      store_id,
+    ]);
 
     // Update store_theme_settings with theme's config values
-    await connection.query(`
+    await connection.query(
+      `
       UPDATE store_theme_settings
       SET
         theme_id = ?,
@@ -138,37 +165,42 @@ exports.apply_theme = async (req, res, next) => {
         theme_mode = ?,
         buy_now_button_enabled = ?
       WHERE store_id = ?
-    `, [
-      theme_id,
-      themeConfig.primary_color || '#6B46C1',
-      themeConfig.secondary_color || '#FFFFFF',
-      themeConfig.theme_mode || 'Light',
-      themeConfig.buy_now_button_enabled || 1,
-      store_id
-    ]);
+    `,
+      [
+        theme_id,
+        themeConfig.primary_color || "#6B46C1",
+        themeConfig.secondary_color || "#FFFFFF",
+        themeConfig.theme_mode || "Light",
+        themeConfig.buy_now_button_enabled || 1,
+        store_id,
+      ],
+    );
 
     // Fetch theme blocks to initialize landing page
     const [blocks] = await connection.query(
       "SELECT * FROM theme_blocks WHERE theme_id = ? ORDER BY sort_order ASC",
-      [theme_id]
+      [theme_id],
     );
 
     // Build initial landing page components from theme blocks
-    const components = blocks.map(block => ({
+    const components = blocks.map((block) => ({
       id: Date.now() + Math.random(), // unique ID
       type: block.block_type,
-      data: JSON.parse(block.default_config)
+      data: JSON.parse(block.default_config),
     }));
 
     // Update store_configurations.page_settings.landingPage with theme's default components
-    await connection.query(`
+    await connection.query(
+      `
       UPDATE store_configurations
       SET page_settings = JSON_SET(
         COALESCE(page_settings, '{}'),
         '$.landingPage.components', ?
       )
       WHERE store_id = ?
-    `, [JSON.stringify(components), store_id]);
+    `,
+      [JSON.stringify(components), store_id],
+    );
 
     await connection.commit();
     connection.release();
@@ -180,9 +212,9 @@ exports.apply_theme = async (req, res, next) => {
         theme: {
           id: theme.id,
           name: theme.name,
-          applied_at: new Date().toISOString()
-        }
-      }
+          applied_at: new Date().toISOString(),
+        },
+      },
     });
   } catch (error) {
     await connection.rollback();
@@ -198,12 +230,12 @@ exports.get_all_pages = async (req, res, next) => {
     const store_id = req.store_id;
     const [rows] = await pool.query(
       "SELECT id, title, slug, status, sort_order, created_at, updated_at FROM pages WHERE store_id = ? ORDER BY sort_order ASC, updated_at DESC",
-      [store_id]
+      [store_id],
     );
 
     res.status(200).json({
       status: "success",
-      data: { pages: rows }
+      data: { pages: rows },
     });
   } catch (error) {
     console.error("Error fetching pages:", error);
@@ -219,7 +251,7 @@ exports.get_page = async (req, res, next) => {
 
     const [rows] = await pool.query(
       "SELECT * FROM pages WHERE id = ? AND store_id = ?",
-      [id, store_id]
+      [id, store_id],
     );
 
     if (rows.length === 0) {
@@ -228,7 +260,7 @@ exports.get_page = async (req, res, next) => {
 
     const page = rows[0];
     // Parse content JSON if stored as string
-    if (page.content && typeof page.content === 'string') {
+    if (page.content && typeof page.content === "string") {
       try {
         page.content = JSON.parse(page.content);
       } catch (e) {
@@ -238,7 +270,7 @@ exports.get_page = async (req, res, next) => {
 
     res.status(200).json({
       status: "success",
-      data: { page }
+      data: { page },
     });
   } catch (error) {
     console.error("Error fetching page:", error);
@@ -255,10 +287,16 @@ exports.create_page = async (req, res, next) => {
 
     if (!store_id) {
       await connection.rollback();
-      return next(new ApiError(400, "User has no associated store. Please ensure your account is properly set up."));
+      return next(
+        new ApiError(
+          400,
+          "User has no associated store. Please ensure your account is properly set up.",
+        ),
+      );
     }
 
-    const { title, slug, content, meta_title, meta_description, status } = req.body;
+    const { title, slug, content, meta_title, meta_description, status } =
+      req.body;
 
     if (!title || !slug) {
       await connection.rollback();
@@ -268,7 +306,7 @@ exports.create_page = async (req, res, next) => {
     // Check slug uniqueness for this store
     const [existing] = await connection.query(
       "SELECT id FROM pages WHERE store_id = ? AND slug = ?",
-      [store_id, slug]
+      [store_id, slug],
     );
 
     if (existing.length > 0) {
@@ -285,15 +323,15 @@ exports.create_page = async (req, res, next) => {
         slug,
         JSON.stringify(content || { blocks: [] }),
         meta_title || title,
-        meta_description || '',
-        status || 'draft'
-      ]
+        meta_description || "",
+        status || "draft",
+      ],
     );
 
     // Get the newly created page
     const [newPage] = await connection.query(
       "SELECT * FROM pages WHERE id = ?",
-      [result.insertId]
+      [result.insertId],
     );
 
     await connection.commit();
@@ -302,10 +340,10 @@ exports.create_page = async (req, res, next) => {
     res.status(201).json({
       status: "success",
       message: "Page created successfully.",
-      data: { 
+      data: {
         page_id: result.insertId,
-        page: newPage[0]
-      }
+        page: newPage[0],
+      },
     });
   } catch (error) {
     await connection.rollback();
@@ -325,12 +363,13 @@ exports.update_page = async (req, res, next) => {
     await connection.beginTransaction();
     const { id } = req.params;
     const store_id = req.store_id;
-    const { title, slug, content, meta_title, meta_description, status } = req.body;
+    const { title, slug, content, meta_title, meta_description, status } =
+      req.body;
 
     // Verify page exists and belongs to store
     const [existing] = await connection.query(
       "SELECT id FROM pages WHERE id = ? AND store_id = ?",
-      [id, store_id]
+      [id, store_id],
     );
 
     if (existing.length === 0) {
@@ -342,7 +381,7 @@ exports.update_page = async (req, res, next) => {
     if (slug) {
       const [slugCheck] = await connection.query(
         "SELECT id FROM pages WHERE store_id = ? AND slug = ? AND id != ?",
-        [store_id, slug, id]
+        [store_id, slug, id],
       );
 
       if (slugCheck.length > 0) {
@@ -365,11 +404,11 @@ exports.update_page = async (req, res, next) => {
         slug,
         content ? JSON.stringify(content) : JSON.stringify({ blocks: [] }),
         meta_title || title,
-        meta_description || '',
-        status || 'draft',
+        meta_description || "",
+        status || "draft",
         id,
-        store_id
-      ]
+        store_id,
+      ],
     );
 
     await connection.commit();
@@ -377,7 +416,7 @@ exports.update_page = async (req, res, next) => {
 
     res.status(200).json({
       status: "success",
-      message: "Page updated successfully."
+      message: "Page updated successfully.",
     });
   } catch (error) {
     await connection.rollback();
@@ -395,7 +434,7 @@ exports.delete_page = async (req, res, next) => {
 
     const [result] = await pool.query(
       "DELETE FROM pages WHERE id = ? AND store_id = ?",
-      [id, store_id]
+      [id, store_id],
     );
 
     if (result.affectedRows === 0) {
@@ -413,12 +452,13 @@ exports.delete_page = async (req, res, next) => {
 exports.get_public_page = async (req, res, next) => {
   try {
     const { slug } = req.params;
+    console.log("slug >>", slug);
     // store_id is resolved by resolve_store middleware
     const store_id = req.store_id;
 
     const [rows] = await pool.query(
       "SELECT * FROM pages WHERE store_id = ? AND slug = ? AND status = 'published'",
-      [store_id, slug]
+      [store_id, slug],
     );
 
     if (rows.length === 0) {
@@ -426,7 +466,7 @@ exports.get_public_page = async (req, res, next) => {
     }
 
     const page = rows[0];
-    if (page.content && typeof page.content === 'string') {
+    if (page.content && typeof page.content === "string") {
       try {
         page.content = JSON.parse(page.content);
       } catch (e) {
@@ -436,7 +476,7 @@ exports.get_public_page = async (req, res, next) => {
 
     res.status(200).json({
       status: "success",
-      data: { page }
+      data: { page },
     });
   } catch (error) {
     console.error("Error fetching public page:", error);
@@ -455,7 +495,7 @@ exports.reorder_pages = async (req, res, next) => {
     }
 
     // Validate all IDs exist and belong to this store
-    const pageIds = orders.map(o => o.id);
+    const pageIds = orders.map((o) => o.id);
     if (pageIds.length === 0) {
       return next(new ApiError(400, "No pages provided."));
     }
@@ -463,25 +503,30 @@ exports.reorder_pages = async (req, res, next) => {
     // Fetch existing pages to verify ownership
     const [existing] = await pool.query(
       `SELECT id FROM pages WHERE store_id = ? AND id IN (?)`,
-      [store_id, pageIds]
+      [store_id, pageIds],
     );
-    const existingIds = existing.map(p => p.id);
-    const invalidIds = pageIds.filter(id => !existingIds.includes(id));
+    const existingIds = existing.map((p) => p.id);
+    const invalidIds = pageIds.filter((id) => !existingIds.includes(id));
     if (invalidIds.length > 0) {
-      return next(new ApiError(403, `Some pages do not belong to this store: ${invalidIds.join(', ')}`));
+      return next(
+        new ApiError(
+          403,
+          `Some pages do not belong to this store: ${invalidIds.join(", ")}`,
+        ),
+      );
     }
 
     // Update sort_order for each page
     for (const item of orders) {
       await pool.query(
         `UPDATE pages SET sort_order = ? WHERE id = ? AND store_id = ?`,
-        [item.sort_order, item.id, store_id]
+        [item.sort_order, item.id, store_id],
       );
     }
 
     res.status(200).json({
       status: "success",
-      message: "Page order updated successfully."
+      message: "Page order updated successfully.",
     });
   } catch (error) {
     console.error("Error updating page order:", error);

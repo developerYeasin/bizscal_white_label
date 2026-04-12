@@ -23,6 +23,7 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
       'http://localhost:8080',
       'http://localhost:8085',
       'http://localhost:4000',
+      'http://localhost:8087',
       /\.bizscal\.com$/,
     ];
 

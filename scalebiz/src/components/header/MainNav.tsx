@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import {
   DropdownMenu,
@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu.jsx";
 import { Button } from "@/components/ui/button.jsx";
-import { Grid, ShoppingCart, Heart, RefreshCw, Search, ChevronDown } from "lucide-react";
+import { Grid, ShoppingCart, Heart, RefreshCw, Search, ChevronDown, Menu } from "lucide-react";
 import { cn } from "@/lib/utils.js";
 import { showInfo } from "@/utils/toast.js";
 
@@ -21,27 +21,54 @@ interface NavItem {
   menuColumns?: { title: string; path: string; subCategories: { path: string; title: string }[] }[];
 }
 
+interface CategoryItem {
+  id: number;
+  name: string;
+  path: string;
+  imageUrl?: string;
+  subCategories?: { path: string; title: string }[];
+}
+
 interface MainNavProps {
   logoUrl: string;
   navItems: NavItem[];
+  categories?: CategoryItem[];
   showGridIcon: boolean;
   showCartIcon: boolean;
   showWishlistIcon: boolean;
   showCompareIcon: boolean;
   showSearchIcon: boolean;
+  showCategorySidebar: boolean;
+  categorySidebarPosition?: "left" | "right" | "hidden";
   enabled: boolean;
+  onCategorySidebarToggle?: () => void;
 }
 
 const MainNav: React.FC<MainNavProps> = ({
   logoUrl,
   navItems,
+  categories = [],
   showGridIcon,
   showCartIcon,
   showWishlistIcon,
   showCompareIcon,
   showSearchIcon,
+  showCategorySidebar,
+  categorySidebarPosition = "left",
   enabled,
+  onCategorySidebarToggle,
 }) => {
+  const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
+
+  // Debug logging
+  console.log("MainNav props:", {
+    enabled,
+    showCategorySidebar,
+    categorySidebarPosition,
+    categoriesCount: categories?.length,
+    categories: categories?.slice(0, 3),
+  });
+
   if (!enabled) return null;
 
   return (
@@ -51,6 +78,44 @@ const MainNav: React.FC<MainNavProps> = ({
           <Link to="/" className="flex items-center">
             <img src={logoUrl} alt="Shop Logo" className="h-8 w-auto" />
           </Link>
+          
+          {/* Category Dropdown */}
+          {showCategorySidebar && categories && categories.length > 0 && (
+            <DropdownMenu open={isCategoryDropdownOpen} onOpenChange={setIsCategoryDropdownOpen}>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="text-base font-medium flex items-center gap-2"
+                >
+                  <Menu className="h-4 w-4" />
+                  All Categories
+                  <ChevronDown className="ml-1 h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-[300px] p-0">
+                {categories.map((category) => (
+                  <DropdownMenuItem key={category.id} asChild className="cursor-pointer">
+                    <Link to={category.path} onClick={() => setIsCategoryDropdownOpen(false)}>
+                      <div className="flex items-center gap-3">
+                        {category.imageUrl && (
+                          <img
+                            src={category.imageUrl}
+                            alt={category.name}
+                            className="h-8 w-8 object-cover rounded"
+                          />
+                        )}
+                        <span className="flex-1">{category.name}</span>
+                        {category.subCategories && category.subCategories.length > 0 && (
+                          <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                        )}
+                      </div>
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+          
           <ul className="hidden lg:flex items-center space-x-6">
             {navItems.map((item, index) => (
               <li key={index}>

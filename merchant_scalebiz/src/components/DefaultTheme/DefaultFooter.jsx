@@ -76,7 +76,7 @@ const DefaultFooter = ({ layout, copyrightText, socialLinks, logoUrl, storeName 
                 </div>
               )}
               <div className="flex space-x-4 mt-4">
-                {socialLinks.map((link, index) => (
+                {socialLinks && socialLinks.map((link, index) => (
                   <SocialIcon key={index} platform={link.platform} url={link.url} />
                 ))}
               </div>
@@ -103,7 +103,7 @@ const DefaultFooter = ({ layout, copyrightText, socialLinks, logoUrl, storeName 
           <p className="text-sm text-muted-foreground mb-4 md:mb-0 ">{copyrightText}</p>
           {layoutStyle !== "detailed-info" && (
             <div className="flex space-x-4 md:hidden">
-              {socialLinks.map((link, index) => (
+              {socialLinks && socialLinks.map((link, index) => (
                 <SocialIcon key={index} platform={link.platform} url={link.url} />
               ))}
             </div>

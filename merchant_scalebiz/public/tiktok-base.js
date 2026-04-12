@@ -50,5 +50,9 @@
   s.async = !0;
   s.src = "https://analytics.tiktok.com/i18n/pixel/sdk.js?sdkid=" + t.toLowerCase();
   var sn = d.getElementsByTagName(t)[0];
-  sn.parentNode.insertBefore(s, sn);
-}(window, document, 'ttq');
+  if (sn && sn.parentNode) {
+    sn.parentNode.insertBefore(s, sn);
+  } else {
+    d.head.appendChild(s);
+  }
+}(window, document, 'script');

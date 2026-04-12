@@ -6,7 +6,7 @@ import path from "path";
 export default defineConfig(() => ({
   server: {
     host: "::",
-    port: 8085,
+    port: 8087,
   },
   plugins: [
     // dyadComponentTagger(), // DISABLED for CSP compliance

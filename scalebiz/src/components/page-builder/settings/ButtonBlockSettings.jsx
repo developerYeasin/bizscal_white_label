@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input.jsx";
 import { Label } from "@/components/ui/label.jsx";
 import CollapsibleCard from "@/components/ui/CollapsibleCard.jsx";
 
-const ButtonBlockSettings = ({ component, updateNested }) => {
+const ButtonBlockSettings = ({ component, updateNested, activeTab }) => {
   if (!component) return null;
   const data = component.data || {};
 
@@ -13,19 +13,9 @@ const ButtonBlockSettings = ({ component, updateNested }) => {
     updateNested(`data.${field}`, value);
   };
 
-  return (
-    <CollapsibleCard title="Button Settings" defaultOpen={true}>
+  if (activeTab === "actions") {
+    return (
       <div className="space-y-4">
-        <div>
-          <Label className="text-xs">Button Text</Label>
-          <Input
-            value={data.text || ""}
-            onChange={(e) => handleChange("text", e.target.value)}
-            className="text-sm mt-1"
-            placeholder="Enter button text..."
-          />
-        </div>
-
         <div>
           <Label className="text-xs">Link URL</Label>
           <Input
@@ -35,7 +25,13 @@ const ButtonBlockSettings = ({ component, updateNested }) => {
             placeholder="https://..."
           />
         </div>
+      </div>
+    );
+  }
 
+  if (activeTab === "styles") {
+    return (
+      <div className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
           <div>
             <Label className="text-xs">Variant</Label>
@@ -113,7 +109,21 @@ const ButtonBlockSettings = ({ component, updateNested }) => {
           </div>
         </div>
       </div>
-    </CollapsibleCard>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <Label className="text-xs">Button Text</Label>
+        <Input
+          value={data.text || ""}
+          onChange={(e) => handleChange("text", e.target.value)}
+          className="text-sm mt-1"
+          placeholder="Enter button text..."
+        />
+      </div>
+    </div>
   );
 };
 
